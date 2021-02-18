@@ -3,7 +3,7 @@ local background = setmetatable({}, require("background.background"))
 local lg, lm = love.graphics, love.math
 local insert, remove = table.insert, table.remove
 
-local width, height = love.window.getSafeArea()
+local _, _, width, height = love.window.getSafeArea()
 
 local maxSize = width > height and height / 2 or width / 2
 local minSize = maxSize / 4
@@ -65,7 +65,7 @@ background.draw = function()
 end
 
 background.resize = function(windowWidth, windowHeight)
-    width, height = love.window.getSafeArea()
+    _, _, width, height = love.window.getSafeArea()
     maxSize = width > height and height / 2 or width / 2
     minSize = maxSize / 4
 end

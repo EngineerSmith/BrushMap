@@ -63,8 +63,10 @@ anchor.position = function(self, anchorWidth, anchorHeight, windowWidth, windowH
     local centerX = floor(windowWidth / 2) - floor(anchorWidth / 2)
     local centerY = floor(windowHeight / 2) - floor(anchorHeight / 2)
     
-    local x = self.x + self.horizontal
-    local y = self.y + self.vertical
+    local safeX, safeY = love.window.getSafeArea()
+    
+    local x = self.x + self.horizontal + safeX
+    local y = self.y + self.vertical + safeY
     
     if self.point == anchor.points.Center then
         return centerX + x, centerY + y
