@@ -1,7 +1,6 @@
-local background = require("background.background")
+local background = setmetatable({}, require("background.background"))
+
 local lg, lm = love.graphics, love.math
-local insert = table.insert
-local remove = table.remove
 
 local maxSize = lg.getWidth() > lg.getHeight() and lg.getHeight()/2 or lg.getWidth()/2
 local minSize = maxSize/4
@@ -19,8 +18,8 @@ local createCircle = function(index)
         alphaMaxTime = lm.random(minTime, maxTime),
         alphaTime = 0,
         size = lm.random(minSize, maxSize),
-        x = lm.random(0-minSize/2, lg.getWidth()+minSize/2),
-        y = lm.random(0-minSize/2, lg.getHeight()+minSize/2),
+        x = lm.random(0-minSize/4, lg.getWidth()+minSize/2),
+        y = lm.random(0-minSize/4, lg.getHeight()+minSize/2),
     }
     circles[index] = circle
 end
@@ -36,8 +35,8 @@ local updateCircle = function(dt, circle, index)
 end
 
 local drawCircle = function(circle)
-    local c = circle.color
-    lg.setColor(c, c ,c, circle.alpha)
+    local c = circle.color * circle.alpha
+    lg.setColor(c, c ,c, 1)
     lg.circle("fill", circle.x, circle.y, circle.size)
 end
 

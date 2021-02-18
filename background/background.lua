@@ -1,4 +1,6 @@
 local background = {}
+background.__index = background
+
 local lg = love.graphics
 
 background.load = function() end
