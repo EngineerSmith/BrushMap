@@ -19,11 +19,16 @@ anchor.__index = anchor
 anchor.new = function(point, x, y, width, height, horizontal, vertical)
     local self = setmetatable({}, anchor)
     
+    if point == "Centre" then -- I keep writting it the British way
+        error("Did you mean Center not Centre?")
+    end
+    
     self.point = anchor.points[point] or error("Anchor requires point")
     self.x = x or error("Anchor requires position X")
     self.y = y or error("Anchor requires position Y")
-    self.horizontal = horizontal or 0 
+    self.horizontal = horizontal or 0 -- Padding
     self.vertical = vertical or 0
+    self.rect = {}
     
     if type(width) == "number" then
        self.width = {min=width,max=width}
@@ -54,42 +59,46 @@ anchor.length = function(side, padding, windowLength)
     end
 end
 
-anchor.position = function(anchor, anchorWidth, anchorHeight, windowWidth, windowHeight)
+anchor.position = function(self, anchorWidth, anchorHeight, windowWidth, windowHeight)
     local centerX = floor(windowWidth / 2) - floor(anchorWidth / 2)
-    local centreY = floor(windowHeight / 2) - floor(anchorHeight / 2)
+    local centerY = floor(windowHeight / 2) - floor(anchorHeight / 2)
     
-    local x = anchor.x + anchor.horizontal
-    local y = anchor.y + anchor.vertical
+    local x = self.x + self.horizontal
+    local y = self.y + self.vertical
     
-    if anchor.point == anchor.point.Center then
+    if self.point == anchor.points.Center then
         return centerX + x, centerY + y
-    elseif anchor.point == anchor.point.North then
+    elseif self.point == anchor.points.North then
         return centerX + x, y
-    elseif anchor.point == anchor.point.NorthWest then
+    elseif self.point == anchor.points.NorthWest then
         return x, y
-    elseif anchor.point == anchor.point.West then
+    elseif self.point == anchor.points.West then
         return x, centerY + y
-    elseif anchor.point == anchor.point.SouthWest then
-        return x, windowHeight - y
-    elseif anchor.point == anchor.point.South then
-        return centerX + x, windowHeight - y
-    elseif anchor.point == anchor.point.SouthEast then
-        return windowWidth - x, windowHeight - y
-    elseif anchor.point == anchor.point.East then
-        return windowWidth - x, centerY + y
-    elseif anchor.point == anchor.point.NorthEast then
-        return windowWidth - x, y
+    elseif self.point == anchor.points.SouthWest then
+        return x, windowHeight - y - anchorHeight
+    elseif self.point == anchor.points.South then
+        return centerX + x, windowHeight - y - anchorHeight
+    elseif self.point == anchor.points.SouthEast then
+        return windowWidth - x - anchorWidth, windowHeight - y - anchorHeight
+    elseif self.point == anchor.points.East then
+        return windowWidth - x - anchorWidth, centerY + y
+    elseif self.point == anchor.points.NorthEast then
+        return windowWidth - x - anchorWidth, y
     end
     error("Unknown anchor point given")
 end
 
-anchor.rect = function(self, windowWidth, windowHeight)
-   local width = anchor.length(self.width, self.horizontal, windowWidth)
-   local height = anchor.length(self.height, self.vertical, windowHeight)
-   
-   local x, y = anchor.position(self, width, height, windowWidth, windowHeight)
-   
-   return x, y, width, height 
+anchor.resize = function(self, windowWidth, windowHeight)
+    local width = anchor.length(self.width, self.horizontal, windowWidth)
+    local height = anchor.length(self.height, self.vertical, windowHeight)
+    
+    local x, y = self:position(width, height, windowWidth, windowHeight)
+    
+    self.rect[1], self.rect[2], self.rect[3], self.rect[4] = x, y, width, height
+end
+
+anchor.getRect = function(self)
+   return self.rect[1], self.rect[2], self.rect[3], self.rect[4] 
 end
 
 return anchor
