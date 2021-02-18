@@ -27,7 +27,7 @@ anchor.new = function(point, x, y, width, height, horizontal, vertical)
     
     if type(width) == "number" then
        self.width = {min=width,max=width}
-    else then
+    else
         self.width = type(width) == "table" and width or {}
         self.width.min = self.width.min or 0
         self.width.max = self.width.max or 0
@@ -35,7 +35,7 @@ anchor.new = function(point, x, y, width, height, horizontal, vertical)
     
     if type(height) == "number" then
        self.height = {min=height,max=height}
-    else then
+    else
         self.height = type(height) == "table" and height or {}
         self.height.min = self.height.min or 0
         self.height.max = self.height.max or 0
@@ -83,7 +83,7 @@ anchor.position = function(anchor, anchorWidth, anchorHeight, windowWidth, windo
     error("Unknown anchor point given")
 end
 
-anchor:rect = function(windowWidth, windowHeight)
+anchor.rect = function(self, windowWidth, windowHeight)
    local width = anchor.length(self.width, self.horizontal, windowWidth)
    local height = anchor.length(self.height, self.vertical, windowHeight)
    

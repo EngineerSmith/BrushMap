@@ -3,6 +3,8 @@ local lg = love.graphics
 
 scene.background = require("background.circles")
 
+local anchor = require("ui.anchor")
+
 scene.load = function()
     scene.background.load(7)
 end
