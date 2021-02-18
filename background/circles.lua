@@ -1,49 +1,51 @@
 local background = setmetatable({}, require("background.background"))
 
 local lg, lm = love.graphics, love.math
+local insert, remove = table.insert, table.remove
 
 local maxSize = lg.getWidth() > lg.getHeight() and lg.getHeight()/2 or lg.getWidth()/2
 local minSize = maxSize/4
 
-local minTime, maxTime = 4, 7
+local minTime, maxTime, timeDp = 40, 70, 1
 
-local minColor, maxColor, colorDp = 10, 18, 2
+local minColor, maxColor, colorDp = 15, 23, 2
 
 local circles = {}
 
-local createCircle = function(index)
+local createCircle = function()
     local circle = {
         color = lm.random(minColor, maxColor) / (10 ^ colorDp),
         alpha = 0, 
-        alphaMaxTime = lm.random(minTime, maxTime),
+        alphaMaxTime = lm.random(minTime, maxTime) / (10 ^ timeDp),
         alphaTime = 0,
         size = lm.random(minSize, maxSize),
         x = lm.random(0-minSize/4, lg.getWidth()+minSize/2),
         y = lm.random(0-minSize/4, lg.getHeight()+minSize/2),
     }
-    circles[index] = circle
+    insert(circles, circle)
 end
 
 local updateCircle = function(dt, circle, index)
     circle.alphaTime = circle.alphaTime + dt
     
     if circle.alphaTime >= circle.alphaMaxTime then
-        createCircle(index)
+        remove(circles, index)
+        createCircle()
     end
     
     circle.alpha = circle.alphaTime / circle.alphaMaxTime + 0.3
 end
 
 local drawCircle = function(circle)
-    local c = circle.color * circle.alpha
+    local c = circle.color * (1-circle.alpha)
     lg.setColor(c, c ,c, 1)
     lg.circle("fill", circle.x, circle.y, circle.size)
 end
 
 background.load = function(numberOfCircles)
     numberOfCircles = numberOfCircles or 0
-    for i=1, numberOfCircles do
-        createCircle(i)
+    for _=1, numberOfCircles do
+        createCircle()
     end
 end
 

@@ -4,7 +4,7 @@ local lg = love.graphics
 scene.background = require("background.circles")
 
 scene.load = function()
-    scene.background.load(3)
+    scene.background.load(7)
 end
 
 scene.update = function(dt) 
