@@ -11,4 +11,6 @@ background.draw = function()
     lg.print("NO BACKGROUND SET.", lg.getWidth()/2, lg.getHeight()/2)
 end
 
+background.resize = function(width, height) end
+
 return background

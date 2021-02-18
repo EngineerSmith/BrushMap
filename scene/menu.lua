@@ -13,7 +13,7 @@ scene.load = function()
     scene.anchorManager = anchorManager.new()
     
     local anchor = anchor.new("Center", 0, 0, 100, 100)
-    scene.anchorManager:add(anchor, lg.getWidth(), lg.getHeight())
+    scene.anchorManager:add(anchor, love.window.getSafeArea())
     
     scene.button = button.new(anchor)
     scene.button:addText("Hello World")
@@ -32,8 +32,8 @@ scene.draw = function()
 end
 
 scene.resize = function(windowWidth, windowHeight)
-    scene.anchorManager:resize(windowWidth, windowHeight
-        ) 
+    scene.background.resize(windowHeight, windowHeight)
+    scene.anchorManager:resize(love.window.getSafeArea()) 
 end
 
 return scene

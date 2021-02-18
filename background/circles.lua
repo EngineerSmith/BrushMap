@@ -3,8 +3,10 @@ local background = setmetatable({}, require("background.background"))
 local lg, lm = love.graphics, love.math
 local insert, remove = table.insert, table.remove
 
-local maxSize = lg.getWidth() > lg.getHeight() and lg.getHeight()/2 or lg.getWidth()/2
-local minSize = maxSize/4
+local width, height = love.window.getSafeArea()
+
+local maxSize = width > height and height / 2 or width / 2
+local minSize = maxSize / 4
 
 local minTime, maxTime, timeDp = 40, 70, 1
 
@@ -19,8 +21,8 @@ local createCircle = function()
         alphaMaxTime = lm.random(minTime, maxTime) / (10 ^ timeDp),
         alphaTime = 0,
         size = lm.random(minSize, maxSize),
-        x = lm.random(0-minSize/4, lg.getWidth()+minSize/2),
-        y = lm.random(0-minSize/4, lg.getHeight()+minSize/2),
+        x = lm.random(0 - minSize / 4, width + minSize / 2),
+        y = lm.random(0 - minSize / 4, height + minSize / 2),
     }
     insert(circles, circle)
 end
@@ -44,7 +46,7 @@ end
 
 background.load = function(numberOfCircles)
     numberOfCircles = numberOfCircles or 0
-    for _=1, numberOfCircles do
+    for _ = 1, numberOfCircles do
         createCircle()
     end
 end
@@ -60,6 +62,12 @@ background.draw = function()
     for _, circle in ipairs(circles) do
         drawCircle(circle)
     end
+end
+
+background.resize = function(windowWidth, windowHeight)
+    width, height = love.window.getSafeArea()
+    maxSize = width > height and height / 2 or width / 2
+    minSize = maxSize / 4
 end
 
 return background
