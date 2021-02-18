@@ -8,24 +8,19 @@ local minSize = maxSize/4
 
 local minTime, maxTime = 4, 7
 
-local colors = {
-    3,
-    {0.07, 0.07, 0.07},
-    {0.08, 0.08, 0.08},
-    {0.10, 0.10, 0.10},
-}
+local minColor, maxColor, colorDp = 10, 18, 2
 
 local circles = {}
 
 local createCircle = function(index)
     local circle = {
-        color = colors[lm.random(2,colors[1])],
-        alpha = 1, 
+        color = lm.random(minColor, maxColor) / (10 ^ colorDp),
+        alpha = 0, 
         alphaMaxTime = lm.random(minTime, maxTime),
         alphaTime = 0,
         size = lm.random(minSize, maxSize),
-        x = lm.random(0-minSize, lg.getWidth()+minSize),
-        y = lm.random(0-minSize, lg.getHeight()+minSize),
+        x = lm.random(0-minSize/2, lg.getWidth()+minSize/2),
+        y = lm.random(0-minSize/2, lg.getHeight()+minSize/2),
     }
     circles[index] = circle
 end
@@ -37,11 +32,12 @@ local updateCircle = function(dt, circle, index)
         createCircle(index)
     end
     
-    circle.alpha = circle.alphaTime / circle.alphaMaxTime
+    circle.alpha = circle.alphaTime / circle.alphaMaxTime + 0.3
 end
 
 local drawCircle = function(circle)
-    lg.setColor(circle.color, circle.alpha)
+    local c = circle.color
+    lg.setColor(c, c ,c, circle.alpha)
     lg.circle("fill", circle.x, circle.y, circle.size)
 end
 
