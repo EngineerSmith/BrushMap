@@ -16,7 +16,7 @@ scene.load = function()
     
     --TODO brain storm and review how buttons and being made
     
-    --Ui manager? Better draw and update
+    --Ui manager? Better draw and update.
     --pass manager into constructor to let it add itself?
     
     local anchor = anchor.new("Center", -120, -20, 200, 100)
