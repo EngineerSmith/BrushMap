@@ -28,6 +28,8 @@ end
 button.addImage = function(self, image, color)
     self.image = image
     self.imageColor = color or {1,1,1}
+    local width, height = image:getWidth(), image:getHeight()
+    self.imageLength = width > height and height or width
 end
 
 button.setOutline = function(self, enabled, distance, lineSize)
@@ -71,8 +73,9 @@ button.draw = function(self)
     
     if self.image then
         lg.setColor(self.imageColor)
-        x, y = x + floor(self.image.getWidth()/2), y + floor(self.image.getWidth()/2)
-        lg.draw(self.image, x, y)
+        --x, y = x + floor(self.image:getWidth()/2), y + floor(self.image:getWidth()/2)
+        local s = (width > height and height or width) / self.imageLength
+        lg.draw(self.image, x, y, 0, s,s)
     end
     
     lg.setColor(1,1,1)

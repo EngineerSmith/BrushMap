@@ -1,5 +1,7 @@
 local floor = math.floor
 
+--TODO add inheritence, anchors can move within anchors
+
 local anchor = {
     points = {
         Center = 0,

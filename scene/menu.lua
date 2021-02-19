@@ -43,19 +43,19 @@ scene.load = function()
     scene.buttonLoad:setOutline(true, 2, 1)
     scene.buttonLoad:setRoundCorner(7)
     
-    local anchor = anchor.new("SouthWest", 15, 15, 100, 100)
+    local anchor = anchor.new("SouthWest", 15, 15, {min=50,max=150}, {min=50,max=150})
     scene.anchorManager:add(anchor, width, height)
     
     scene.buttonLanguage = button.new(anchor)
-    scene.buttonLanguage:addText("Language")
+    scene.buttonLanguage:addImage(lg.newImage("assets/wireframe-globe.png")) --TODO lily
     scene.buttonLanguage:setOutline(true, 2, 1)
     scene.buttonLanguage:setRoundCorner(7)
     
-    local anchor = anchor.new("SouthEast", 15, 15, 100, 100)
+    local anchor = anchor.new("SouthEast", 15, 15, {min=50,max=150}, {min=50,max=150})
     scene.anchorManager:add(anchor, width, height)
     
     scene.buttonHelp = button.new(anchor)
-    scene.buttonHelp:addText("Help")
+    scene.buttonHelp:addImage(lg.newImage("assets/help.png"))
     scene.buttonHelp:setOutline(true, 2, 1)
     scene.buttonHelp:setRoundCorner(7)
     
