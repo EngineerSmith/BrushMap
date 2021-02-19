@@ -1,0 +1,3 @@
+[submodule "lib/lily"]
+	path = lib/lily
+	url = https://github.com/MikuAuahDark/lily
