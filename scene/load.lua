@@ -9,12 +9,11 @@ scene.update = function()
     end
 end
 
-local maxWidth = 100
+local maxWidth, lineDistance = 100, 4
 
 scene.draw = function() 
     local width = (lily:getLoadedCount() / lily:getCount()) * maxWidth
     lg.setColor(1,1,1)
-    local lineDistance = 4
     lg.rectangle("line", 50-lineDistance,50-lineDistance,maxWidth+(lineDistance*2),5+(lineDistance*2))
     lg.rectangle("fill", 50,50,width,5)
 end

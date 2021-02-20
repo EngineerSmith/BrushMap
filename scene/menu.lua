@@ -22,6 +22,14 @@ scene.draw = function()
     scene.uiwindow:draw()
 end
 
+scene.touchpressed = function(id, x, y, dx, dy, pressure)
+    scene.uiwindow:touchpressed(id, x, y, dx, dy, pressure)
+end
+
+scene.touchreleased = function(id, x, y, dx, dy, pressure)
+    scene .uiwindow:touchreleased(id, x, y, dx, dy, pressure)
+end
+
 scene.resize = function(windowWidth, windowHeight)
     scene.background.resize(windowHeight, windowHeight)
     

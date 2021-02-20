@@ -40,7 +40,7 @@ button.setRoundCorner = function(self, round)
    self.rectCorner = round or 0 
 end
 
-button.touchPressedElement = function(self, pressedX, pressedY)
+button.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
     local x, y, w, h = self.anchor:rect()
     if pressedX > x and pressedX < x + w and
        pressedY > y and pressedY < y + h then
@@ -49,7 +49,7 @@ button.touchPressedElement = function(self, pressedX, pressedY)
     end
     return false
 end
-    
+
 button.drawElement = function(self)
     local x, y, width, height = self.anchor:getRect()
     

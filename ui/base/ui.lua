@@ -61,37 +61,37 @@ ui.drawElement = function(self) end
 
 -- EVENTS
 
-ui.touchPressed = function(self, x, y)
-    return self:touchPressedChildren(x, y) or self:touchPressedElement(x, y)
+ui.touchpressed = function(self, id, x, y, dx, dy, pressure)
+    return self:touchpressedChildren(x, y) or self:touchpressedElement(id, x, y, dx, dy, pressure)
 end
 
-ui.touchPressedChildren = function(self, x, y) 
+ui.touchpressedChildren = function(self, id, x, y, dx, dy, pressure) 
     for _, child in ipairs(self.children) do
-        if child:touchPressed(x, y) then
+        if child:touchpressed(id, x, y, dx, dy, pressure) then
             return true
         end
     end
     return false
 end
 
-ui.touchPressedElement = function(self, x, y)
+ui.touchpressedElement = function(self, id, x, y, dx, dy, pressure)
     return false
 end
 
-ui.touchReleased = function(self, x, y)
-    return self:touchReleasedChildren(x, y) or self:touchReleasedElement(x, y)
+ui.touchreleased = function(self, id, x, y, dx, dy, pressure)
+    return self:touchreleasedChildren(id, x, y, dx, dy, pressure) or self:touchreleasedElement(id, x, y, dx, dy, pressure)
 end
 
-ui.touchReleasedChildren = function(self, x, y)
+ui.touchreleasedChildren = function(self, id, x, y, dx, dy, pressure)
     for _, child in ipairs(self.children) do
-        if child:touchReleased(x, y) then
+        if child:touchreleased(id, x, y, dx, dy, pressure) then
             return true
         end
     end
     return false
 end
 
-ui.touchReleasedElement = function(self, x, y)
+ui.touchreleasedElement = function(self, id, x, y, dx, dy, pressure)
     return false
 end
 
