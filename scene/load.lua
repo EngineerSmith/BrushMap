@@ -1,7 +1,7 @@
 local scene = {}
 local lg = love.graphics
 
-local lilly = require("utilities.lilyLoader")
+local lily = require("utilities.lilyLoader")
 
 scene.update = function()
     if lily:isComplete() then

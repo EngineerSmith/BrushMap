@@ -3,6 +3,6 @@ return {
         version = "0.1",
         name = "BrushMap",
     },
-    assetDir = "assets",
+    assetsDir = "assets",
     assets = {},
 }

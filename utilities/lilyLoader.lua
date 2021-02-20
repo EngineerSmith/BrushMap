@@ -1,6 +1,7 @@
 local lily = require("lib.lily.lily")
 
 local global = require("global")
+local insert = table.insert
 
 local lilyLoaders = {
     png  = "newImage",
@@ -22,7 +23,7 @@ local function splitFileExtension(strFilename)
 end
 
 local loadAssets = function()
-    local assetTable = require(global.assetDir..".assets")
+    local assetTable = require(global.assetsDir..".assets")
     
     local lilyTable = {}
     for _, asset in ipairs(assetTable) do
