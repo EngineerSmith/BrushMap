@@ -1,6 +1,8 @@
 local window = require("ui.base.window")
 local menu = window.new()
 
+local global = require("global")
+
 local anchor = require("ui.base.anchor")
 
 local button = require("ui.button")
@@ -31,7 +33,7 @@ menu:addChild(buttonLoad)
 
 local anchor = anchor.new("SouthWest", 15, 15, {min=50,max=150}, {min=50,max=150})
 local buttonLanguage = button.new(anchor)
-buttonLanguage:addImage(love.graphics.newImage("assets/wireframe-globe.png")) --TODO lily
+buttonLanguage:addImage(global.assets["icon.language"])
 buttonLanguage:setOutline(true, 2, 1)
 buttonLanguage:setRoundCorner(7)
 
@@ -39,7 +41,7 @@ menu:addChild(buttonLanguage)
 
 local anchor = anchor.new("SouthEast", 15, 15, {min=50,max=150}, {min=50,max=150})
 local buttonHelp = button.new(anchor)
-buttonHelp:addImage(love.graphics.newImage("assets/help.png"))
+buttonHelp:addImage(global.assets["icon.help"])
 buttonHelp:setOutline(true, 2, 1)
 buttonHelp:setRoundCorner(7)
 

@@ -27,7 +27,7 @@ local loadAssets = function()
     local lilyTable = {}
     for _, asset in ipairs(assetTable) do
         local extension = splitFileExtension(asset[2])
-        insert(lilyTable, {lilyLoaders[extension], asset[2]})
+        insert(lilyTable, {lilyLoaders[extension], global.assetsDir .. "/" .. asset[2]})
     end
     
     local lilyMulti = lily.loadMulti(lilyTable)
