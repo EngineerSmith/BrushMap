@@ -1,12 +1,16 @@
-local ui = {
-    children = {},
-    parent = nil,
-}
+local ui = {}
 ui.__index = ui
 
 local insert = table.insert
 
-ui.new = function() 
+ui.new = function(anchor) 
+    local self = {
+        children = {},
+        parent = nil,
+        anchor = anchor or error("UI requires anchor"),
+    }
+    
+    return setmetatable(self, ui)
 end
 
 ui.addChild = function(self, child)
@@ -16,9 +20,18 @@ ui.addChild = function(self, child)
     
     insert(self.children, child)
     child.parent = self
-    
-    --TODO recalculate child's anchor
 end
+
+ui.updateAnchor = function(self, windowWidth, windowLength, offsetX, offsetY)
+    offsetX, offsetY = offsetX or 0, offsetY or 0
+    local x, y, width, height = self.anchor:calculate(offsetX, offsetY, windowWidth, windowLength)
+    offsetX, offsetY = offsetX + x, offsetY + y
+    for _, child in ipairs(self.children) do
+        child:updateAnchor(width, height, offsetX, offsetY)
+    end
+end
+
+-- Functions ending in Element are to be overriden
 
 ui.update = function(self, dt) 
     self:updateElement(dt)

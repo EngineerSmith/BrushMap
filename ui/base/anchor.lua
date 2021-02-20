@@ -1,7 +1,5 @@
 local floor = math.floor
 
---TODO add inheritence, anchors can move within anchors
-
 local anchor = {
     points = {
         Center = 0,
@@ -21,7 +19,7 @@ anchor.__index = anchor
 anchor.new = function(point, x, y, width, height, horizontal, vertical)
     local self = setmetatable({}, anchor)
     
-    if point == "Centre" then -- I keep writting it the British way
+    if point == "Centre" then -- I keep writing it the British way
         error("Did you mean Center not Centre?")
     end
     
@@ -52,6 +50,11 @@ anchor.new = function(point, x, y, width, height, horizontal, vertical)
 end
 
 anchor.length = function(side, padding, windowLength)
+    
+    if side.max == -1 then
+       return windowLength 
+    end
+    
     if side.max + padding <= windowLength then
         return side.max
     elseif side.min + padding <= windowLength then
@@ -65,10 +68,11 @@ anchor.position = function(self, anchorWidth, anchorHeight, windowWidth, windowH
     local centerX = floor(windowWidth / 2) - floor(anchorWidth / 2)
     local centerY = floor(windowHeight / 2) - floor(anchorHeight / 2)
     
-    local safeX, safeY = love.window.getSafeArea()
+    --TODO research what safeArea's x and y is 
+    -- local safeX, safeY = love.window.getSafeArea()
     
-    local x = self.x + self.horizontal + safeX
-    local y = self.y + self.vertical + safeY
+    local x = self.x + self.horizontal -- + safeX
+    local y = self.y + self.vertical --+ safeY
     
     if self.point == anchor.points.Center then
         return centerX + x, centerY + y
@@ -92,17 +96,20 @@ anchor.position = function(self, anchorWidth, anchorHeight, windowWidth, windowH
     error("Unknown anchor point given")
 end
 
-anchor.resize = function(self, windowWidth, windowHeight)
+anchor.calculate = function(self, offsetX, offsetY, windowWidth, windowHeight)
+    
     local width = anchor.length(self.width, self.horizontal, windowWidth)
     local height = anchor.length(self.height, self.vertical, windowHeight)
     
     local x, y = self:position(width, height, windowWidth, windowHeight)
     
-    self.rect[1], self.rect[2], self.rect[3], self.rect[4] = x, y, width, height
+    self.rect[1], self.rect[2], self.rect[3], self.rect[4] = x + offsetX, y + offsetY, width, height
+    
+    return self.rect[1], self.rect[2], self.rect[3], self.rect[4]
 end
 
 anchor.getRect = function(self)
-   return self.rect[1], self.rect[2], self.rect[3], self.rect[4] 
+   return self.rect[1], self.rect[2], self.rect[3], self.rect[4]
 end
 
 return anchor

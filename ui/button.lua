@@ -1,16 +1,14 @@
-local button = {}
+local ui = require("ui.base.ui")
+local button = setmetatable({}, {__index=ui})
 button.__index = button
 
 local lg = love.graphics
 local floor = math.floor
 local nilFunc = function() end
 
---TODO STATES?
-
 button.new = function(anchor, color, callback)
-    local self = setmetatable({}, button)
+    local self = setmetatable(ui.new(anchor), button)
     
-    self.anchor = anchor
     self.color = color or {0.4,0.4,0.4}
     self.callback = callback or nilFunc
     self.rectCorner = 0
@@ -42,7 +40,7 @@ button.setRoundCorner = function(self, round)
    self.rectCorner = round or 0 
 end
 
-button.pressed = function(self, pressedX, pressedY)
+button.touchPressedElement = function(self, pressedX, pressedY)
     local x, y, w, h = self.anchor:rect()
     if pressedX > x and pressedX < x + w and
        pressedY > y and pressedY < y + h then
@@ -52,7 +50,7 @@ button.pressed = function(self, pressedX, pressedY)
     return false
 end
     
-button.draw = function(self)
+button.drawElement = function(self)
     local x, y, width, height = self.anchor:getRect()
     
     lg.setColor(self.color)
@@ -73,7 +71,6 @@ button.draw = function(self)
     
     if self.image then
         lg.setColor(self.imageColor)
-        --x, y = x + floor(self.image:getWidth()/2), y + floor(self.image:getWidth()/2)
         local s = (width > height and height or width) / self.imageLength
         lg.draw(self.image, x, y, 0, s,s)
     end
