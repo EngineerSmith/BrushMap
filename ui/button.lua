@@ -41,7 +41,7 @@ button.setRoundCorner = function(self, round)
 end
 
 button.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
-    local x, y, w, h = self.anchor:rect()
+    local x, y, w, h = self.anchor:getRect()
     if pressedX > x and pressedX < x + w and
        pressedY > y and pressedY < y + h then
         self.callback()

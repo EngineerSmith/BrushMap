@@ -1,4 +1,7 @@
 local scene = {}
+
+local global = require("global")
+
 local lg = love.graphics
 
 scene.background = require("background.circles")
@@ -17,7 +20,7 @@ end
 scene.draw = function()
     scene.background.draw()
     lg.setColor(1,1,1,1)
-    lg.print("BrushMap 0.1", 5, 30)
+    lg.print(global.info.name .. " " .. global.info.version, 5, 30)
     
     scene.uiwindow:draw()
 end

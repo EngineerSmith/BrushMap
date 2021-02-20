@@ -62,7 +62,7 @@ ui.drawElement = function(self) end
 -- EVENTS
 
 ui.touchpressed = function(self, id, x, y, dx, dy, pressure)
-    return self:touchpressedChildren(x, y) or self:touchpressedElement(id, x, y, dx, dy, pressure)
+    return self:touchpressedChildren(id, x, y, dx, dy, pressure) or self:touchpressedElement(id, x, y, dx, dy, pressure)
 end
 
 ui.touchpressedChildren = function(self, id, x, y, dx, dy, pressure) 
