@@ -66,7 +66,11 @@ button.drawElement = function(self)
     
     if self.text then
         lg.setColor(self.textColor)
-        lg.print(self.text, x, y) --TODO text allignment
+        if self.font then
+            lg.print(self.text, self.font, x, y)
+        else
+            lg.print(self.text, x, y) --TODO text allignment
+        end
     end
     
     if self.image then
