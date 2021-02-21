@@ -43,7 +43,7 @@ end
 button.setOutline = function(self, enabled, distance, lineSize)
     self.lineEnabled = enabled or false
     self.lineDistance = distance or 2
-    self.lineSize = lineSize or 1 --TODO add lineSize
+    self.lineSize = lineSize or 1
 end
 
 button.setRoundCorner = function(self, round)
