@@ -2,6 +2,9 @@ local ui = require("ui.base.ui")
 local button = setmetatable({}, {__index=ui})
 button.__index = button
 
+local anchor = require("ui.base.anchor")
+local imageUi = require("ui.image")
+
 local lg = love.graphics
 local floor = math.floor
 local nilFunc = function() end
@@ -24,10 +27,13 @@ button.addText = function(self, text, color, font)
 end
 
 button.addImage = function(self, image, color)
-    self.image = image
-    self.imageColor = color or {1,1,1}
-    local width, height = image:getWidth(), image:getHeight()
-    self.imageLength = width > height and height or width
+    if not self.image then
+        local anchor = anchor.new("NorthWest", 0, 0, -1, -1)
+        self.image = imageUi.new(anchor, image, color)
+        self:addChild(self.image)
+    else
+        self.image:setImage(image, color)
+    end
 end
 
 button.setOutline = function(self, enabled, distance, lineSize)
@@ -71,12 +77,6 @@ button.drawElement = function(self)
         else
             lg.print(self.text, x, y) --TODO text allignment
         end
-    end
-    
-    if self.image then
-        lg.setColor(self.imageColor)
-        local s = (width > height and height or width) / self.imageLength
-        lg.draw(self.image, x, y, 0, s,s)
     end
     
     lg.setColor(1,1,1)

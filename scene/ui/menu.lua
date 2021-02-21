@@ -49,7 +49,7 @@ menu:addChild(buttonHelp)
 
 local anchor = anchor.new("North", 0, 30, 500, 100)
 local buttonTitle = button.new(anchor, {0.15,0.15,0.15})
-buttonTitle:addText("BrushMap", nil, global.assets["font.kennyfuture50"])
+buttonTitle:addText("BrushMap", nil, global.assets["font.kennyfuture72"])
 
 menu:addChild(buttonTitle)
 
