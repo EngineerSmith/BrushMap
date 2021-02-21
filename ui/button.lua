@@ -4,6 +4,7 @@ button.__index = button
 
 local anchor = require("ui.base.anchor")
 local imageUi = require("ui.image")
+local textUi = require("ui.text")
 
 local lg = love.graphics
 local floor = math.floor
@@ -20,15 +21,18 @@ button.new = function(anchor, color, callback)
 end
 
 button.addText = function(self, text, color, font)
-   --TODO come back to Text
-   self.text = text
-   self.textColor = color or {1,1,1}
-   self.font = font
+    if not self.text then
+        local anchor = anchor.new("East", 0, 0, -1, -1)
+        self.text = textUi.new(anchor, text, font, color)
+        self:addChild(self.text)
+    else
+        self.text:updateText(text, font, color)
+    end
 end
 
 button.addImage = function(self, image, color)
     if not self.image then
-        local anchor = anchor.new("NorthWest", 0, 0, -1, -1)
+        local anchor = anchor.new("West", 0, 0, -1, -1)
         self.image = imageUi.new(anchor, image, color)
         self:addChild(self.image)
     else
@@ -68,16 +72,7 @@ button.drawElement = function(self)
         lg.setLineWidth(1)
     end
     
-    lg.rectangle("fill", x, y, width, height, self.rectCorner)
-    
-    if self.text then
-        lg.setColor(self.textColor)
-        if self.font then
-            lg.print(self.text, self.font, x, y)
-        else
-            lg.print(self.text, x, y) --TODO text allignment
-        end
-    end
+    lg.rectangle("fill", x, y, width, height,self.rectCorner)
     
     lg.setColor(1,1,1)
 end
