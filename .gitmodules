@@ -1,3 +1,6 @@
 [submodule "lib/lily"]
 	path = lib/lily
 	url = https://github.com/MikuAuahDark/lily
+[submodule "lib/nativefs"]
+	path = lib/nativefs
+	url = https://github.com/megagrump/nativefs

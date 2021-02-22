@@ -10,6 +10,12 @@ scene.uiwindow = require("scene.ui.menu")
 
 scene.load = function()
     scene.background.load(7)
+    love.filesystem.createDirectory("Test")
+    local file = love.filesystem.newFile("HelloWorld.txt")
+    file:open("w")
+    file:write("Hello World")
+    file:flush()
+    file:close()
 end
 
 scene.update = function(dt) 
