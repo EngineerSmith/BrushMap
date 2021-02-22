@@ -25,10 +25,7 @@ menu:addChild(buttonNew3D)
 
 local anchor = anchor.new("Center", 0, 120, 200, 100)
 local buttonLoad = button.new(anchor)
-
---buttonLoad:addText("Load Map")
-buttonLoad:addText(tostring(result))
-
+buttonLoad:addText("Load Map")
 buttonLoad:setOutline(true, 2, 1)
 buttonLoad:setRoundCorner(7)
 

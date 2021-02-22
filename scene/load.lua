@@ -3,13 +3,15 @@ local lg, ls = love.graphics, love.system
 
 local nfs = require("lib.nativefs")
 
-local lily = require("utilities.lilyLoader")
+local lily
 
 scene.load = function()
     if ls.getOS() == "Android" then
         local result = nfs.mount("/storage/emulated/0/code", "externalAssets")
     end
     --local img = love.graphics.newImage("externalAssets/confirmed.png")
+    
+    lily = require("utilities.lilyLoader")
 end
 
 scene.update = function()
