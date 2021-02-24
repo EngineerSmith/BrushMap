@@ -28,7 +28,6 @@ anchor.new = function(point, x, y, width, height, horizontal, vertical)
     self.y = y or error("Anchor requires position Y")
     self.horizontal = horizontal or 0 -- Padding
     self.vertical = vertical or 0
-    self.rect = {}
     
     if type(width) == "number" then
        self.width = {min=width,max=width}
@@ -46,13 +45,19 @@ anchor.new = function(point, x, y, width, height, horizontal, vertical)
         self.height.max = self.height.max or 0
     end
     
+    self.rect = {}
+    self:calculate(0,0,-1,-1) -- Initlize rect with max values
+    
     return self
 end
 
 anchor.length = function(side, padding, windowLength)
-    
     if side.max == -1 then
-       return windowLength 
+       return windowLength - padding
+    end
+    
+    if windowLength == -1 then 
+        return side.max
     end
     
     if side.max + padding <= windowLength then
@@ -68,10 +73,11 @@ anchor.position = function(self, anchorWidth, anchorHeight, windowWidth, windowH
     local centerX = floor(windowWidth / 2) - floor(anchorWidth / 2)
     local centerY = floor(windowHeight / 2) - floor(anchorHeight / 2)
     
-    local safeX, safeY = love.window.getSafeArea()
+    --TODO design better point to add safe position
+    -- local safeX, safeY = love.window.getSafeArea()
     
-    local x = self.x + self.horizontal + safeX
-    local y = self.y + self.vertical + safeY
+    local x = self.x --+ self.horizontal
+    local y = self.y --+ self.vertical
     
     if self.point == anchor.points.Center then
         return centerX + x, centerY + y

@@ -5,9 +5,10 @@ local insert = table.insert
 
 ui.new = function(anchor) 
     local self = {
-        children = {},
+        children = {count=0},
         parent = nil,
         anchor = anchor or error("UI requires anchor"),
+        enabled = true,
     }
     
     return setmetatable(self, ui)
@@ -19,15 +20,25 @@ ui.addChild = function(self, child)
     end
     
     insert(self.children, child)
+    self.children.count = self.children.count + 1
     child.parent = self
+    self:getAnchorUpdate()
+end
+
+ui.getAnchorUpdate = function(self)
+    if self.parent then
+        self.parent:getAnchorUpdate()
+    else
+        local _,_, width, height = love.window.getSafeArea()
+        self:updateAnchor(width, height)
+    end
 end
 
 ui.updateAnchor = function(self, windowWidth, windowLength, offsetX, offsetY)
     offsetX, offsetY = offsetX or 0, offsetY or 0
     local x, y, width, height = self.anchor:calculate(offsetX, offsetY, windowWidth, windowLength)
-    offsetX, offsetY = offsetX + x, offsetY + y
     for _, child in ipairs(self.children) do
-        child:updateAnchor(width, height, offsetX, offsetY)
+        child:updateAnchor(width, height, x, y)
     end
 end
 
@@ -46,14 +57,16 @@ end
 
 ui.updateElement = function(self, dt) end 
 
-ui.draw = function(self) 
+ui.draw = function(self)
     self:drawElement()
     self:drawChildren()
 end
 
 ui.drawChildren = function(self) 
     for _, child in ipairs(self.children) do
-        child:draw()
+        if child.enabled then
+            child:draw()
+        end
     end
 end
 

@@ -11,6 +11,8 @@ local assets = {
     {"icon.help", "icons/help.png"},
     {"icon.arrow.right", "icons/arrow-right.png"},
     {"icon.arrow.left", "icons/arrow-left.png"},
+    {"icon.folder.open", "icons/open-folder.png"},
+    {"icon.stack", "icons/stack.png"},
     --EXAMPLE {"icon.pixel", "pixel.png", onLoad=pixelArt},
 }
 

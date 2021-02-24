@@ -8,21 +8,23 @@ local textUi = require("ui.text")
 
 local lg = love.graphics
 local floor = math.floor
+local aabb = require("utilities.aabb")
 local nilFunc = function() end
 
-button.new = function(anchor, color, callback)
+button.new = function(anchor, color, callbackPressed, callbackReleased)
     local self = setmetatable(ui.new(anchor), button)
     
     self.color = color or {0.4,0.4,0.4}
-    self.callback = callback or nilFunc
+    self.callbackPressed = callbackPressed or nilFunc
+    self.callbackReleased = callbackReleased or nilFunc
     self.rectCorner = 0
     
     return self
 end
 
-button.addText = function(self, text, color, font)
+button.setText = function(self, text, color, font)
     if not self.text then
-        local anchor = anchor.new("East", 0, 0, -1, -1)
+        local anchor = anchor.new("West", 0,0, -1,-1)
         self.text = textUi.new(anchor, text, font, color)
         self:addChild(self.text)
     else
@@ -30,9 +32,9 @@ button.addText = function(self, text, color, font)
     end
 end
 
-button.addImage = function(self, image, color)
+button.setImage = function(self, image, color)
     if not self.image then
-        local anchor = anchor.new("West", 0, 0, -1, -1)
+        local anchor = anchor.new("West", 0,0, -1,-1)
         self.image = imageUi.new(anchor, image, color)
         self:addChild(self.image)
     else
@@ -51,11 +53,17 @@ button.setRoundCorner = function(self, round)
 end
 
 button.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
-    local x, y, w, h = self.anchor:getRect()
-    if pressedX > x and pressedX < x + w and
-       pressedY > y and pressedY < y + h then
-        self.callback()
-        return true
+    if aabb(pressedX, pressedY, self.anchor:getRect()) then
+        local result = self.callbackPressed()
+        return result ~= nil and result or true
+    end
+    return false
+end
+
+button.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
+    if aabb(pressedX, pressedY, self.anchor:getRect()) then
+        local result = self.callbackReleased()
+        return result ~= nil and result or true
     end
     return false
 end
