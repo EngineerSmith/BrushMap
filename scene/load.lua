@@ -7,9 +7,9 @@ local lily
 
 scene.load = function()
     if ls.getOS() == "Android" then
-        local result = nfs.mount("/storage/emulated/0/Download", "externalAssets/Download")
+       local result = nfs.mount("/storage/emulated/0/Download", "externalAssets/Download")
+       assert(result, "Unable to mount drive: /storage/emulated/0/Download")
     end
-    --local img = love.graphics.newImage("externalAssets/confirmed.png")
     
     lily = require("utilities.lilyLoader")
 end

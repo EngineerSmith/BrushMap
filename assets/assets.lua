@@ -9,6 +9,7 @@ local assets = {
     {"font.kennyfuture72", "fonts/Kenney Future.ttf", 72},
     {"font.robotoReg12", "fonts/Roboto-Regular.ttf", 12},
     {"font.robotoReg18", "fonts/Roboto-Regular.ttf", 18},
+    {"font.robotoReg25", "fonts/Roboto-Regular.ttf", 25},
     {"font.robotoReg50", "fonts/Roboto-Regular.ttf", 50},
     {"font.robotoReg72", "fonts/Roboto-Regular.ttf", 72},
     {"icon.language", "icons/wireframe-globe.png"},

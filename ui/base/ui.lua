@@ -80,7 +80,7 @@ end
 
 ui.touchpressedChildren = function(self, id, x, y, dx, dy, pressure) 
     for _, child in ipairs(self.children) do
-        if child:touchpressed(id, x, y, dx, dy, pressure) then
+        if child.enabled and child:touchpressed(id, x, y, dx, dy, pressure) then
             return true
         end
     end
@@ -97,7 +97,7 @@ end
 
 ui.touchmovedChildren = function(self, id, x, y, dx, dy, pressure)
     for _, child in ipairs(self.children) do
-        if child:touchmoved(id, x, y, dx, dy, pressure) then
+        if child.enabled and child:touchmoved(id, x, y, dx, dy, pressure) then
             return true
         end
     end
@@ -114,7 +114,7 @@ end
 
 ui.touchreleasedChildren = function(self, id, x, y, dx, dy, pressure)
     for _, child in ipairs(self.children) do
-        if child:touchreleased(id, x, y, dx, dy, pressure) then
+        if child.enabled and child:touchreleased(id, x, y, dx, dy, pressure) then
             return true
         end
     end
