@@ -20,6 +20,7 @@ scrollView.new = function(anchor, widthDistance, heightDistance, maskFunction)
     end
     
     self.offsetX, self.offsetY = 0,0
+    self.actualHeight = 0
     
     return self
 end
@@ -39,12 +40,29 @@ scrollView.addChild = function(self, child)
     child.anchor.y = num * self.heightDistance
     
     self:getAnchorUpdate()
+    
+    self.actualHeight = child.anchor.y + child.anchor.height.max
 end
 
 scrollView.empty = function(self)
     local removedChildren = self.children
     self.children = {count=0}
     return removedChildren
+end
+
+local limit = function(value, min, max)
+    if value < min then
+        return min
+    elseif value > max then
+        return max
+    end
+    return value
+end
+
+scrollView.touchmovedElement = function(self, id, x, y, dx, dy, pressure)
+    local yLimit = self.anchor.rect[4] - self.actualHeight
+    self.offsetY = limit(self.offsetY + dy, yLimit, 0)
+    return true
 end
 
 scrollView.draw = function(self)
@@ -56,7 +74,7 @@ scrollView.draw = function(self)
     lg.setStencilTest("greater", 0)
     
     lg.push()
-    --lg.translate(self.offsetX, self.offsetY)
+    lg.translate(self.offsetX, self.offsetY)
     
     self:drawChildren()
     

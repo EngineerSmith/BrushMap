@@ -29,6 +29,10 @@ scene.touchpressed = function(id, x, y, dx, dy, pressure)
     scene.menuWindow:touchpressed(id, x, y, dx, dy, pressure)
 end
 
+scene.touchmoved = function(id, x, y, dx, dy, pressure)
+    scene.menuWindow:touchmoved(id, x, y, dx, dy, pressure)
+end
+
 scene.touchreleased = function(id, x, y, dx, dy, pressure)
     scene.menuWindow:touchreleased(id, x, y, dx, dy, pressure)
 end
