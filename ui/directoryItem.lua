@@ -50,7 +50,11 @@ end
 
 
 directoryItem.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
-    if aabb(pressedX, pressedY, self.anchor:getRect()) then
+    local x,y,w,h = self.anchor:getRect()
+    if not self.selected then
+        w = self.iconSize * 3 + self.font:getWidth(self.text)
+    end
+    if aabb(pressedX, pressedY, x,y,w,h) then
         self:setSelected(not self.selected)
         local result = self:callbackReleased(self.selected)
         return result ~= nil and result or true

@@ -65,6 +65,24 @@ scrollView.touchmovedElement = function(self, id, x, y, dx, dy, pressure)
     return true
 end
 
+scrollView.touchpressedChildren = function(self, id, x, y, dx, dy, pressure)
+    for _, child in ipairs(self.children) do
+        if child:touchpressed(id, x - self.offsetX, y - self.offsetY, dx, dy, pressure) then
+            return true
+        end
+    end
+    return false
+end
+
+scrollView.touchreleasedChildren = function(self, id, x, y, dx, dy, pressure)
+    for _, child in ipairs(self.children) do
+        if child:touchreleased(id, x - self.offsetX, y - self.offsetY, dx, dy, pressure) then
+            return true
+        end
+    end
+    return false
+end
+
 scrollView.draw = function(self)
     self.background:drawElement()
     
