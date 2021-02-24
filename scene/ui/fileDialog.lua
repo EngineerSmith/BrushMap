@@ -52,6 +52,20 @@ end
 
 fileItemfactory("Test1.png")
 fileItemfactory("Test2.png")
+fileItemfactory("Test3.png")
+fileItemfactory("Test4.png")
+fileItemfactory("Test5.png")
+fileItemfactory("Test6.png")
+fileItemfactory("Test7.png")
+fileItemfactory("Test8.png")
+fileItemfactory("Test9.png")
+fileItemfactory("Test10.png")
+fileItemfactory("Test11.png")
+fileItemfactory("Test12.png")
+fileItemfactory("Test13.png")
+fileItemfactory("Test14.png")
+fileItemfactory("Test15.png")
+fileItemfactory("Test16.png")
 --fileItemfactory("Test3.png")
 --[[ 
 CALLBACK EXAMPLE

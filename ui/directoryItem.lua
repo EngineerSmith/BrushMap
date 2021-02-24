@@ -34,11 +34,6 @@ directoryItem.new = function(icon, text, font, iconSize, callback)
     return self
 end
 
-directoryItem.update = function(self, dt)
-    
-    self.text = self.background.anchor.rect[3]..":"..self.background.anchor.rect[4]
-end
-
 directoryItem.setIcon = function(self, icon)
     self.icon = icon or error("Icon required")
     
