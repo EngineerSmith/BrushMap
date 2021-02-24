@@ -91,6 +91,23 @@ ui.touchpressedElement = function(self, id, x, y, dx, dy, pressure)
     return false
 end
 
+ui.touchmoved = function(self, id, x, y, dx, dy, pressure)
+   return self:touchmovedChildren(id, x, y, dx, dy, pressure) or self:touchmovedElement(id, x, y, dx, dy, pressure) 
+end
+
+ui.touchmovedChildren = function(self, id, x, y, dx, dy, pressure)
+    for _, child in ipairs(self.children) do
+        if child:touchmoved(id, x, y, dx, dy, pressure) then
+            return true
+        end
+    end
+    return false
+end
+
+ui.touchmovedElement = function(self, id, x, y, dx, dy, pressure)
+    return false
+end
+
 ui.touchreleased = function(self, id, x, y, dx, dy, pressure)
     return self:touchreleasedChildren(id, x, y, dx, dy, pressure) or self:touchreleasedElement(id, x, y, dx, dy, pressure)
 end

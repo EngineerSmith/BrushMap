@@ -21,7 +21,7 @@ directoryItem.new = function(icon, text, font, iconSize, callback)
     self:setIcon(icon)
     self.text = text or error("Text required")
     self.font = font or lg.getFont()
-    self.callbackReleased = callback
+    self.callbackReleased = callback or nilFunc
     
     local anchor = anchor.new("Center", 0,0, -1,-1)
     
@@ -71,7 +71,7 @@ directoryItem.drawElement = function(self)
     lg.setColor(1,1,1,1)
     lg.draw(self.icon, x,y, 0, s,s)
     local textMid = floor(self.iconSize/2) - floor(self.font:getHeight()/2)
-    lg.print(self.text, self.font, x + self.iconSize,y + textMid)
+    lg.print(self.text, self.font, x + self.iconSize + 2,y + textMid)
 end
 
 return directoryItem

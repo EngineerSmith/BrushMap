@@ -40,18 +40,18 @@ end
 
 local fileItemfactory = function(fileName)
     fileName = fileName or error("File name required")
-    local item = directoryItem.new(global.assets["icon.stack"], fileName, global.assets["font.kennyfuture12"], iconSize, fileItemCallback)
+    local item = directoryItem.new(global.assets["icon.stack.128"], fileName, global.assets["font.robotoReg12"], iconSize, fileItemCallback)
     window.scrollView:addChild(item)
 end
 
 local directoryItemFactory = function(directoryName)
     directoryName = directoryName or error("Directory name required")
-    local item = directoryItem.new(global.assets["icon.folder.open"], directoryName, global.assets["font.kennyfuture12"], iconSize)
+    local item = directoryItem.new(global.assets["icon.folder.128"], directoryName, global.assets["font.robotoReg12"], iconSize)
     window.scrollView:addChild(item)
 end
 
 fileItemfactory("Test1.png")
-fileItemfactory("Test2.png")
+directoryItemFactory("Test2.png")
 fileItemfactory("Test3.png")
 fileItemfactory("Test4.png")
 fileItemfactory("Test5.png")
@@ -66,7 +66,7 @@ fileItemfactory("Test13.png")
 fileItemfactory("Test14.png")
 fileItemfactory("Test15.png")
 fileItemfactory("Test16.png")
---fileItemfactory("Test3.png")
+
 --[[ 
 CALLBACK EXAMPLE
     function callback(success, filePath) end
