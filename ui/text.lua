@@ -4,9 +4,7 @@ text.__index = text
 
 local lg = love.graphics
 
-text.allignment = {
-    "Center"
-}
+local floor = math.floor
 
 text.new = function(anchor, string, font, color)
     local self = setmetatable(ui.new(anchor), text)
@@ -16,9 +14,6 @@ text.new = function(anchor, string, font, color)
     self:updateTextSize()
     return self
 end
-
-text.setAllignment = function(self, allignment)
-
 
 text.updateText = function(self, string, font, color)
     self.text = string
@@ -38,11 +33,19 @@ end
 
 text.drawElement = function(self)
     local x, y, width, height = self.anchor:getRect()
-    if self.font then
-        lg.print(self.text, self.font, x, y)
-    else
-        lg.print(self.text, x, y)
+    
+    local allignment = self.anchor.pointStr
+    local centreV = floor(width/2) - floor(self.font:getWidth(self.text) / 2)
+    local centreH = floor(height/2) - floor(self.font:getHeight() /2)
+    
+    if allignment == "North" or allignment == "Center" or allignment == "South" then
+        x = x + centreV
     end
+    if allignment == "West" or allignment == "Centre" or allignment == "East" then
+        y = y + centreH
+    end
+    
+    lg.print(self.text, self.font, x, y)
 end
 
 return text
