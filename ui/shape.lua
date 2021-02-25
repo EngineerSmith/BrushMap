@@ -48,6 +48,13 @@ shape.setSegments = function(self, segments)
     self.segments = segments
 end
 
+shape.setColor = function(self, r, g, b, a)
+    self.color[1] = r or self.color[1]
+    self.color[2] = g or self.color[2]
+    self.color[3] = b or self.color[3]
+    self.color[4] = a or self.color[4]
+end
+
 shape.drawElement = function(self)
     local x, y, width, height = self.anchor:getRect()
     
