@@ -4,6 +4,10 @@ text.__index = text
 
 local lg = love.graphics
 
+text.allignment = {
+    "Center"
+}
+
 text.new = function(anchor, string, font, color)
     local self = setmetatable(ui.new(anchor), text)
     self.text = string
@@ -12,6 +16,8 @@ text.new = function(anchor, string, font, color)
     self:updateTextSize()
     return self
 end
+
+text.setAllignment = function(self, allignment)
 
 
 text.updateText = function(self, string, font, color)

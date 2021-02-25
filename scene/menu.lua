@@ -10,6 +10,7 @@ scene.menuWindow = require("scene.ui.fileDialog")
 
 scene.load = function()
     scene.background.load(7)
+    scene.menuWindow.dialog("load")
 end
 
 scene.update = function(dt) 

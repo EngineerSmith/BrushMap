@@ -47,6 +47,8 @@ end
 scrollView.empty = function(self)
     local removedChildren = self.children
     self.children = {count=0}
+    self.offsetX, self.offsetY = 0,0
+    self.actualHeight = 0
     return removedChildren
 end
 
@@ -61,7 +63,9 @@ end
 
 scrollView.touchmovedElement = function(self, id, x, y, dx, dy, pressure)
     local yLimit = self.anchor.rect[4] - self.actualHeight
-    self.offsetY = limit(self.offsetY + dy, yLimit, 0)
+    if yLimit < 0 then
+        self.offsetY = limit(self.offsetY + dy, yLimit, 0)
+    end
     return true
 end
 

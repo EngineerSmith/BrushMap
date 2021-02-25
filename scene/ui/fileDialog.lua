@@ -21,6 +21,7 @@ window:addChild(background)
 
 local anchor = anchor.new("SouthEast", 10,10, 120,120)
 local actionButton = button.new(anchor)
+actionButton:setText("HELLO")
 window.actionButton = actionButton
 background:addChild(actionButton)
 
@@ -68,20 +69,45 @@ local fileItemCallback = function(self, selected)
     return true
 end
 
+local directoryItemCallback
+
 local fileItemfactory = function(fileName)
     fileName = fileName or error("File name required")
     local item = directoryItem.new(global.assets["icon.stack.128"], fileName, global.assets["font.robotoReg12"], iconSize, fileItemCallback)
     window.scrollView:addChild(item)
+    return item
 end
 
 local directoryItemFactory = function(directoryName)
     directoryName = directoryName or error("Directory name required")
-    local item = directoryItem.new(global.assets["icon.folder.128"], directoryName, global.assets["font.robotoReg12"], iconSize)
+    local item = directoryItem.new(global.assets["icon.folder.128"], directoryName, global.assets["font.robotoReg12"], iconSize, directoryItemCallback)
     window.scrollView:addChild(item)
+    return item
 end
 
-fileItemfactory("Test1.png")
-directoryItemFactory("Test2.png")
+local displayMap = function(map)
+    window.scrollView:empty()
+    window.previousSelected = nil
+    
+    if map.parent then
+        local item = directoryItemFactory("..")
+        item.map = map.parent
+    end
+    
+    for i=1, #map.directories, 2 do
+        local item = directoryItemFactory(map.directories[i])
+        item.map = map.directories[i+1]
+    end
+    for i=1, #map.files, 2 do
+        local item = fileItemfactory(map.files[i])
+        item.fullDir = map.files[i+1]
+    end
+end
+
+directoryItemCallback = function(self, selected)
+    displayMap(self.map)
+    return true
+end
 
 --[[ 
 CALLBACK EXAMPLE
@@ -95,17 +121,17 @@ window.modes = {
     ["load"] = "Load File",
 }
 
-window.dialog = function(callback, mode, filter)
-    window.callback = callback or error("Callback required when displaying file dialog")
+window.dialog = function(mode, callback, filter)
+    --window.callback = callback or error("Callback required when displaying file dialog")
     window.mode = window.modes[mode] and mode or error("Mode not supported in file dialog. "..tostring(mode))
     
-    actionButton:setText(window.modes[mode])
-    
+    window.actionButton:setText(window.modes[mode], {1,1,1},global.assets["font.robotoReg18"])
+    window.enabled = true
 end
 
-window.createMap = function(directory)
+window.createMap = function(directory, parent)
     local items = lfs.getDirectoryItems(directory)
-    local map = {directories ={}, files={},directory=directory}
+    local map = {directories ={}, files={},directory=directory, parent=parent}
     
     for _, item in ipairs(items) do
         local fullDir = directory.."/"..item
@@ -114,7 +140,7 @@ window.createMap = function(directory)
            insert(map.files, fullDir)
         elseif lfs.isDirectory(fullDir) then
             insert(map.directories, item)
-            insert(map.directories, window.createMap(fullDir))
+            insert(map.directories, window.createMap(fullDir, map))
         end
     end
     
@@ -125,14 +151,9 @@ window.setDrive = function(drive)
     drive = "externalAssets/"..drive
     window.map = window.createMap(drive)
     
-    window.scrollView:empty()
-    
-    for i=1, #window.map.directories, 2 do
-        directoryItemFactory(window.map.directories[i])
-    end
-    for i=1, #window.map.files, 2 do
-        fileItemfactory(window.map.files[i])
-    end
+    displayMap(window.map)
 end
+
+window.enabled = false
 
 return window
