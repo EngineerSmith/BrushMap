@@ -58,8 +58,10 @@ end
 ui.updateElement = function(self, dt) end 
 
 ui.draw = function(self)
-    self:drawElement()
-    self:drawChildren()
+    if self.enabled then
+        self:drawElement()
+        self:drawChildren()
+    end
 end
 
 ui.drawChildren = function(self) 

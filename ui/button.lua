@@ -24,7 +24,7 @@ end
 
 button.setText = function(self, text, color, font)
     if not self.text then
-        local anchor = anchor.new("West", 0,0, -1,-1)
+        local anchor = anchor.new("Center", 0,0, -1,-1)
         self.text = textUi.new(anchor, text, font, color)
         self:addChild(self.text)
     else
@@ -34,7 +34,7 @@ end
 
 button.setImage = function(self, image, color)
     if not self.image then
-        local anchor = anchor.new("West", 0,0, -1,-1)
+        local anchor = anchor.new("Center", 0,0, -1,-1)
         self.image = imageUi.new(anchor, image, color)
         self:addChild(self.image)
     else
@@ -54,7 +54,7 @@ end
 
 button.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
     if aabb(pressedX, pressedY, self.anchor:getRect()) then
-        local result = self.callbackPressed()
+        local result = self:callbackPressed()
         return result ~= nil and result or true
     end
     return false
@@ -62,7 +62,7 @@ end
 
 button.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
     if aabb(pressedX, pressedY, self.anchor:getRect()) then
-        local result = self.callbackReleased()
+        local result = self:callbackReleased()
         return result ~= nil and result or true
     end
     return false

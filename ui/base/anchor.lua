@@ -24,6 +24,7 @@ anchor.new = function(point, x, y, width, height, horizontal, vertical)
     end
     
     self.point = anchor.points[point] or error("Anchor requires point")
+    self.pointStr = point
     self.x = x or error("Anchor requires position X")
     self.y = y or error("Anchor requires position Y")
     self.horizontal = horizontal or 0 -- Padding

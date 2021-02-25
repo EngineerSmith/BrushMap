@@ -21,9 +21,24 @@ window:addChild(background)
 
 local anchor = anchor.new("SouthEast", 10,10, 120,120)
 local actionButton = button.new(anchor)
-actionButton:setText("HELLO")
+actionButton.callbackReleased = function(self)
+    window.enabled = false
+    window.callback(true, window.previousSelected.fullDir)
+    return true
+end
 window.actionButton = actionButton
 background:addChild(actionButton)
+
+local anchor = anchor.new("NorthWest", 10,10, 80,30)
+local returnButton = button.new(anchor)
+returnButton:setText("Return", {1,1,1}, global.assets["font.robotoReg18"])
+returnButton.callbackReleased = function(self)
+    window.enabled = false
+    window.callback(false)
+    return true
+end
+window.returnButton = returnButton
+background:addChild(returnButton)
 
 local iconSize = 30
 
@@ -32,22 +47,21 @@ local fileScrollView = scrollView.new(anchor, 0, iconSize + 2)
 window.scrollView = fileScrollView
 background:addChild(fileScrollView)
 
-
 local options = lfs.getDirectoryItems("externalAssets")
 
-
-local anchor = anchor.new("NorthWest", 10,10, -1,30, 20,0)
+local anchor = anchor.new("NorthWest", 100,10, -1,30, 120,0)
 local driveDrop = dropDown.new(anchor, options, global.assets["font.robotoReg18"], "Select drive")
 
+local fileItemCallback
+
 driveDrop.touchpressedCallback = function(self)
+    fileItemCallback(nil, false)
     window.scrollView.enabled = false
-    window.actionButton.enabled = false
 end
 
 driveDrop.touchreleasedCallback = function(self)
     if self.selected ~= -1 then
         window.scrollView.enabled = true
-        window.actionButton.enabled = true
         window.setDrive(self.options[self.selected])
     end
 end
@@ -57,14 +71,16 @@ background:addChild(driveDrop)
 window.scrollView.enabled = false
 window.actionButton.enabled = false
 
-local fileItemCallback = function(self, selected)
+fileItemCallback = function(self, selected)
     if selected and window.previousSelected then
         window.previousSelected:setSelected(false)
         window.previousSelected = self
     elseif selected then
         window.previousSelected = self
+        window.actionButton.enabled = true
     else
         window.previousSelected = nil
+        window.actionButton.enabled = false
     end
     return true
 end
@@ -87,7 +103,6 @@ end
 
 local displayMap = function(map)
     window.scrollView:empty()
-    window.previousSelected = nil
     
     if map.parent then
         local item = directoryItemFactory("..")
@@ -105,6 +120,7 @@ local displayMap = function(map)
 end
 
 directoryItemCallback = function(self, selected)
+    fileItemCallback(nil, false)
     displayMap(self.map)
     return true
 end
@@ -117,13 +133,14 @@ FILTER EXAMPLE
 ]]
 
 window.modes = {
-    --["save"] = "Save Here", --TODO
     ["load"] = "Load File",
+    --["save"] = "Save Here", --TODO
 }
 
 window.dialog = function(mode, callback, filter)
-    --window.callback = callback or error("Callback required when displaying file dialog")
+    window.callback = callback or error("Callback required when displaying file dialog")
     window.mode = window.modes[mode] and mode or error("Mode not supported in file dialog. "..tostring(mode))
+    window.filter = filter or {"*"}
     
     window.actionButton:setText(window.modes[mode], {1,1,1},global.assets["font.robotoReg18"])
     window.enabled = true

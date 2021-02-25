@@ -7,10 +7,11 @@ local lg = love.graphics
 scene.background = require("background.circles")
 
 scene.menuWindow = require("scene.ui.fileDialog")
+local callback = function(success, path) end
 
 scene.load = function()
     scene.background.load(7)
-    scene.menuWindow.dialog("load")
+    scene.menuWindow.dialog("load", callback)
 end
 
 scene.update = function(dt) 
