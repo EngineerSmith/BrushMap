@@ -1,10 +1,12 @@
 local language = {
     all = {},
-    localeKey = nil
+    localeKey = nil,
+    imported = 0
 }
 
 language.import = function(localeKey, locale)
     language.all[localeKey] = locale
+    language.imported = language.imported + 1
 end
 
 language.setLocale = function(localeKey)
@@ -39,7 +41,7 @@ end
 
 language.isLocaleValid = function(localeKey)
     localeKey = localeKey or error("localeKey required")
-    if not language.all[localeKey] ~= nil then
+    if language.all[localeKey] == nil then
         error("LocaleKey not imported")
     end
 end
@@ -49,7 +51,7 @@ local insert,sort = table.insert, table.sort
 language.getLocales = function()
     local locales = {}
     for key, _ in pairs(language.all) do
-       insert(locales, {key=key, name=language.all[key]["Language"] or key}) 
+       insert(locales, {key=key, name=language.all[key]["language"] or key}) 
     end
     local sortFunction = function(a, b) return a.name < b.name end
     sort(locales, sortFunction)

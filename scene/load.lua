@@ -10,6 +10,12 @@ local mountDrive = function(path, to)
 end
 
 scene.load = function()
+    require("utilities.languageLoader")() -- Possible bottleneck
+    local lang = require("utilities.language")
+    
+    --TODO add load settings
+    lang.setLocale("en_GB")
+    
     if ls.getOS() == "Android" then
        mountDrive("/storage/emulated/0/Download", "externalAssets/Download")
     end
