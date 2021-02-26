@@ -5,10 +5,13 @@ local nfs = require("lib.nativefs")
 
 local lily
 
+local mountDrive = function(path, to)
+    assert(nfs.mount(path, to), "Unable to mount drive, tell a programmer: "..path)
+end
+
 scene.load = function()
     if ls.getOS() == "Android" then
-       local result = nfs.mount("/storage/emulated/0/Download", "externalAssets/Download")
-       assert(result, "Unable to mount drive: /storage/emulated/0/Download")
+       mountDrive("/storage/emulated/0/Download", "externalAssets/Download")
     end
     
     lily = require("utilities.lilyLoader")

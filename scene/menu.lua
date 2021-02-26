@@ -6,11 +6,15 @@ local lg = love.graphics
 
 scene.background = require("background.circles")
 
-scene.menuWindow = require("scene.ui.fileDialog")
-local callback = function(success, path) end
+scene.menuWindow = --[[require("scene.ui.menu")]] require("scene.ui.fileDialog")
+local callback = function(success, path)
+    require("utilities.sceneManager").changeScene("scene.tilesetEditor")
+end
 
 scene.load = function()
     scene.background.load(7)
+    
+    
     scene.menuWindow.dialog("load", callback)
 end
 

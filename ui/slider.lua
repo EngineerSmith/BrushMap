@@ -15,7 +15,19 @@ slider.new = function(anchor, maxValue, startingValue, color)
     
     self.active = false
     
+    self.ratio = self.value / self.maxValue
+    self:limitRatio()
+    
     return self
+end
+
+slider.limitRatio = function(self)
+    if self.ratio > 1 then
+        self.ratio = 1
+    end
+    if self.ratio < 0 then
+        self.ratio = 0
+    end
 end
 
 slider.calculateValue = function(self, pressedX)
@@ -23,6 +35,7 @@ slider.calculateValue = function(self, pressedX)
     pressedX = pressedX - x
     local ratio = pressedX / w
     self.ratio = ratio
+    self:limitRatio()
     self.value = self.maxValue * ratio
     if self.valueChangedCallback then
         self:valueChangedCallback(self.value)
@@ -38,7 +51,7 @@ slider.touchpressedElement = function(self, id, x, y, dx, dy, pressure)
     return false
 end
 
-slider.touchmovedElement = functon(self, id, x, y, dx, dy, pressure)
+slider.touchmovedElement = function(self, id, x, y, dx, dy, pressure)
     if self.active then
         self:calculateValue(x)
     end
