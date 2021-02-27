@@ -33,10 +33,11 @@ shape.new = function(anchor, shapeType, color, drawMode, ...)
     return self
 end
 
-shape.setOutline = function(self, enabled, distance, lineSize)
+shape.setOutline = function(self, enabled, distance, lineSize, color)
     self.lineEnabled = enabled or false
     self.lineDistance = distance or 2
     self.lineSize = lineSize or 1
+    self.lineColor = color or self.color
 end
 
 shape.setRoundCorner = function(self, rx, ry)
@@ -58,24 +59,27 @@ end
 shape.drawElement = function(self)
     local x, y, width, height = self.anchor:getRect()
     
-    lg.setColor(self.color)
-    
     if self.type == "Rectangle" then
         if self.lineEnabled then
             local line = self.lineDistance
             lg.setLineWidth(self.lineSize)
+            lg.setColor(self.lineColor)
             lg.rectangle("line", x-line, y-line, width+line*2, height+line*2, self.rx, self.ry, self.segments)
             lg.setLineWidth(1)
         end
         
+        lg.setColor(self.color)
         lg.rectangle(self.mode, x, y, width, height, self.rx, self.ry, self.segments)
     elseif self.type == "Circle" or self.type == "Eclipse" then
         if self.lineEnabled then
             local line = self.lineDistance
             lg.setLineWidth(self.lineSize)
+            lg.setColor(self.lineColor)
             lg.eclipse("line", x-line, y-line, width+line*2, height+line*2, self.segments)
             lg.setLineWidth(1)
         end
+        
+        lg.setColor(self.color)
         lg.eclipse(self.mode, x, y, width, height, self.segments)
     end
 end

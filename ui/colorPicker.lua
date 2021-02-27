@@ -13,6 +13,7 @@ colorPicker.new = function()
     
     local anchor = anchor.new("Center", 0,-50, {min=20,max=200},{min=20,max=200})
     self.previewShape = shape.new(anchor, "Rectangle", nil, "fill", 3)
+    self.previewShape:setOutline(true, 0, 2, {1,1,1})
     
     self:addChild(self.previewShape)
     
@@ -27,12 +28,14 @@ colorPicker.new = function()
     self:addChild(self.greenSlider)
     self:addChild(self.blueSlider)
     
-    self.callback = function(_, value)
+    self.callback = function()
         local r = self.redSlider.ratio
         local g = self.greenSlider.ratio
         local b = self.blueSlider.ratio
         self.previewShape:setColor(r,g,b)
     end
+    
+    self.callback() --INIT shape colour
     
     self.redSlider.valueChangedCallback = self.callback
     self.greenSlider.valueChangedCallback = self.callback

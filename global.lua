@@ -5,4 +5,5 @@ return {
     },
     assetsDir = "assets",
     assets = {},
+    editorSession = {},
 }
