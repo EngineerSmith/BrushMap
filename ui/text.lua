@@ -16,7 +16,7 @@ text.new = function(anchor, string, font, color)
 end
 
 text.updateText = function(self, string, font, color)
-    self.text = string
+    self.text = string or self.text
     self.font = font or self.font
     self.color = color or self.color
     self:updateTextSize()
@@ -44,7 +44,7 @@ text.drawElement = function(self)
     if allignment == "West" or allignment == "Centre" or allignment == "East" then
         y = y + centreH
     end
-    
+    lg.setColor(self.color)
     lg.print(self.text, self.font, x, y)
 end
 

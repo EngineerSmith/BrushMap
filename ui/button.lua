@@ -15,9 +15,12 @@ button.new = function(anchor, color, callbackPressed, callbackReleased)
     local self = setmetatable(ui.new(anchor), button)
     
     self.color = color or {0.4,0.4,0.4}
+    self.activeColor = self.color
     self.callbackPressed = callbackPressed or nilFunc
     self.callbackReleased = callbackReleased or nilFunc
     self.rectCorner = 0
+    
+    self:setActive(callbackPressed ~= nil and callbackReleased ~= nil)
     
     return self
 end
@@ -30,6 +33,7 @@ button.setText = function(self, text, color, font)
     else
         self.text:updateText(text, font, color)
     end
+    self:setActive(self.active)
 end
 
 button.setImage = function(self, image, color)
@@ -40,6 +44,7 @@ button.setImage = function(self, image, color)
     else
         self.image:setImage(image, color)
     end
+    self:setActive(self.active)
 end
 
 button.setOutline = function(self, enabled, distance, lineSize)
@@ -52,8 +57,45 @@ button.setRoundCorner = function(self, round)
    self.rectCorner = round or 0 
 end
 
+button.setActive = function(self, value)
+    self.active = value
+    if self.active then
+        self.color = self.activeColor
+        if self.text and self.activeTextColor then
+            self.text:updateText(nil,nil, self.activeTextColor)
+        end
+        if self.image and self.activeImageColor then
+            self.image:updateImage(nil, self.activeImageColor)
+        end
+    else
+        local r,g,b = self.activeColor[1],self.activeColor[2],self.activeColor[3]
+        self.color = {r-0.2,g-0.2,b-0.2}
+        if self.text and self.activeTextColor == nil then
+            local r,g,b = self.text.color[1],self.text.color[2],self.text.color[3]
+            self.activeTextColor = self.text.color
+            self.text:updateText(nil, nil, {r-0.4,g-0.4,b-0.4})
+        end
+        if self.image and self.activeImageColor == nil then
+            local r,g,b = self.image.color[1],self.image.color[2],self.image.color[3]
+            self.activeImageColor = self.image.color
+            self.image:setImage(nil, {r-0.4,g-0.4,b-0.4})
+        end
+    end
+end
+
+button.setCallbackPressed = function(self, callback)
+    self.callbackPressed = callback or nilFunc
+    self:setActive(self.callbackPressed ~= nilFunc or self.callbackReleased ~= nilFunc)
+end
+
+button.setCallbackReleased = function(self, callback) 
+    self.callbackReleased = callback or nilFunc
+    self:setActive(self.callbackPressed ~= nilFunc or self.callbackReleased ~= nilFunc)
+end
+
 button.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
     if aabb(pressedX, pressedY, self.anchor:getRect()) then
+    self.color = {1,0,0}
         local result = self:callbackPressed()
         return result ~= nil and result or true
     end

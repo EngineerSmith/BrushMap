@@ -61,4 +61,10 @@ local textTitle = text.new(anchor, lang.getText("menu.title"), global.assets["fo
 
 window:addChild(textTitle)
 
+window.buttonNew2D = buttonNew2D
+window.buttonNew3D = buttonNew3D
+window.buttonLoad = buttonLoad
+window.buttonLanguage = buttonLanguage
+window.buttonHelp = buttonHelp
+
 return window

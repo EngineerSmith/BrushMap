@@ -6,7 +6,13 @@ local lg = love.graphics
 
 scene.background = require("background.circles")
 
-scene.menuWindow = require("scene.ui.menu") --[[require("scene.ui.fileDialog")
+scene.menuWindow = require("scene.ui.menu")
+
+scene.menuWindow.buttonNew2D:setCallbackPressed(function(self)
+   require("utilities.sceneManager").changeScene("scene.tilesetEditor")
+   return true
+end)
+--[[require("scene.ui.fileDialog")
 local callback = function(success, path)
     require("utilities.sceneManager").changeScene("scene.tilesetEditor")
 end]]

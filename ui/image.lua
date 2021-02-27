@@ -13,10 +13,11 @@ end
 local rad = math.rad
 
 image.setImage = function(self, image, color)
-    self.image = image
-    local width, height = image:getWidth(), image:getHeight()
-    self.imageLength = width > height and height or width
-    
+    if image then
+        self.image = image
+        local width, height = image:getWidth(), image:getHeight()
+        self.imageLength = width > height and height or width
+    end
     self.color = color or {1,1,1}
 end
 
