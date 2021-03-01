@@ -4,11 +4,13 @@ tabController.__index = tabController
 
 local anchor = require("ui.base.anchor")
 
+local tabTitleWidth = 40
+
 tabController.new = function(windowWidth)
-    local anchor = anchor.new("NorthEast", 30,0, 0,-1)
+    local anchor = anchor.new("NorthEast", tabTitleWidth,0, 0,-1)
     local self = setmetatable(ui.new(anchor), tabController)
     
-    self.windowWidth = windowWidth or 100
+    self.windowWidth = windowWidth or 200
     self.active = false
     
     return self
@@ -37,7 +39,7 @@ tabController.updateTabLocations = function(self)
     
     y = y + padding
     for i, child in ipairs(self.children) do
-        child:setTitleRect(x,y,30,height)
+        child:setTitleRect(x,y,tabTitleWidth,height)
         y = y + padding + height
     end
 end

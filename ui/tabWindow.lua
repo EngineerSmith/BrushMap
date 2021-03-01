@@ -7,12 +7,14 @@ local anchor = require("ui.base.anchor")
 local lg = love.graphics
 
 local aabb = require("utilities.aabb")
+local floor = math.floor
 
-tabWindow.new = function(title, windowWidth)
-    local anchor = anchor.new("NorthEast", -(windowWidth or 130),0, windowWidth or 130,-1)
+tabWindow.new = function(title, font, windowWidth)
+    local anchor = anchor.new("NorthEast", -(windowWidth or 240),0, windowWidth or 240,-1)
     local self = setmetatable(ui.new(anchor), tabWindow)
     
     self.title = title
+    self.font = font or lg.getFont()
     self.titleRect = {0,0,0,0}
     self.active = false
     
@@ -31,21 +33,30 @@ end
 
 tabWindow.drawElement = function(self)
     local x,y,w,h = self:getTitleRect()
-    local x2,y2,w2,h2 = self.anchor:getRect()
-    
-    if self.active then
-        lg.setColor(.2,.2,.2)
-        lg.rectangle("fill", x2,y2,w2,h2)
-    end
     
     if self.parent.active then
         x = x - w
     end
+    
     if self.active then
-    lg.setColor(.2,.2,.2)
+        lg.setColor(.3,.3,.3)
     else 
-        lg.setColor(.8,.8,.8) end
+        lg.setColor(.2,.2,.2) 
+    end
     lg.rectangle("fill", x,y,w,h)
+    
+    lg.setColor(1,1,1)
+    
+    w = floor(w/2) - floor(self.font:getHeight()/2)
+    h = floor(h/2) + floor(self.font:getWidth(self.title)/2)
+    lg.print(self.title, self.font, x+w,y+h, math.rad(270))
+    
+    if self.active then
+        x,y,w,h = self.anchor:getRect()
+        lg.setColor(.3,.3,.3)
+        lg.rectangle("fill", x,y,w,h)
+    end
+    
 end
 
 
@@ -53,14 +64,8 @@ tabWindow.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, 
     local x,y,w,h = self:getTitleRect()
     x = x - (self.parent.active and w or 0)
     if aabb(pressedX, pressedY, x,y,w,h) then
-        self.color = {1,0,0}
-        if not self.active then 
-            self.parent:setActive(true, self)
-            self.active = true 
-        else
-            self.active = false
-            self.parent:setActive(false, self)
-        end
+        self.active = not self.active
+        self.parent:setActive(self.active, self)
         return true
     end
 end
