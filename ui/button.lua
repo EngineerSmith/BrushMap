@@ -16,11 +16,9 @@ button.new = function(anchor, color, callbackPressed, callbackReleased)
     
     self.color = color or {0.4,0.4,0.4}
     self.activeColor = self.color
-    self.callbackPressed = callbackPressed or nilFunc
-    self.callbackReleased = callbackReleased or nilFunc
+    self:setCallbackPressed(callbackPressed)
+    self:setCallbackReleased(callbackReleased)
     self.rectCorner = 0
-    
-    self:setActive(callbackPressed ~= nil and callbackReleased ~= nil)
     
     return self
 end

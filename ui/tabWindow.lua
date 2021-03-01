@@ -31,6 +31,14 @@ tabWindow.getTitleRect = function(self)
     return self.titleRect[1], self.titleRect[2], self.titleRect[3], self.titleRect[4]
 end
 
+tabWindow.draw = function(self)
+    if self.enabled then
+        self:drawElement()
+        if self.active then 
+            self:drawChildren() end
+    end
+end
+
 tabWindow.drawElement = function(self)
     local x,y,w,h = self:getTitleRect()
     
@@ -59,7 +67,6 @@ tabWindow.drawElement = function(self)
     
 end
 
-
 tabWindow.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
     local x,y,w,h = self:getTitleRect()
     x = x - (self.parent.active and w or 0)
@@ -67,6 +74,24 @@ tabWindow.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, 
         self.active = not self.active
         self.parent:setActive(self.active, self)
         return true
+    end
+end
+
+tabWindow.touchpressedChildren = function(self, ...)
+    if self.active then
+        ui.touchpressedChildren(self, ...)
+    end
+end
+
+tabWindow.touchmovedChildren = function(self, ...)
+    if self.active then
+        ui.touchmovedChildren(self, ...)
+    end
+end
+
+tabWindow.touchreleasedChildren = function(self, ...)
+    if self.active then
+        ui.touchreleasedChildren(self, ...)
     end
 end
 
