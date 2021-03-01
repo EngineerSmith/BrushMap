@@ -23,6 +23,7 @@ ui.addChild = function(self, child)
     self.children.count = self.children.count + 1
     child.parent = self
     self:getAnchorUpdate()
+    return self.children.count
 end
 
 ui.getAnchorUpdate = function(self)
