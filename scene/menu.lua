@@ -12,14 +12,9 @@ scene.menuWindow.buttonNew2D:setCallbackPressed(function(self)
    require("utilities.sceneManager").changeScene("scene.editor")
    return true
 end)
---[[require("scene.ui.fileDialog")
-local callback = function(success, path)
-    require("utilities.sceneManager").changeScene("scene.tilesetEditor")
-end]]
 
 scene.load = function()
     scene.background.load(7)
-    --scene.menuWindow.dialog("load", callback)
 end
 
 scene.update = function(dt) 
@@ -30,7 +25,7 @@ end
 scene.draw = function()
     scene.background.draw()
     lg.setColor(1,1,1,1)
-    lg.print(global.info.name .. " " .. global.info.version, 5, 30)
+    lg.print(global.info.name.." "..global.info.version, 5, 30)
     
     scene.menuWindow:draw()
 end

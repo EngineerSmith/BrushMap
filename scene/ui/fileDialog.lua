@@ -21,22 +21,22 @@ window:addChild(background)
 
 local anchor = anchor.new("SouthEast", 10,10, 120,120)
 local actionButton = button.new(anchor)
-actionButton.callbackReleased = function(self)
+actionButton:setCallbackReleased(function(self)
     window.enabled = false
     window.callback(true, window.previousSelected.fullDir)
     return true
-end
+end)
 window.actionButton = actionButton
 background:addChild(actionButton)
 
 local anchor = anchor.new("NorthWest", 10,10, 80,30)
 local returnButton = button.new(anchor)
 returnButton:setText("Return", {1,1,1}, global.assets["font.robotoReg18"])
-returnButton.callbackReleased = function(self)
+returnButton:setCallbackReleased(function(self)
     window.enabled = false
     window.callback(false)
     return true
-end
+end)
 window.returnButton = returnButton
 background:addChild(returnButton)
 
