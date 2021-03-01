@@ -41,7 +41,10 @@ tabWindow.drawElement = function(self)
     if self.parent.active then
         x = x - w
     end
-    lg.setColor(self.color)
+    if self.active then
+    lg.setColor(.2,.2,.2)
+    else 
+        lg.setColor(.8,.8,.8) end
     lg.rectangle("fill", x,y,w,h)
 end
 
@@ -52,9 +55,7 @@ tabWindow.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, 
     if aabb(pressedX, pressedY, x,y,w,h) then
         self.color = {1,0,0}
         if not self.active then 
-            if not self.parent.active then
-                self.parent:setActive(true, self)
-            end
+            self.parent:setActive(true, self)
             self.active = true 
         else
             self.active = false

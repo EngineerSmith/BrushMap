@@ -31,7 +31,7 @@ tabController.updateTabLocations = function(self)
     local x,y,w,h = self.anchor:getRect()
     
     local height = h / self.children.count
-    if height + (padding * self.children.count) > maxHeight then
+    if padding + height > maxHeight then
         height = maxHeight
     end
     
@@ -44,11 +44,10 @@ end
 
 tabController.setActive = function(self, value, child)
     if value then
-        if self.activeChild ~= child then
-            for _, c in ipairs(self.children) do
-                if c ~= child then c.active = false end
+        for _, c in ipairs(self.children) do
+            if c ~= child then 
+                c.active = false
             end
-            self.activeChild = child
         end
     end
     
