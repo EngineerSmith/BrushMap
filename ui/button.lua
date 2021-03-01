@@ -93,7 +93,6 @@ end
 
 button.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
     if aabb(pressedX, pressedY, self.anchor:getRect()) then
-    self.color = {1,0,0}
         local result = self:callbackPressed()
         return result ~= nil and result or true
     end

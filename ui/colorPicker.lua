@@ -44,4 +44,8 @@ colorPicker.new = function()
     return self
 end
 
+colorPicker.getColor = function(self)
+    return self.redSlider.ratio, self.greenSlider.ratio, self.blueSlider.ratio
+end
+
 return colorPicker

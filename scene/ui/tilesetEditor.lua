@@ -13,11 +13,14 @@ local picker = colorPicker.new()
 picker.enabled = false
 window:addChild(picker)
 
+local pickerReturn
+
 local togglePicker = function(bool)
     for _, child in ipairs(window.children) do
         child.enabled = not bool
     end
     picker.enabled = bool
+    pickerReturn.enabled = bool
 end
 
 local showPicker = function()
@@ -26,7 +29,14 @@ end
 
 local hidePicker = function()
     togglePicker(false)
+    love.graphics.setBackgroundColor(picker:getColor())
 end
+
+local anchor = anchor.new("NorthWest", 20,20, 80,80)
+pickerReturn = button.new(anchor, nil, hidePicker)
+pickerReturn:setText("Return")
+pickerReturn.enabled = false
+window:addChild(pickerReturn)
 
 local controller = tabController.new()
 window:addChild(controller)
@@ -34,9 +44,9 @@ window:addChild(controller)
 local tabTileset = tabWindow.new("Tileset", global.assets["font.robotoReg18"])
 controller:addChild(tabTileset)
 
-local anchor = anchor.new("NorthWest", 0,30, 100,40)
+local anchor = anchor.new("NorthWest", 10,30, -1,40, 20,0)
 local butt = button.new(anchor, nil, showPicker)
-butt:setText("Background Color")
+butt:setText("Background Colour")
 
 tabTileset:addChild(butt)
 
