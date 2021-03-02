@@ -120,8 +120,6 @@ button.drawElement = function(self)
     end
     
     lg.rectangle("fill", x, y, width, height,self.rectCorner)
-    
-    lg.setColor(1,1,1)
 end
 
 return button

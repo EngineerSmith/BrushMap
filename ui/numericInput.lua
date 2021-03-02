@@ -7,13 +7,13 @@ local lg = love.graphics
 local floor = math.floor
 local aabb = require("utilities.aabb")
 
-local buttonWidth = 50
+local buttonWidth = 40
 local halfButtonWidth = floor(buttonWidth/2)
 
-numericInput.new = function(anchor, min, max, font)
+numericInput.new = function(anchor, min, max, baseValue, font)
     local self = setmetatable(ui.new(anchor), numericInput)
     
-    self.value = min
+    self.value = baseValue or min
     self.min, self.max = min, max
     self.font = font or lg.getFont()
     return self

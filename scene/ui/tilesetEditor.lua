@@ -1,5 +1,8 @@
 local window = require("ui.base.window").new()
 
+window.tilesizeX, window.tilesizeY = 16,16
+window.tileoffsetX, window.tileoffsetY = 0,0
+
 local windowFileDialog = require("scene.ui.fileDialog")
 window:addChild(windowFileDialog)
 
@@ -62,6 +65,10 @@ tabTileset:addChild(backgroundColor)
 
 local fileDialogCallback = function(success, path)
     togglePicker(false)
+    if success then --TODO if failed to load
+        window.tileset = love.graphics.newImage(path)
+        window.tileset:setFilter("nearest","nearest")
+    end
 end
 
 local titleSelectCallback = function()
@@ -85,9 +92,9 @@ tabTileset:addChild(titleTilesize)
 local anchor = anchor.new("NorthWest", 10,170, 20,40)
 local textTilesizeX = text.new(anchor, "X", font)
 local anchor = anchor.new("NorthWest", 30,160, -1,40, 40,0)
-local tilesizeX = numericInput.new(anchor, 0, 9999, font)
+local tilesizeX = numericInput.new(anchor, 4, 9999, 16, font)
 tilesizeX:setValueChangedCallback(function(_, value)
-    window.tileSizeX = value
+    window.tilesizeX = value
 end)
 tabTileset:addChild(textTilesizeX)
 tabTileset:addChild(tilesizeX)
@@ -95,7 +102,7 @@ tabTileset:addChild(tilesizeX)
 local anchor = anchor.new("NorthWest", 10,220, 20,40)
 local textTilesizeY = text.new(anchor, "Y", font)
 local anchor = anchor.new("NorthWest", 30,210, -1,40, 40,0)
-local tilesizeY = numericInput.new(anchor, 0, 9999, font)
+local tilesizeY = numericInput.new(anchor, 4, 9999, 16, font)
 tilesizeY:setValueChangedCallback(function(_, value)
     window.tilesizeY = value
 end)
@@ -110,9 +117,9 @@ tabTileset:addChild(titleTileoffset)
 local anchor = anchor.new("NorthWest", 10,300, 20,40)
 local textTileoffsetX = text.new(anchor, "X", font)
 local anchor = anchor.new("NorthWest", 30,290, -1,40, 40,0)
-local tileoffsetX = numericInput.new(anchor, 0, 9999, font)
+local tileoffsetX = numericInput.new(anchor, 0, 9999, 0, font)
 tileoffsetX:setValueChangedCallback(function(_, value)
-    window.tileOffsetX = value
+    window.tileoffsetX = value
 end)
 tabTileset:addChild(textTileoffsetX)
 tabTileset:addChild(tileoffsetX)
@@ -120,7 +127,7 @@ tabTileset:addChild(tileoffsetX)
 local anchor = anchor.new("NorthWest", 10,350, 20,40)
 local textTileoffsetY = text.new(anchor, "Y", font)
 local anchor = anchor.new("NorthWest", 30,340, -1,40, 40,0)
-local tileoffsetY = numericInput.new(anchor, 0, 9999, font)
+local tileoffsetY = numericInput.new(anchor, 0, 9999, 0, font)
 tileoffsetY:setValueChangedCallback(function(_, value)
     window.tileoffsetY = value
 end)

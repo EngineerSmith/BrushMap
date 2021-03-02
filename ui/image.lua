@@ -22,11 +22,13 @@ image.setImage = function(self, image, color)
 end
 
 image.drawElement = function(self)
-    local x, y, width, height = self.anchor:getRect()
-    local s = (width > height and height or width) / self.imageLength
-    
-    lg.setColor(self.color)
-    lg.draw(self.image, x, y, 0, s, s)
+    if self.image then
+        local x, y, width, height = self.anchor:getRect()
+        local s = (width > height and height or width) / self.imageLength
+        
+        lg.setColor(self.color)
+        lg.draw(self.image, x, y, 0, s, s)
+    end
 end
 
 return image
