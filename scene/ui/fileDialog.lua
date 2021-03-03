@@ -15,7 +15,7 @@ local directoryItem = require("ui.directoryItem")
 local dropDown = require("ui.dropDown")
 
 local anchor = anchor.new("Center", 0,0, -1,-1, 70,70)
-local background = shape.new(anchor, "Rectangle", {0.4,0.4,0.4, 0.5}, "fill", 7)
+local background = shape.new(anchor, "Rectangle", {0.4,0.4,0.4, 0.7}, "fill", 7)
 
 window:addChild(background)
 
