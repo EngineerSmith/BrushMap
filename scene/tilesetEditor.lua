@@ -7,21 +7,17 @@ local sqrt = math.sqrt
 local editorWindow = require("scene.ui.tilesetEditor")
 local dashedLine = require("utilities.dashedLine")
 
-local cameraMode = "translate"
 local cameraX, cameraY, cameraScale = 0, 0, 1
 local cameraScaleSpeed = 0.01
-local touches = lt.getTouches()
 
 scene.update = function(dt)
-    touches = lt.getTouches()
-    
-    if #touches <= 1 then
-        cameraMode = "translate"
-    elseif #touches >= 2 then
-        cameraMode = "scale"
-    end
-    
     editorWindow:update(dt)
+    
+    if editorWindow.tileset then
+        --focalX, focalY = editorWindow.tileset:getDimensions()
+        --focalX, focalY = focalX / 2, focalY / 2
+        --focalX, focalY = (focalX + cameraX) * cameraScale, (focalY + cameraY) * cameraScale
+    end
 end
 
 scene.draw = function()
@@ -48,34 +44,38 @@ scene.draw = function()
         end
     end
     lg.pop()
-    lg.setColor(1,1,0)
-    lg.circle("fill", focalX or -1000, focalY or -1000, 5)
+    lg.setColor(1,0,1)
+    lg.circle("fill", focalX or -100, focalY or -100, 5)
     editorWindow:draw()
 end
 
+local lastX, lastY = 0,0
 
 scene.touchpressed = function(id, x, y, dx, dy, pressure)
     if editorWindow:touchpressed(id, x, y, dx, dy, pressure) then
         return end
+    lastX, lastY = x,y
 end
+
 
 scene.touchmoved = function(id, x, y, dx, dy, pressure)
     if editorWindow:touchmoved(id, x, y, dx, dy, pressure) then
         return end
-    touches = lt.getTouches() -- Catch as events fire before update 
-    if cameraMode == "translate" then
-        cameraX = cameraX + dx
-        cameraY = cameraY + dy
-    elseif cameraMode == "scale" and #touches >= 2 then
-        local t1x, t1y, t1dx, t1dy = nil,nil, 0,0
-        local t2x, t2y, t2dx, t2dy = nil,nil, 0,0
+    local touches = lt.getTouches()
+    if #touches == 1 then
+        cameraX = cameraX + (x - lastX) / cameraScale
+        cameraY = cameraY + (y - lastY) / cameraScale
+        lastX, lastY = x,y
+    elseif #touches >= 2 then
+        local t1x, t1y, t1dx, t1dy = x,y, 0,0
+        local t2x, t2y, t2dx, t2dy = x,y, 0,0
         -- Get touch information
         if touches[1] == id then
-            t1x, t1y, t1dx, t1dy = x,y,dx,dy
+            t1dx, t1dy = dx, dy
             t2x, t2y = lt.getPosition(touches[2])
         elseif touches[2] == id then
             t1x, t1y = lt.getPosition(touches[1])
-            t2x, t2y, t2dx, t2dy = x,y,dx,dy
+            t2dx, t2dy = dx,dy
         else
             return -- A touch we don't care for
         end
@@ -92,30 +92,36 @@ scene.touchmoved = function(id, x, y, dx, dy, pressure)
         
         local deltaLenDiff = preTDeltaLen - tDeltaLen
         
+        local previousScale = cameraScale
+        
         cameraScale = cameraScale - deltaLenDiff * cameraScaleSpeed
         
         if cameraScale < 0.1 then
             cameraScale = 0.1 end
         -- Reference End
         --TODO Solve translate at pinch focal
-        --[[
-        local tChange = tDeltaLen / preTDeltaLen
+        --focalX, focalY = t1x + t2x / 2, t1y + t2y / 2
+        focalX, focalY = editorWindow.tileset:getDimensions()
+        focalX, focalY = focalX / 2, focalY / 2
+        focalX, focalY = focalX + cameraX, focalY + cameraY
+        focalX, focalY = focalX * cameraScale, focalY * cameraScale
+        local _,_,w,h = love.window.getSafeArea()
         
-        local tdx, tdy = t2x - t1x, t2y - t1y
-        focalX, focalY = t1x + tdx/2, t1y + tdy/2
+        local prevWidth, prevHeight = w * previousScale, h * previousScale
+        local nextWidth, nextHeight = w * cameraScale, h * cameraScale
         
-        local dirX, dirY = cameraX - focalX, cameraY - focalY
-        
-        local dirLen = sqrt(dirX*dirX+dirY*dirY)
-        local newDir = dirLen / tChange
-        cameraX = newDir * (dirX / dirLen)
-        cameraY = newDir * (dirY / dirLen)]]
+        cameraX = cameraX + (focalX * -1) * ((nextWidth - prevWidth) / nextWidth)
+        cameraY = cameraY + (focalY * -1) * ((nextHeight - prevHeight) / nextHeight)
     end
 end
 
 scene.touchreleased = function(id, x, y, dx, dy, pressure)
     if editorWindow:touchreleased(id, x, y, dx, dy, pressure) then
         return end
+    local touches = lt.getTouches()
+    if #touches == 1 then
+        lastX, lastY = lt.getPosition(touches[1])
+    end
 end
 
 
