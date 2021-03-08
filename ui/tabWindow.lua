@@ -7,6 +7,7 @@ local anchor = require("ui.base.anchor")
 local lg = love.graphics
 
 local aabb = require("utilities.aabb")
+local insert, remove = table.insert, table.remove
 local floor = math.floor
 
 tabWindow.new = function(title, font, windowWidth)
@@ -18,6 +19,7 @@ tabWindow.new = function(title, font, windowWidth)
     self.titleRect = {0,0,0,0}
     self.active = false
     
+    self.touches = {}
     self.color ={.8,.8,.8}
     
     return self
@@ -59,21 +61,60 @@ tabWindow.drawElement = function(self)
     h = floor(h/2) + floor(self.font:getWidth(self.title)/2)
     lg.print(self.title, self.font, x+w,y+h, math.rad(270))
     
-    if self.active then
-        x,y,w,h = self.anchor:getRect()
+    if self.active then 
         lg.setColor(.3,.3,.3)
-        lg.rectangle("fill", x,y,w,h)
+        lg.rectangle("fill", self.anchor:getRect())
     end
     
 end
 
-tabWindow.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
+local getTouch = function(touches, id)
+    for k,v in ipairs(touches) do
+        if v.id == id then return k,v end
+    end
+    return -1
+end
+
+tabWindow.touchpressedElement = function(self, id, pressedX, pressedY, ...)
     local x,y,w,h = self:getTitleRect()
     x = x - (self.parent.active and w or 0)
     if aabb(pressedX, pressedY, x,y,w,h) then
-        self.active = not self.active
-        self.parent:setActive(self.active, self)
+        insert(self.touches, {id=id, trigger=true})
         return true
+    end
+    if self.active and aabb(pressedX, pressedY, self.anchor:getRect()) then
+        insert(self.touches, {id=id, trigger=false})
+        return true
+    end
+end
+
+tabWindow.touchmovedElement = function(self, id, pressedX, pressedY, ...)
+    local x,y,w,h = self:getTitleRect()
+    x = x - (self.parent.active and w or 0)
+    if (aabb(pressedX, pressedY, x,y,w,h)) or (self.active and aabb(pressedX, pressedY, self.anchor:getRect())) then
+        local key = getTouch(self.touches, id)
+        return key ~= -1
+    end
+end
+
+tabWindow.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
+    
+    local key = getTouch(self.touches, id)
+    if key ~= -1 then
+        local trigger = self.touches[key].trigger
+        remove(self.touches, key)
+        
+        if trigger then
+            local x,y,w,h = self:getTitleRect()
+            x = x - (self.parent.active and w or 0)
+            if aabb(pressedX, pressedY, x,y,w,h) then
+                self.active = not self.active
+                self.parent:setActive(self.active, self)
+                return true
+            end
+        end
+        
+        return self.active and aabb(pressedX, pressedY, self.anchor:getRect())
     end
 end
 

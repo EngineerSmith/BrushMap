@@ -128,7 +128,7 @@ end
 --[[ 
 CALLBACK EXAMPLE
     function callback(success, filePath) end
-FILTER EXAMPLE
+FILTER EXAMPLE -- TODO
     {"png", "tga", "jpeg", "jpg"}
 ]]
 
@@ -169,6 +169,18 @@ window.setDrive = function(drive)
     window.map = window.createMap(drive)
     
     displayMap(window.map)
+end
+
+window.touchpressedElement = function(...)
+    return true
+end
+
+window.touchmovedElement = function(...)
+    return true
+end
+
+window.touchreleasedElement = function(...)
+    return true
 end
 
 window.enabled = false
