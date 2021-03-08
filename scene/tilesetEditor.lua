@@ -9,6 +9,10 @@ local touchController = require("input.touch")
 local _,_,w,h = love.window.getSafeArea()
 touchController.setDimensions(w,h)
 
+local function inbetween(min, max, value)
+    return math.min(max, math.max(min, value))
+end
+
 scene.update = function(dt)
     touchController.update()
     editorWindow:update(dt)
@@ -29,8 +33,8 @@ scene.draw = function()
         local x = editorWindow.tilesizeX
         local y = editorWindow.tilesizeY
         
-        local dash  = 5 / (touchController.scale / 1.5)
-        local space = 3 / (touchController.scale / 1.5)
+        local dash  = inbetween(2.1, 5, 5 / (touchController.scale / 1.5))
+        local space = inbetween(2.1, 5,5 / (touchController.scale / 1.5))
         lg.setLineWidth(math.min(math.max(touchController.scale/1.5,1),0.2))
         lg.setColor(.8,.8,.8)
         for i=0, (width-offsetX)/x do
