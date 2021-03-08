@@ -15,6 +15,8 @@ local dashedLine = function(p1x, p1y, p2x, p2y, dash, gap)
         local j = i * stride
         lg.line(j, 0, j + dash, 0)
     end
+    local j = count * stride
+    lg.line(j,0, j + dash,0)
     lg.pop()
 end
 

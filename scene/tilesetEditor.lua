@@ -24,17 +24,22 @@ scene.draw = function()
     end
     
     if editorWindow.tileset then
+        local offsetX, offsetY = editorWindow.tileoffsetX, editorWindow.tileoffsetY
         local width, height = editorWindow.tileset:getDimensions()
         local x = editorWindow.tilesizeX
         local y = editorWindow.tilesizeY
-        lg.setColor(1,1,1,.6)
-        for i=-1, width/x + 1 do
-            dashedLine(i*x,-y, i*x,height+y, 3,2)
+        
+        local dash  = 5 / (touchController.scale / 1.5)
+        local space = 3 / (touchController.scale / 1.5)
+        lg.setLineWidth(math.min(math.max(touchController.scale/1.5,1),0.2))
+        lg.setColor(.8,.8,.8)
+        for i=0, (width-offsetX)/x do
+            dashedLine(i*x+offsetX, offsetY, i*x+offsetX,height, dash, space)
         end
-        for i=-1, height/y + 1 do
-            lg.setColor(1,1,1,.6)
-            dashedLine(-x,i*y, width+x,i*y, 3,2)
+        for i=0, (height-offsetY)/y do
+            dashedLine(offsetX,i*y+offsetY, width,i*y+offsetY, dash, space)
         end
+        lg.setLineWidth(1)
     end
     lg.pop()
     editorWindow:draw()
