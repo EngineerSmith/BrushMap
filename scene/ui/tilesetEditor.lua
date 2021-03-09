@@ -16,6 +16,7 @@ local button = require("ui.button")
 local colorPicker = require("ui.colorPicker")
 local numericInput = require("ui.numericInput")
 local text = require("ui.text")
+local checkbox = require("ui.checkbox")
 
 local font = global.assets["font.robotoReg18"]
 
@@ -111,6 +112,14 @@ tilesizeY:setValueChangedCallback(function(_, value)
 end)
 tabTileset:addChild(textTilesizeY)
 tabTileset:addChild(tilesizeY)
+
+local anchor = anchor.new("NorthEast", 10,125, 30,30)
+local checkboxMirror = checkbox.new(anchor, true)
+checkboxMirror:setValueChangedCallback(function(self, selected)
+    tilesizeX:setClone(selected and tilesizeY or nil)
+end)
+
+tabTileset:addChild(checkboxMirror)
 --[[TILE OFFSET]]
 local anchor = anchor.new("NorthWest", 10, 260, -1,20, 20,0)
 local titleTileoffset = text.new(anchor, "Tile Offset", font)
@@ -136,6 +145,14 @@ tileoffsetY:setValueChangedCallback(function(_, value)
 end)
 tabTileset:addChild(textTileoffsetY)
 tabTileset:addChild(tileoffsetY)
+
+local anchor = anchor.new("NorthEast", 10,255, 30,30)
+local checkboxMirror = checkbox.new(anchor, true)
+checkboxMirror:setValueChangedCallback(function(self, selected)
+    tileoffsetX:setClone(selected and tileoffsetY or nil)
+end)
+
+tabTileset:addChild(checkboxMirror)
 --[[]]
 local tabStatic = tabWindow.new("Static", font)
 controller:addChild(tabStatic)
