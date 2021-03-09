@@ -68,6 +68,9 @@ local fileDialogCallback = function(success, path)
     if success then --TODO if failed to load
         window.tileset = love.graphics.newImage(path)
         window.tileset:setFilter("nearest","nearest")
+        if window.newTilesetCallback then
+            window.newTilesetCallback(window.tileset)
+        end
     end
 end
 

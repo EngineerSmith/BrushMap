@@ -2,6 +2,8 @@ local scene = {}
 
 local lg, lt = love.graphics, love.touch
 
+local aabbBox = require("utilities.aabbBox")
+
 local editorWindow = require("scene.ui.tilesetEditor")
 local dashedLine = require("utilities.dashedLine")
 local touchController = require("input.touch")
@@ -9,13 +11,32 @@ local touchController = require("input.touch")
 local _,_,w,h = love.window.getSafeArea()
 touchController.setDimensions(w,h)
 
+editorWindow.newTilesetCallback = function(tileset)
+    local low, high = 0.8, 5
+    touchController.setLimitScale(low, high)
+    touchController.reset()
+end
+
 local function inbetween(min, max, value)
     return math.min(max, math.max(min, value))
 end
 
+local str = ""
+
 scene.update = function(dt)
     touchController.update()
     editorWindow:update(dt)
+    if editorWindow.tileset then
+        local scale = touchController.scale
+        local x,y = touchController.x, touchController.y
+        local tw, th = w * scale, h * scale
+        local w, h = editorWindow.tileset:getDimensions()
+        w, h = w * scale, h * scale
+        str = ("Box1: %.1f, %.1f, %1.f, %1.f\nBox2: %.1f, %.1f, %1.f, %1.f"):format(0,0,tw,th,x,y,w,h)
+        if not aabbBox(0,0,tw,th, x,y,w,h) then
+            touchController.reset()
+        end
+    end
 end
 
 scene.draw = function()
@@ -48,7 +69,7 @@ scene.draw = function()
     lg.pop()
     editorWindow:draw()
     lg.setColor(1,1,1)
-    lg.print((""):format(), 50,50)
+    lg.print(str, 50,50)
 end
 
 scene.touchpressed = function(...)

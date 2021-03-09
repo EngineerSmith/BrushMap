@@ -4,10 +4,14 @@ local controller = {
 }
 
 local insert, remove = table.insert, table.remove
-local sqrt = math.sqrt
+local sqrt, min, max = math.sqrt, math.min, math.max
 
 local touches = {}
 local prevWidth, prevHeight
+
+local function inbetween(low, high, value)
+    return min(high, max(low, value))
+end
 
 controller.setDimensions = function(width, height)
     controller.width, controller.height = width, height
@@ -18,6 +22,14 @@ controller.reset = function()
     controller.x = 0
     controller.y = 0
     controller.scale = 1
+    prevWidth, prevHeight = controller.width, controller.height
+end
+
+controller.setLimitScale = function(low, high)
+    controller.scaleLimit = {
+        low = low or 0.1,
+        high = high or 2
+    }
 end
 
 local updateTouch = function(touch)
@@ -53,7 +65,15 @@ controller.update = function()
             local dist = sqrt(dx*dx+dy*dy)
             
             controller.scale = controller.scale * (dist/lastDist)
-            lastDist = dist
+            if controller.scaleLimit then
+                if controller.scale > controller.scaleLimit.high then
+                    controller.scale = controller.scaleLimit.high
+                elseif controller.scale < controller.scaleLimit.low then
+                    controller.scale = controller.scaleLimit.low
+                else
+                    lastDist = dist
+                end
+            end
             --Translate
             A.x, B.x = (A.x / controller.scale) - controller.x, (B.x / controller.scale) - controller.x
             A.y, B.y = (A.y / controller.scale) - controller.y, (B.y / controller.scale) - controller.y
