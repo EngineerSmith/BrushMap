@@ -27,7 +27,7 @@ tabController.getAnchorUpdate = function(self)
 end
 
 local padding = 10
-local maxHeight = 150
+local maxHeight = 120
 
 tabController.updateTabLocations = function(self)
     local x,y,w,h = self.anchor:getRect()

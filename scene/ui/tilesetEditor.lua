@@ -160,4 +160,7 @@ controller:addChild(tabStatic)
 local tabAnimation = tabWindow.new("Animation", font)
 controller:addChild(tabAnimation)
 
+local tabBitmask = tabWindow.new("Bitmask", font)
+controller:addChild(tabBitmask)
+
 return window

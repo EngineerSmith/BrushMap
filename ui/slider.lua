@@ -21,6 +21,24 @@ slider.new = function(anchor, maxValue, startingValue, color)
     return self
 end
 
+slider.setValue = function(self, value)
+    self.value = value
+    self.ratio = value / self.maxValue
+    self:limitRatio()
+    if self.valueChangedCallback then
+        self:valueChangedCallback(self.value)
+    end
+end
+
+slider.setRatio = function(self, value)
+    self.ratio = value
+    self:limitRatio()
+    self.value = self.ratio * self.maxValue
+    if self.valueChangedCallback then
+        self:valueChangedCallback(self.value)
+    end
+end
+
 slider.limitRatio = function(self)
     if self.ratio > 1 then
         self.ratio = 1

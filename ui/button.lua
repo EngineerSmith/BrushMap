@@ -45,10 +45,11 @@ button.setImage = function(self, image, color)
     self:setActive(self.active)
 end
 
-button.setOutline = function(self, enabled, distance, lineSize)
+button.setOutline = function(self, enabled, distance, lineSize, color)
     self.lineEnabled = enabled or false
     self.lineDistance = distance or 2
     self.lineSize = lineSize or 1
+    self.linecolor = color or self.color
 end
 
 button.setRoundCorner = function(self, round)
@@ -110,16 +111,16 @@ end
 button.drawElement = function(self)
     local x, y, width, height = self.anchor:getRect()
     
-    lg.setColor(self.color)
-    
     if self.lineEnabled then
+        lg.setColor(self.linecolor)
         local line = self.lineDistance
         lg.setLineWidth(self.lineSize)
         lg.rectangle("line", x-line, y-line, width+line*2, height+line*2, self.rectCorner)
         lg.setLineWidth(1)
     end
     
-    lg.rectangle("fill", x, y, width, height,self.rectCorner)
+    lg.setColor(self.color)
+    lg.rectangle("fill", x, y, width, height, self.rectCorner)
 end
 
 return button
