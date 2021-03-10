@@ -8,15 +8,19 @@ local aabbBox = require("utilities.aabbBox")
 local editorWindow = require("scene.ui.tilesetEditor")
 local touchController = require("input.touch")
 local grid = require("utilities.grid").new()
+local outlineBox = require("utilities.outlineBox")
 
 local _,_,w,h = love.window.getSafeArea()
 touchController.setDimensions(w,h)
+
+local outlines = {}
 
 editorWindow.newTilesetCallback = function(tileset)
     local low, high = 0.8, 5
     touchController.setLimitScale(low, high)
     touchController.reset()
     grid:setDimensions(tileset:getDimensions())
+    outlines = {}
 end
 
 touchController.setPressedCallback(function(x, y)
@@ -26,8 +30,10 @@ touchController.setPressedCallback(function(x, y)
         local w, h = editorWindow.tileset:getDimensions()
         
         if aabb(x,y, 0,0,w,h) then
-            xx, yy = grid:positionToTile(x, y)
-            str = ("TOUCH!\n%.0f, %.0f\n%.2f, %.2f"):format(x, y, xx, yy)
+            local x, y = grid:positionToTile(x, y)
+            x, y = math.floor(x), math.floor(y)
+            local w, h = grid.sizeX, grid.sizeY
+            table.insert(outlines, outlineBox.new(x*w,y*h,w,h))
         end
     end
 end)
@@ -63,6 +69,11 @@ scene.draw = function()
     if editorWindow.tileset then
         grid:draw(touchController.scale / 1.5)    
     end
+    
+    for _, box in ipairs(outlines) do
+        box:draw(touchController.scale / 1.5)
+    end
+    
     lg.pop()
     editorWindow:draw()
     lg.setColor(1,1,1)
