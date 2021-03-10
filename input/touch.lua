@@ -38,6 +38,12 @@ controller.setLimitScale = function(low, high)
     }
 end
 
+controller.touchToWorld = function(x, y)
+    x = (x / controller.scale) - controller.x
+    y = (y / controller.scale) - controller.y
+    return x, y
+end
+
 local updateTouch = function(touch)
     local lastX, lastY = touch.x, touch.y
     local dx,dy = 0,0

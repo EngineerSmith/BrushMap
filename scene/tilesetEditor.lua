@@ -2,6 +2,7 @@ local scene = {}
 
 local lg, lt = love.graphics, love.touch
 
+local aabb = require("utilities.aabb")
 local aabbBox = require("utilities.aabbBox")
 
 local editorWindow = require("scene.ui.tilesetEditor")
@@ -17,6 +18,19 @@ editorWindow.newTilesetCallback = function(tileset)
     touchController.reset()
     grid:setDimensions(tileset:getDimensions())
 end
+
+touchController.setPressedCallback(function(x, y)
+    if editorWindow.tileset then
+        x, y = touchController.touchToWorld(x, y)
+        
+        local w, h = editorWindow.tileset:getDimensions()
+        
+        if aabb(x,y, 0,0,w,h) then
+            xx, yy = grid:positionToTile(x, y)
+            str = ("TOUCH!\n%.0f, %.0f\n%.2f, %.2f"):format(x, y, xx, yy)
+        end
+    end
+end)
 
 scene.update = function(dt)
     touchController.update()
@@ -52,7 +66,8 @@ scene.draw = function()
     lg.pop()
     editorWindow:draw()
     lg.setColor(1,1,1)
-    lg.print((""):format(), 50,50)
+    local str = str or ""
+    lg.print(str, 50,50)
 end
 
 scene.touchpressed = function(...)

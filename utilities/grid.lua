@@ -36,7 +36,9 @@ grid.setColor = function(self, r,g,b)
 end
 
 grid.positionToTile = function(self, x, y)
-    
+    local tx = x / self.sizeX
+    local ty = y / self.sizeY 
+    return tx, ty
 end
 
 grid.draw = function(self, scale)
