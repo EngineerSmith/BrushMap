@@ -1,6 +1,7 @@
 local controller = {
     x, y, scale,
-    width, height = 1,1
+    width, height = 1,1,
+    pressedDelay = 0.2,
 }
 
 local insert, remove = table.insert, table.remove
@@ -13,16 +14,21 @@ local function inbetween(low, high, value)
     return min(high, max(low, value))
 end
 
-controller.setDimensions = function(width, height)
-    controller.width, controller.height = width, height
-    prevWidth, prevHeight = width, height
-end
-
 controller.reset = function()
     controller.x = 0
     controller.y = 0
     controller.scale = 1
     prevWidth, prevHeight = controller.width, controller.height
+end
+
+controller.setPressedCallback = function(callback, pressedDelay)
+    controller.pressedCallback = callback or nil
+    controller.pressedDelay = pressedDelay or 0.2
+end
+
+controller.setDimensions = function(width, height)
+    controller.width, controller.height = width, height
+    prevWidth, prevHeight = width, height
 end
 
 controller.setLimitScale = function(low, high)
@@ -100,7 +106,7 @@ local getTouch = function(id)
 end
 
 controller.touchpressed = function(id, x, y, dx, dy, pressure)
-    insert(touches, {id=id, x=x, y=y, moved={}})
+    insert(touches, {id=id, x=x, y=y, moved={}, time=love.timer.getTime()})
     if #touches == 2 then
         local dx, dy = touches[2].x - touches[1].x, touches[2].y - touches[1].y
         lastDist = sqrt(dx*dx+dy*dy)
@@ -115,8 +121,12 @@ controller.touchmoved = function(id, x, y, dx, dy, pressure)
 end
 
 controller.touchreleased = function(id, x, y, dx, dy, pressure)
-    local key = getTouch(id)
+    local key, touch = getTouch(id)
     if key ~= -1 then
+        local time = love.timer.getTime() - touch.time
+        if controller.pressedCallback and time < controller.pressedDelay then
+            controller.pressedCallback(x, y)
+        end
         remove(touches, key)
     end
 end

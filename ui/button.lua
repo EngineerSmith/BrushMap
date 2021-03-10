@@ -58,6 +58,7 @@ end
 
 button.setActive = function(self, value)
     self.active = value
+    local prevColor = self.color
     if self.active then
         self.color = self.activeColor
         if self.text and self.activeTextColor then
@@ -79,6 +80,10 @@ button.setActive = function(self, value)
             self.activeImageColor = self.image.color
             self.image:setImage(nil, {r-0.4,g-0.4,b-0.4})
         end
+    end
+    -- Set line color to current active color if it's own color hasn't been set
+    if self.linecolor == prevColor then
+        self.linecolor = self.color
     end
 end
 
