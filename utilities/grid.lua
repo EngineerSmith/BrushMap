@@ -2,7 +2,7 @@ local grid = {}
 grid.__index = grid
 
 local lg = love.graphics
-local min, max, mod = math.min, math.max, math.mod
+local min, max, mod, modf = math.min, math.max, math.mod, math.modf
 
 local dashedLine = require("utilities.dashedLine")
 
@@ -44,11 +44,45 @@ grid.setColor = function(self, r,g,b)
 end
 
 grid.positionToTile = function(self, x, y)
-    local tx = x / self.sizeX
-    local ty = y / self.sizeY
-    tx = tx - (self.offsetX / self.sizeX)
-    ty = ty - (self.offsetY / self.sizeY)
-    return tx, ty
+    local rX, rY
+    local rW, rH = self.sizeX, self.sizeY
+    
+    local strideX = self.sizeX + self.innerX
+    local strideY = self.sizeY + self.innerY
+    
+    local startX = mod(self.offsetX, strideX)
+    local startY = mod(self.offsetY, strideY)
+    
+    if self.innerX == 0 then
+        x = x - startX
+        if x < 0 then
+            x = x - strideX
+        end
+        local idX = modf(x / strideX)
+        rX = idX * strideX + startX
+        if rX < 0 then
+            rW = strideX - startX
+            rX = rX - rW + strideX
+        end
+    else
+        --TODO
+    end
+    if self.innerY == 0 then
+        y = y - startY
+        if y < 0 then
+            y = y - strideY
+        end
+        local idY = modf(y / strideY)
+        rY = idY * strideY + startY
+        if rY < 0 then
+            rH = strideY - startY
+            rY = rY - rH + strideY
+        end
+    else
+        --TODO
+    end
+    
+    return rX, rY, rW, rH
 end
 
 grid.draw = function(self, scale)
@@ -56,13 +90,12 @@ grid.draw = function(self, scale)
     local space = inbetween(2.1, 5, 5 / scale)
     
     local w, h = self.width, self.height
-    local ofX, ofY = self.offsetX, self.offsetY
     
     local strideX = self.sizeX + self.innerX
     local strideY = self.sizeY + self.innerY
     
-    local startX = mod(ofX, strideX)
-    local startY = mod(ofY, strideY)
+    local startX = mod(self.offsetX, strideX)
+    local startY = mod(self.offsetY, strideY)
     
     lg.setLineWidth(min(scale, 0.2))
     lg.setColor(self.color)
@@ -73,7 +106,7 @@ grid.draw = function(self, scale)
         end
     end
     if self.innerX ~= 0 then
-        for x = startX + self.innerX, w, strideX do
+        for x = startX - self.innerX, w, strideX do
             if x >= 0 then
                 dashedLine(x, 0, x, h, dash, space)
             end
@@ -86,7 +119,7 @@ grid.draw = function(self, scale)
         end
     end
     if self.innerY ~= 0 then
-        for y = startY + self.innerY, h, strideY do
+        for y = startY - self.innerY, h, strideY do
             if y >= 0 then
                 dashedLine(0, y, w, y, dash, space)
             end
