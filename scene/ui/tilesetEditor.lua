@@ -2,6 +2,7 @@ local window = require("ui.base.window").new()
 
 window.tilesizeX, window.tilesizeY = 16,16
 window.tileoffsetX, window.tileoffsetY = 0,0
+window.paddingX, window.paddingY = 0,0
 
 local windowFileDialog = require("scene.ui.fileDialog")
 window:addChild(windowFileDialog)
@@ -129,7 +130,7 @@ tabTileset:addChild(titleTileoffset)
 local anchor = anchor.new("NorthWest", 10,300, 20,40)
 local textTileoffsetX = text.new(anchor, "X", font)
 local anchor = anchor.new("NorthWest", 30,290, -1,40, 40,0)
-local tileoffsetX = numericInput.new(anchor, -9999, 9999, 0, font)
+local tileoffsetX = numericInput.new(anchor, 0, 9999, 0, font)
 tileoffsetX:setValueChangedCallback(function(_, value)
     window.tileoffsetX = value
 end)
@@ -139,7 +140,7 @@ tabTileset:addChild(tileoffsetX)
 local anchor = anchor.new("NorthWest", 10,350, 20,40)
 local textTileoffsetY = text.new(anchor, "Y", font)
 local anchor = anchor.new("NorthWest", 30,340, -1,40, 40,0)
-local tileoffsetY = numericInput.new(anchor, -9999, 9999, 0, font)
+local tileoffsetY = numericInput.new(anchor, 0, 9999, 0, font)
 tileoffsetY:setValueChangedCallback(function(_, value)
     window.tileoffsetY = value
 end)
@@ -150,6 +151,39 @@ local anchor = anchor.new("NorthEast", 10,255, 30,30)
 local checkboxMirror = checkbox.new(anchor, true)
 checkboxMirror:setValueChangedCallback(function(self, selected)
     tileoffsetX:setClone(selected and tileoffsetY or nil)
+end)
+
+tabTileset:addChild(checkboxMirror)
+--[[TILE PADDING]]
+local anchor = anchor.new("NorthWest", 10, 390, -1,20, 20,0)
+local titlePadding = text.new(anchor, "Padding", font)
+
+tabTileset:addChild(titlePadding)
+
+local anchor = anchor.new("NorthWest", 10,430, 20,40)
+local textPaddingtX = text.new(anchor, "X", font)
+local anchor = anchor.new("NorthWest", 30,420, -1,40, 40,0)
+local paddingX = numericInput.new(anchor, 0, 9999, 0, font)
+paddingX:setValueChangedCallback(function(_, value)
+    window.paddingX = value
+end)
+tabTileset:addChild(textPaddingtX)
+tabTileset:addChild(paddingX)
+
+local anchor = anchor.new("NorthWest", 10,480, 20,40)
+local textPaddingY = text.new(anchor, "Y", font)
+local anchor = anchor.new("NorthWest", 30,470, -1,40, 40,0)
+local paddingY = numericInput.new(anchor, 0, 9999, 0, font)
+paddingY:setValueChangedCallback(function(_, value)
+    window.paddingY = value
+end)
+tabTileset:addChild(textPaddingY)
+tabTileset:addChild(paddingY)
+
+local anchor = anchor.new("NorthEast", 10,385, 30,30)
+local checkboxMirror = checkbox.new(anchor, true)
+checkboxMirror:setValueChangedCallback(function(self, selected)
+    paddingX:setClone(selected and paddingY or nil)
 end)
 
 tabTileset:addChild(checkboxMirror)

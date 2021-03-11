@@ -55,11 +55,20 @@ numericInput.drawElement = function(self)
         lg.rectangle("fill", x,y, buttonWidth, h)
         lg.rectangle("fill", x+w-buttonWidth,y,buttonWidth,h)
         
-        lg.setColor(1,1,1)
         lg.push()
         lg.translate(x+halfButtonWidth,y+floor(h/2))
+        if self.value == self.min then
+            lg.setColor(.7,.7,.7)
+        else
+            lg.setColor(1,1,1)
+        end
         lg.polygon("fill", numericInput.triangleDown)
         lg.translate(w-buttonWidth,0)
+        if self.value == self.max then
+            lg.setColor(.7,.7,.7)
+        else
+            lg.setColor(1,1,1)
+        end
         lg.polygon("fill", numericInput.triangleUp)
         lg.pop()
     end

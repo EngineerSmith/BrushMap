@@ -31,8 +31,8 @@ grid.setTileOffset = function(self, x, y)
     self.offsetX, self.offsetY = x, y
 end
 
-grid.setInnerOffset = function(self, x , y)
-    self.innerX, self.innerY = x, y
+grid.setPadding = function(self, x , y)
+    self.paddingX, self.paddingY = x, y
 end
 
 grid.setDimensions = function(self, width, height)
@@ -43,43 +43,57 @@ grid.setColor = function(self, r,g,b)
     self.color[1], self.color[2], self.color[3] = r, g, b
 end
 
+local getTitlePosition = function(pos, length, start, stride, fullLength)
+    pos = pos - start
+    if pos < 0 then
+        pos = pos - stride
+    end
+    local int = modf(pos / stride)
+    pos = int * stride + start
+    if pos < 0 then
+        length = start
+        pos = pos + stride - start
+    elseif pos + length > fullLength then
+        length = stride - start
+    end
+    return pos, length
+end
+
 grid.positionToTile = function(self, x, y)
-    local rX, rY
+    local rX, rY = -1, -1
     local rW, rH = self.sizeX, self.sizeY
     
-    local strideX = self.sizeX + self.innerX
-    local strideY = self.sizeY + self.innerY
+    local strideX = self.sizeX + self.paddingX
+    local strideY = self.sizeY + self.paddingY
     
     local startX = mod(self.offsetX, strideX)
     local startY = mod(self.offsetY, strideY)
     
-    if self.innerX == 0 then
-        x = x - startX
-        if x < 0 then
-            x = x - strideX
-        end
-        local idX = modf(x / strideX)
-        rX = idX * strideX + startX
-        if rX < 0 then
-            rW = strideX - startX
-            rX = rX - rW + strideX
-        end
+    if self.paddingX == 0 then
+        rX, rW = getTitlePosition(x, rW, startX, strideX, self.width)
     else
-        --TODO
+        local rX1, rW1 = getTitlePosition(x, rW, startX, strideX, self.width)
+        if x > rX1 and x < rX1 + self.sizeX then
+            rX = rX1
+            if rX == 0 then
+                rW = rW1 - self.paddingY
+            elseif rX + rW > self.width then
+                rW = self.width - rX
+            end
+        end
     end
-    if self.innerY == 0 then
-        y = y - startY
-        if y < 0 then
-            y = y - strideY
-        end
-        local idY = modf(y / strideY)
-        rY = idY * strideY + startY
-        if rY < 0 then
-            rH = strideY - startY
-            rY = rY - rH + strideY
-        end
+    if self.paddingY == 0 then
+        rY, rH = getTitlePosition(y, rH, startY, strideY, self.height)
     else
-        --TODO
+        local rY1, rH1 = getTitlePosition(y, rH, startY, strideY, self.height)
+        if y > rY1 and y < rY1 + self.sizeY then
+            rY = rY1
+            if rY == 0 then
+                rH = rH1 - self.paddingY
+            elseif rY + rH > self.height then
+                rH = self.height - rY
+            end
+        end
     end
     
     return rX, rY, rW, rH
@@ -91,8 +105,8 @@ grid.draw = function(self, scale)
     
     local w, h = self.width, self.height
     
-    local strideX = self.sizeX + self.innerX
-    local strideY = self.sizeY + self.innerY
+    local strideX = self.sizeX + self.paddingX
+    local strideY = self.sizeY + self.paddingY
     
     local startX = mod(self.offsetX, strideX)
     local startY = mod(self.offsetY, strideY)
@@ -105,8 +119,8 @@ grid.draw = function(self, scale)
             dashedLine(x, 0, x, h, dash, space)
         end
     end
-    if self.innerX ~= 0 then
-        for x = startX - self.innerX, w, strideX do
+    if self.paddingX ~= 0 then
+        for x = startX - self.paddingX, w, strideX do
             if x >= 0 then
                 dashedLine(x, 0, x, h, dash, space)
             end
@@ -118,8 +132,8 @@ grid.draw = function(self, scale)
             dashedLine(0, y, w, y, dash, space)
         end
     end
-    if self.innerY ~= 0 then
-        for y = startY - self.innerY, h, strideY do
+    if self.paddingY ~= 0 then
+        for y = startY - self.paddingY, h, strideY do
             if y >= 0 then
                 dashedLine(0, y, w, y, dash, space)
             end

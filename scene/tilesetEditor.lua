@@ -30,9 +30,10 @@ touchController.setPressedCallback(function(x, y)
         local w, h = editorWindow.tileset:getDimensions()
         
         if aabb(x,y, 0,0,w,h) then
-            local x2, y2, w, h = grid:positionToTile(x, y)
-            table.insert(outlines, outlineBox.new(x2,y2,w,h))
-            str = ("%.2f, %.2f = %.2f, %.2f\n%.2f:%.2f"):format(x,y,x2,y2,w,h)
+            local x, y, w, h = grid:positionToTile(x, y)
+            if x ~= -1 and y ~= -1 then
+                table.insert(outlines, outlineBox.new(x,y,w,h))
+            end
         end
     end
 end)
@@ -43,7 +44,7 @@ scene.update = function(dt)
     
     grid:setTileSize(editorWindow.tilesizeX, editorWindow.tilesizeY)
     grid:setTileOffset(editorWindow.tileoffsetX, editorWindow.tileoffsetY)
-    grid:setInnerOffset(0, 0)
+    grid:setPadding(editorWindow.paddingX, editorWindow.paddingY)
     
     if editorWindow.tileset then
         local scale = touchController.scale
