@@ -2,7 +2,7 @@ local grid = {}
 grid.__index = grid
 
 local lg = love.graphics
-local min, max = math.min, math.max
+local min, max, mod = math.min, math.max, math.mod
 
 local dashedLine = require("utilities.dashedLine")
 
@@ -16,6 +16,10 @@ grid.new = function()
         color = {.8,.8,.8}
     }, grid)
     
+    self.stencilFunc = function()
+        lg.rectangle("fill", 0,0, self.width, self.height)
+    end
+    
     return self
 end
 
@@ -25,6 +29,10 @@ end
 
 grid.setTileOffset = function(self, x, y)
     self.offsetX, self.offsetY = x, y
+end
+
+grid.setInnerOffset = function(self, x , y)
+    self.innerX, self.innerY = x, y
 end
 
 grid.setDimensions = function(self, width, height)
@@ -37,7 +45,9 @@ end
 
 grid.positionToTile = function(self, x, y)
     local tx = x / self.sizeX
-    local ty = y / self.sizeY 
+    local ty = y / self.sizeY
+    tx = tx - (self.offsetX / self.sizeX)
+    ty = ty - (self.offsetY / self.sizeY)
     return tx, ty
 end
 
@@ -46,17 +56,43 @@ grid.draw = function(self, scale)
     local space = inbetween(2.1, 5, 5 / scale)
     
     local w, h = self.width, self.height
-    local x, y = self.sizeX, self.sizeY
     local ofX, ofY = self.offsetX, self.offsetY
+    
+    local strideX = self.sizeX + self.innerX
+    local strideY = self.sizeY + self.innerY
+    
+    local startX = mod(ofX, strideX)
+    local startY = mod(ofY, strideY)
     
     lg.setLineWidth(min(scale, 0.2))
     lg.setColor(self.color)
-    for i=0, (w - ofX) / x do
-        dashedLine(i * x + ofX, ofY, i * x + ofX, h, dash, space)
+    
+    for x = startX, w, strideX do
+        if x >= 0 then
+            dashedLine(x, 0, x, h, dash, space)
+        end
     end
-    for i=0, (h - ofY) / y do
-        dashedLine(ofX, i * y + ofY, w, i * y + ofY, dash, space)
+    if self.innerX ~= 0 then
+        for x = startX + self.innerX, w, strideX do
+            if x >= 0 then
+                dashedLine(x, 0, x, h, dash, space)
+            end
+        end
     end
+    
+    for y = startY, h, strideY do
+        if y >= 0 then
+            dashedLine(0, y, w, y, dash, space)
+        end
+    end
+    if self.innerY ~= 0 then
+        for y = startY + self.innerY, h, strideY do
+            if y >= 0 then
+                dashedLine(0, y, w, y, dash, space)
+            end
+        end
+    end
+    
     lg.setLineWidth(1)
 end
 

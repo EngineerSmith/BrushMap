@@ -44,6 +44,7 @@ scene.update = function(dt)
     
     grid:setTileSize(editorWindow.tilesizeX, editorWindow.tilesizeY)
     grid:setTileOffset(editorWindow.tileoffsetX, editorWindow.tileoffsetY)
+    grid:setInnerOffset(4, 4)
     
     if editorWindow.tileset then
         local scale = touchController.scale
