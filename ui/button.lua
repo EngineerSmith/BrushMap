@@ -3,6 +3,7 @@ local button = setmetatable({}, {__index=ui})
 button.__index = button
 
 local anchor = require("ui.base.anchor")
+local shape = require("ui.shape")
 local imageUi = require("ui.image")
 local textUi = require("ui.text")
 
@@ -14,11 +15,11 @@ local nilFunc = function() end
 button.new = function(anchor, color, callbackPressed, callbackReleased)
     local self = setmetatable(ui.new(anchor), button)
     
-    self.color = color or {0.4,0.4,0.4}
-    self.activeColor = self.color
+    self.shape = shape.new(anchor, "Rectangle", color or {.4,.4,.4}, "fill")
+    self.activeColor = self.shape.color
+    
     self:setCallbackPressed(callbackPressed)
     self:setCallbackReleased(callbackReleased)
-    self.rectCorner = 0
     
     return self
 end
@@ -34,7 +35,7 @@ button.setText = function(self, text, color, font)
     self:setActive(self.active)
 end
 
-button.setImage = function(self, image, color)
+button.setImage = function(self, image, color, stencil)
     if not self.image then
         local anchor = anchor.new("Center", 0,0, -1,-1)
         self.image = imageUi.new(anchor, image, color)
@@ -42,25 +43,23 @@ button.setImage = function(self, image, color)
     else
         self.image:setImage(image, color)
     end
+    self.shape:enableStencil(stencil or false)
     self:setActive(self.active)
 end
 
 button.setOutline = function(self, enabled, distance, lineSize, color)
-    self.lineEnabled = enabled or false
-    self.lineDistance = distance or 2
-    self.lineSize = lineSize or 1
-    self.linecolor = color or self.color
+    self.shape:setOutline(enabled, distance, lineSize, color)
 end
 
 button.setRoundCorner = function(self, round)
-   self.rectCorner = round or 0 
+    self.shape:setRoundCorner(round)
 end
 
 button.setActive = function(self, value)
     self.active = value
-    local prevColor = self.color
+    local prevColor = self.shape.color
     if self.active then
-        self.color = self.activeColor
+        self.shape.color = self.activeColor
         if self.text and self.activeTextColor then
             self.text:updateText(nil,nil, self.activeTextColor)
         end
@@ -69,7 +68,7 @@ button.setActive = function(self, value)
         end
     else
         local r,g,b = self.activeColor[1],self.activeColor[2],self.activeColor[3]
-        self.color = {r-0.2,g-0.2,b-0.2}
+        self.shape.color = {r-0.2,g-0.2,b-0.2}
         if self.text and self.activeTextColor == nil then
             local r,g,b = self.text.color[1],self.text.color[2],self.text.color[3]
             self.activeTextColor = self.text.color
@@ -82,8 +81,8 @@ button.setActive = function(self, value)
         end
     end
     -- Set line color to current active color if it's own color hasn't been set
-    if self.linecolor == prevColor then
-        self.linecolor = self.color
+    if self.shape.lineColor == prevColor then
+        self.shape.lineColor = self.shape.color
     end
 end
 
@@ -114,18 +113,7 @@ button.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, pre
 end
 
 button.drawElement = function(self)
-    local x, y, width, height = self.anchor:getRect()
-    
-    if self.lineEnabled then
-        lg.setColor(self.linecolor)
-        local line = self.lineDistance
-        lg.setLineWidth(self.lineSize)
-        lg.rectangle("line", x-line, y-line, width+line*2, height+line*2, self.rectCorner)
-        lg.setLineWidth(1)
-    end
-    
-    lg.setColor(self.color)
-    lg.rectangle("fill", x, y, width, height, self.rectCorner)
+    self.shape:draw()
 end
 
 return button

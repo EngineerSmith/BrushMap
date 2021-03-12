@@ -2,6 +2,8 @@ local scene = {}
 
 local lg, lt = love.graphics, love.touch
 
+local global = require("global")
+
 local aabb = require("utilities.aabb")
 local aabbBox = require("utilities.aabbBox")
 
@@ -58,7 +60,15 @@ scene.update = function(dt)
     end
 end
 
+local texture = global.assets["texture.checkerboard"]
+local _,_, width, height = love.window.getSafeArea()
+local quad = lg.newQuad(0,0, width/4, height/4, texture:getDimensions())
+
 scene.draw = function()
+    if editorWindow.showTexture then
+        lg.setColor(lg.getBackgroundColor())
+        lg.draw(texture, quad, 0,0, 0, 4,4)
+    end
     lg.push("all")
     lg.scale(touchController.scale)
     lg.translate(touchController.x, touchController.y)

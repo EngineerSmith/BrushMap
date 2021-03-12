@@ -21,9 +21,10 @@ local checkbox = require("ui.checkbox")
 
 local font = global.assets["font.robotoReg18"]
 
-local picker = colorPicker.new()
+local picker = colorPicker.new(global.assets["texture.checkerboard"])
 picker.enabled = false
 window:addChild(picker)
+window.picker = picker
 
 local pickerReturn
 
@@ -34,6 +35,7 @@ local togglePicker = function(bool)
     end
     picker.enabled = bool
     pickerReturn.enabled = bool
+    window.showTexture = picker.bgImage.enabled
 end
 
 local showPicker = function()

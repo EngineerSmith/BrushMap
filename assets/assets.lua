@@ -1,5 +1,6 @@
 local pixelArt = function(asset)
     asset:setFilter("nearest","nearest")
+    asset:setWrap("repeat")
 end
 
 local assets = {
@@ -18,7 +19,8 @@ local assets = {
     {"icon.arrow.left", "icons/arrow-left.png"},
     {"icon.folder.128", "icons/open-folder-128.png"},
     {"icon.stack.128", "icons/stack-128.png"},
-    {"icon.disc.128", "icons/compact-disc-128.png"}
+    {"icon.disc.128", "icons/compact-disc-128.png"},
+    {"texture.checkerboard", "textures/checkerboard.png", onLoad=pixelArt}
     --EXAMPLE {"icon.pixel", "pixel.png", onLoad=pixelArt},
 }
 

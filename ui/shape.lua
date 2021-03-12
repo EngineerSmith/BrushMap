@@ -30,6 +30,30 @@ shape.new = function(anchor, shapeType, color, drawMode, ...)
     elseif self.type == "Circle" or self.type == "Eclipse" then
         self.segments = shapeData[1]
     end
+    
+    self.stencilFunc = function()
+        local x, y, width, height = self.anchor:getRect()
+        if self.type == "Rectangle" then
+            if self.lineEnabled then
+                local line = self.lineDistance
+                lg.setLineWidth(self.lineSize+.1)
+                lg.rectangle("line", x-line, y-line, width+line*2, height+line*2, self.rx, self.ry, self.segments)
+                lg.setLineWidth(1)
+            end
+            lg.rectangle(self.mode, x, y, width, height, self.rx, self.ry, self.segments)
+        elseif self.type == "Circle" or self.type == "Eclipse" then
+            if self.lineEnabled then
+                local line = self.lineDistance
+                lg.setLineWidth(self.lineSize+.1)
+                lg.eclipse("line", x-line, y-line, width+line*2, height+line*2, self.segments)
+                lg.setLineWidth(1)
+            end
+            lg.eclipse(self.mode, x, y, width, height, self.segments)
+        end
+    end
+    
+    self.stencil = false
+    
     return self
 end
 
@@ -54,6 +78,24 @@ shape.setColor = function(self, r, g, b, a)
     self.color[2] = g or self.color[2]
     self.color[3] = b or self.color[3]
     self.color[4] = a or self.color[4]
+end
+
+shape.enableStencil = function(bool)
+    shape.stencil = bool
+end
+
+shape.draw = function(self)
+    if self.enabled then
+        self:drawElement()
+        if self.stencil then
+            lg.stencil(self.stencilFunc, ",replace", "1")
+            lg.setStencilTest("greater", "0")
+        end
+        self:drawChildren()
+        if self.stencil then
+            lg.setStencilTest()
+        end
+    end
 end
 
 shape.drawElement = function(self)
