@@ -7,6 +7,7 @@ local anchor = require("ui.base.anchor")
 local lg = love.graphics
 
 local aabb = require("utilities.aabb")
+local inbetween = require("utilities.inbetween")
 local insert, remove = table.insert, table.remove
 local floor = math.floor
 
@@ -18,6 +19,8 @@ tabWindow.new = function(title, font, windowWidth)
     self.font = font or lg.getFont()
     self.titleRect = {0,0,0,0}
     self.active = false
+    self.offsetY = 0
+    self.actualHeight = 0
     
     self.touches = {}
     self.color ={.8,.8,.8}
@@ -33,11 +36,35 @@ tabWindow.getTitleRect = function(self)
     return self.titleRect[1], self.titleRect[2], self.titleRect[3], self.titleRect[4]
 end
 
+local bottomPadding = 30
+
+tabWindow.addChild = function(self, child)
+    if child.parent then 
+        error("Child already a has parent") 
+    end
+    
+    insert(self.children, child)
+    self.children.count = self.children.count + 1
+    child.parent = self
+    
+    local num = self.children.count - 1
+    
+    self:getAnchorUpdate()
+    local h = child.anchor.y + child.anchor.height.max
+    if h > self.actualHeight - bottomPadding then
+        self.actualHeight = h + bottomPadding
+    end
+end
+
 tabWindow.draw = function(self)
     if self.enabled then
         self:drawElement()
+        lg.push()
+        lg.translate(0, self.offsetY)
         if self.active then 
-            self:drawChildren() end
+            self:drawChildren()
+        end
+        lg.pop()
     end
 end
 
@@ -88,12 +115,18 @@ tabWindow.touchpressedElement = function(self, id, pressedX, pressedY, ...)
     end
 end
 
-tabWindow.touchmovedElement = function(self, id, pressedX, pressedY, ...)
+tabWindow.touchmovedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
     local x,y,w,h = self:getTitleRect()
     x = x - (self.parent.active and w or 0)
     if (aabb(pressedX, pressedY, x,y,w,h)) or (self.active and aabb(pressedX, pressedY, self.anchor:getRect())) then
         local key = getTouch(self.touches, id)
-        return key ~= -1
+        if key ~= -1 then
+            local yLimit = self.anchor.rect[4] - self.actualHeight
+            if yLimit < 0 then
+              self.offsetY = inbetween(self.offsetY + dy, 0, yLimit)
+            end
+            return true
+        end
     end
 end
 

@@ -2,13 +2,10 @@ local grid = {}
 grid.__index = grid
 
 local lg = love.graphics
-local min, max, mod, modf = math.min, math.max, math.mod, math.modf
+local min, mod, modf = math.min, math.mod, math.modf
 
+local inbetween = require("utilities.inbetween")
 local dashedLine = require("utilities.dashedLine")
-
-local function inbetween(low, high, value)
-    return min(high, max(low, value))
-end
 
 grid.new = function()
     local self = setmetatable({

@@ -4,6 +4,8 @@ scrollView.__index = scrollView
 
 local shape = require("ui.shape")
 
+local inbetween = require("utilities.inbetween")
+
 local lg = love.graphics
 local insert = table.insert
 
@@ -51,20 +53,10 @@ scrollView.empty = function(self)
     self.actualHeight = 0
     return removedChildren
 end
-
-local limit = function(value, min, max)
-    if value < min then
-        return min
-    elseif value > max then
-        return max
-    end
-    return value
-end
-
 scrollView.touchmovedElement = function(self, id, x, y, dx, dy, pressure)
     local yLimit = self.anchor.rect[4] - self.actualHeight
     if yLimit < 0 then
-        self.offsetY = limit(self.offsetY + dy, yLimit, 0)
+        self.offsetY = inbetween(self.offsetY + dy, 0, yLimit)
     end
     return true
 end

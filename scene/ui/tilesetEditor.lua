@@ -193,6 +193,18 @@ tabTileset:addChild(checkboxMirror)
 local tabStatic = tabWindow.new("Static", font)
 controller:addChild(tabStatic)
 
+local anchor = anchor.new("NorthWest", 10, 500, -1,20, 20,0)
+local title = text.new(anchor, "HELLO WORLD1", font)
+tabStatic:addChild(title)
+
+local anchor = anchor.new("NorthWest", 10, 1000, -1,20, 20,0)
+local title = text.new(anchor, "HELLO WORLD2", font)
+tabStatic:addChild(title)
+
+local anchor = anchor.new("NorthWest", 10, 1500, -1,20, 20,0)
+local title = text.new(anchor, "HELLO WORLD3", font)
+tabStatic:addChild(title)
+
 local tabAnimation = tabWindow.new("Animation", font)
 controller:addChild(tabAnimation)
 
