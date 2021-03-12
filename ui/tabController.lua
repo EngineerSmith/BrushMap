@@ -52,6 +52,7 @@ tabController.setActive = function(self, value, child)
             end
         end
     end
+    self.activeChild = child
     
     if self.active ~= value then
         self.active = value

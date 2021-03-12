@@ -1,8 +1,14 @@
 local window = require("ui.base.window").new()
 
+local lg = love.graphics
+
 window.tilesizeX, window.tilesizeY = 16,16
 window.tileoffsetX, window.tileoffsetY = 0,0
 window.paddingX, window.paddingY = 0,0
+
+window.preview = require("utilities.outlineBox").new(0,0,4,4)
+
+local maxNum = 9999
 
 local windowFileDialog = require("scene.ui.fileDialog")
 window:addChild(windowFileDialog)
@@ -18,6 +24,7 @@ local colorPicker = require("ui.colorPicker")
 local numericInput = require("ui.numericInput")
 local text = require("ui.text")
 local checkbox = require("ui.checkbox")
+local image = require("ui.image")
 
 local font = global.assets["font.robotoReg18"]
 
@@ -57,6 +64,9 @@ window:addChild(pickerReturn)
 
 local controller = tabController.new()
 window:addChild(controller)
+window.controller = controller
+
+--[[TAB TILESET]]
 
 local tabTileset = tabWindow.new("Tileset", font)
 controller:addChild(tabTileset)
@@ -70,8 +80,9 @@ tabTileset:addChild(backgroundColor)
 local fileDialogCallback = function(success, path)
     togglePicker(false)
     if success then --TODO if failed to load
-        window.tileset = love.graphics.newImage(path)
+        window.tileset = lg.newImage(path)
         window.tileset:setFilter("nearest","nearest")
+        window.staticpreview:setImage(window.tileset)
         if window.newTilesetCallback then
             window.newTilesetCallback(window.tileset)
         end
@@ -99,7 +110,7 @@ tabTileset:addChild(titleTilesize)
 local anchor = anchor.new("NorthWest", 10,170, 20,40)
 local textTilesizeX = text.new(anchor, "X", font)
 local anchor = anchor.new("NorthWest", 30,160, -1,40, 40,0)
-local tilesizeX = numericInput.new(anchor, 4, 9999, 16, font)
+local tilesizeX = numericInput.new(anchor, 4, maxNum, 16, font)
 tilesizeX:setValueChangedCallback(function(_, value)
     window.tilesizeX = value
 end)
@@ -109,7 +120,7 @@ tabTileset:addChild(tilesizeX)
 local anchor = anchor.new("NorthWest", 10,220, 20,40)
 local textTilesizeY = text.new(anchor, "Y", font)
 local anchor = anchor.new("NorthWest", 30,210, -1,40, 40,0)
-local tilesizeY = numericInput.new(anchor, 4, 9999, 16, font)
+local tilesizeY = numericInput.new(anchor, 4, maxNum, 16, font)
 tilesizeY:setValueChangedCallback(function(_, value)
     window.tilesizeY = value
 end)
@@ -132,7 +143,7 @@ tabTileset:addChild(titleTileoffset)
 local anchor = anchor.new("NorthWest", 10,300, 20,40)
 local textTileoffsetX = text.new(anchor, "X", font)
 local anchor = anchor.new("NorthWest", 30,290, -1,40, 40,0)
-local tileoffsetX = numericInput.new(anchor, 0, 9999, 0, font)
+local tileoffsetX = numericInput.new(anchor, 0, maxNum, 0, font)
 tileoffsetX:setValueChangedCallback(function(_, value)
     window.tileoffsetX = value
 end)
@@ -142,7 +153,7 @@ tabTileset:addChild(tileoffsetX)
 local anchor = anchor.new("NorthWest", 10,350, 20,40)
 local textTileoffsetY = text.new(anchor, "Y", font)
 local anchor = anchor.new("NorthWest", 30,340, -1,40, 40,0)
-local tileoffsetY = numericInput.new(anchor, 0, 9999, 0, font)
+local tileoffsetY = numericInput.new(anchor, 0, maxNum, 0, font)
 tileoffsetY:setValueChangedCallback(function(_, value)
     window.tileoffsetY = value
 end)
@@ -163,19 +174,19 @@ local titlePadding = text.new(anchor, "Padding", font)
 tabTileset:addChild(titlePadding)
 
 local anchor = anchor.new("NorthWest", 10,430, 20,40)
-local textPaddingtX = text.new(anchor, "X", font)
+local textPaddingX = text.new(anchor, "X", font)
 local anchor = anchor.new("NorthWest", 30,420, -1,40, 40,0)
-local paddingX = numericInput.new(anchor, 0, 9999, 0, font)
+local paddingX = numericInput.new(anchor, 0, maxNum, 0, font)
 paddingX:setValueChangedCallback(function(_, value)
     window.paddingX = value
 end)
-tabTileset:addChild(textPaddingtX)
+tabTileset:addChild(textPaddingX)
 tabTileset:addChild(paddingX)
 
 local anchor = anchor.new("NorthWest", 10,480, 20,40)
 local textPaddingY = text.new(anchor, "Y", font)
 local anchor = anchor.new("NorthWest", 30,470, -1,40, 40,0)
-local paddingY = numericInput.new(anchor, 0, 9999, 0, font)
+local paddingY = numericInput.new(anchor, 0, maxNum, 0, font)
 paddingY:setValueChangedCallback(function(_, value)
     window.paddingY = value
 end)
@@ -189,21 +200,82 @@ checkboxMirror:setValueChangedCallback(function(self, selected)
 end)
 
 tabTileset:addChild(checkboxMirror)
---[[]]
+--[[TAB STATIC]]
+
 local tabStatic = tabWindow.new("Static", font)
 controller:addChild(tabStatic)
 
-local anchor = anchor.new("NorthWest", 10, 500, -1,20, 20,0)
-local title = text.new(anchor, "HELLO WORLD1", font)
-tabStatic:addChild(title)
+local updateStaticQuad = function()
+    if window.tileset then
+        local x, y, w, h = window.preview:getRect()
+        window.previewQuad = lg.newQuad(x,y, w,h, window.tileset:getDimensions())
+        window.staticpreview:setQuad(window.previewQuad)
+    end
+end
 
-local anchor = anchor.new("NorthWest", 10, 1000, -1,20, 20,0)
-local title = text.new(anchor, "HELLO WORLD2", font)
-tabStatic:addChild(title)
+local anchor = anchor.new("NorthWest", 10,30, -1,-2, 20,0)
+window.staticpreview = image.new(anchor, nil)
+window.staticpreview:setBackgroundColor({0,0,0})
+tabStatic:addChild(window.staticpreview)
 
-local anchor = anchor.new("NorthWest", 10, 1500, -1,20, 20,0)
-local title = text.new(anchor, "HELLO WORLD3", font)
-tabStatic:addChild(title)
+local rect = window.staticpreview.anchor.rect
+local height = rect[2] + rect[4]
+
+local anchor = anchor.new("NorthWest", 10,20+height, 20,40)
+local textTileX = text.new(anchor, "X", font)
+local anchor = anchor.new("NorthWest", 30,10+height, -1,40, 40,0)
+local tileX = numericInput.new(anchor, 0, maxNum, 0, font)
+tileX:setValueChangedCallback(function(_, value)
+    window.preview.x = value
+    updateStaticQuad()
+end)
+tabStatic:addChild(textTileX)
+tabStatic:addChild(tileX)
+
+local anchor = anchor.new("NorthWest", 10,70+height, 20,40)
+local textTileY = text.new(anchor, "Y", font)
+local anchor = anchor.new("NorthWest", 30,60+height, -1,40, 40,0)
+local tileY = numericInput.new(anchor, 0, maxNum, 0, font)
+tileY:setValueChangedCallback(function(_, value)
+    window.preview.y = value
+    updateStaticQuad()
+end)
+tabStatic:addChild(textTileY)
+tabStatic:addChild(tileY)
+
+local anchor = anchor.new("NorthWest", 8,122+height, 20,40)
+local textTileW = text.new(anchor, "W", font)
+local anchor = anchor.new("NorthWest", 30,110+height, -1,40, 40,0)
+local tileW = numericInput.new(anchor, 4, maxNum, 4, font)
+tileW:setValueChangedCallback(function(_, value)
+    window.preview.width = value
+    updateStaticQuad()
+end)
+tabStatic:addChild(textTileW)
+tabStatic:addChild(tileW)
+
+local anchor = anchor.new("NorthWest", 10,168+height, 20,40)
+local textTileH = text.new(anchor, "H", font)
+local anchor = anchor.new("NorthWest", 30,160+height, -1,40, 40,0)
+local tileH = numericInput.new(anchor, 4, maxNum, 4, font)
+tileH:setValueChangedCallback(function(_, value)
+    window.preview.height = value
+    updateStaticQuad()
+end)
+tabStatic:addChild(textTileH)
+tabStatic:addChild(tileH)
+
+window.updatePreview = function(x, y, w, h)
+    window.preview.x = x
+    window.preview.y = y
+    window.preview.width = w
+    window.preview.height = h
+    tileX.value = x
+    tileY.value = y
+    tileW.value = w
+    tileH.value = h
+    updateStaticQuad()
+end
 
 local tabAnimation = tabWindow.new("Animation", font)
 controller:addChild(tabAnimation)

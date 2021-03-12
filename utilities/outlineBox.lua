@@ -20,6 +20,10 @@ outlineBox.new = function(x, y, width, height, color)
     return self
 end
 
+outlineBox.getRect = function(self)
+    return self.x, self.y, self.width, self.height
+end
+
 outlineBox.draw = function(self, scale)
     local dash  = inbetween(2.1, 5, 5 / scale)
     local space = inbetween(2.1, 5, 5 / scale)

@@ -105,7 +105,12 @@ end
 anchor.calculate = function(self, offsetX, offsetY, windowWidth, windowHeight)
     
     local width = anchor.length(self.width, self.horizontal, windowWidth)
-    local height = anchor.length(self.height, self.vertical, windowHeight)
+    local height
+    if self.height.max == -2 then
+        height = width
+    else
+        height = anchor.length(self.height, self.vertical, windowHeight)
+    end
     
     local x, y = self:position(width, height, windowWidth, windowHeight)
     
