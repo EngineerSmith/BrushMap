@@ -20,6 +20,14 @@ numericInput.new = function(anchor, min, max, baseValue, font)
     return self
 end
 
+numericInput.updateValue = function(self, value, min, max)
+    self.value = value or self.value
+    self.min = min or self.min
+    self.max = max or self.max
+    self:checkValue(self.value < self.min, self.min)
+    self:checkValue(self.value > self.max, self.max)
+end
+
 numericInput.setValueChangedCallback = function(self, callback)
     self.valueChangedCallback = callback
     if self.valueChangedCallback then
@@ -79,12 +87,14 @@ numericInput.drawElement = function(self)
     lg.print(str, self.font, x+floor(w/2)-floor(width/2),y+floor(h/2)-floor(height/2))
 end
 
-local checkValue = function(self, bool, value)
+numericInput.checkValue = function(self, bool, value)
     local triggerCloneCallback = false
     if bool then
         self.value = value
     elseif self.valueChangedCallback then
-        self:valueChangedCallback(self.value) 
+        if not self:valueChangedCallback(self.value) then
+            return false
+        end
         triggerCloneCallback = true
     end
     if self.clone then
@@ -92,21 +102,26 @@ local checkValue = function(self, bool, value)
         if triggerCloneCallback and self.clone.valueChangedCallback then
             self.clone:valueChangedCallback(self.value)
         end
-        
     end
+    return true
 end
 
 numericInput.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
+    local oldvalue = self.value
     if self.active then
         local x,y,w,h = self.anchor:getRect()
         if aabb(pressedX, pressedY, x,y,buttonWidth,h) then
             self.value = self.value - 1
-            checkValue(self, self.value < self.min, self.min)
+            if not self:checkValue(self.value < self.min, self.min) then
+                self.value = oldvalue
+            end
             return true
         end
         if aabb(pressedX, pressedY, x+w-buttonWidth,y,buttonWidth,h) then
             self.value = self.value + 1
-            checkValue(self, self.value > self.max, self.max)
+            if not self:checkValue(self.value > self.max, self.max) then
+                self.value = oldvalue
+            end
             return true
         end
     end

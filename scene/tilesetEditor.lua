@@ -10,20 +10,15 @@ local aabbBox = require("utilities.aabbBox")
 local editorWindow = require("scene.ui.tilesetEditor")
 local touchController = require("input.touch")
 local grid = require("utilities.grid").new()
-local outlineBox = require("utilities.outlineBox")
 
 local _,_,w,h = love.window.getSafeArea()
 touchController.setDimensions(w,h)
-
-local outlines = {}
-
 
 editorWindow.newTilesetCallback = function(tileset)
     local low, high = 0.8, 5
     touchController.setLimitScale(low, high)
     touchController.reset()
     grid:setDimensions(tileset:getDimensions())
-    outlines = {}
     local x, y, w, h = grid:positionToTile(0,0)
     if x ~= -1 and y ~= -1 then
         editorWindow.updatePreview(x,y, w,h)
@@ -40,7 +35,6 @@ touchController.setPressedCallback(function(x, y)
             local x, y, w, h = grid:positionToTile(x, y)
             if x ~= -1 and y ~= -1 then
                 editorWindow.updatePreview(x, y, w, h)
-                --table.insert(outlines, outlineBox.new(x,y,w,h))
             end
         end
     end
@@ -87,13 +81,7 @@ scene.draw = function()
         grid:draw(touchController.scale / 1.5)    
     end
     
-    for _, box in ipairs(outlines) do
-        box:draw(touchController.scale / 1.5)
-    end
-    
-    if editorWindow.controller.activeChild then
-        editorWindow.preview:draw(touchController.scale / 1.5)
-    end
+    editorWindow.drawOutlines(touchController.scale / 1.5)
     
     lg.pop()
     editorWindow:draw()

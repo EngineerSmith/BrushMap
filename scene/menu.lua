@@ -9,7 +9,7 @@ scene.background = require("background.circles")
 scene.menuWindow = require("scene.ui.menu")
 
 scene.menuWindow.buttonNew2D:setCallbackPressed(function(self)
-    global.editorSession = {}
+    global.editorSession = require("utilities.session").new()
    require("utilities.sceneManager").changeScene("scene.editor")
    return true
 end)

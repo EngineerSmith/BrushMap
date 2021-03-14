@@ -77,6 +77,8 @@ grid.positionToTile = function(self, x, y)
             elseif rX + rW > self.width then
                 rW = self.width - rX
             end
+        else
+            return -1, -1, rW, rH
         end
     end
     if self.paddingY == 0 then
