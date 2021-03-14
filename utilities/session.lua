@@ -37,4 +37,18 @@ session.addTileset = function(self, path)
     return image
 end
 
+--TODO check if already existing
+session.addTile = function(self, tileData, tilesetImage)
+    if not tileData.tileset then
+        for key, tileset in ipairs(self.tilesets) do
+            if tileset.image == tilesetImage then
+                tileData.tileset = key
+                insert(self.tiles, tileData)
+            end
+        end
+    else
+        insert(self.tiles, tileData)
+    end
+end
+
 return session

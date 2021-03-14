@@ -6,7 +6,13 @@ window.tilesizeX, window.tilesizeY = 16,16
 window.tileoffsetX, window.tileoffsetY = 0,0
 window.paddingX, window.paddingY = 0,0
 
-window.preview = require("utilities.outlineBox").new(0,0,4,4)
+local outlineBox = require("utilities.outlineBox")
+
+window.preview = outlineBox.new(0,0,4,4, {0,.8,.8})
+
+local tileColorStatic    = {1,0,0}
+local tileColorAnimated  = {0,1,0}
+local tileColorBitmasked = {0,0,1}
 
 local maxNum = 9999
 
@@ -69,7 +75,12 @@ window.controller = controller
 window.drawOutlines = function(scale)
     if window.controller.activeChild then
         window.preview:draw(scale)
-    end 
+    end
+    if window.tilesetPreviews then
+        for _, tile in ipairs(window.tilesetPreviews) do
+            tile:draw(scale)
+        end
+    end
 end
 
 --[[TAB TILESET]]
@@ -90,6 +101,7 @@ local fileDialogCallback = function(success, path)
         
         window.tileset:setFilter("nearest","nearest")
         window.staticpreview:setImage(window.tileset)
+        window.tilesetPreviews = {}
         
         window.static.w:updateValue(nil,nil, window.tileset:getWidth())
         window.static.h:updateValue(nil,nil, window.tileset:getHeight())
@@ -323,6 +335,23 @@ window.updatePreview = function(x, y, w, h)
     updateStaticQuad()
 end
 
+local anchor = anchor.new("NorthWest", 10,220+height, -1,40, 20,0)
+local createTile = button.new(anchor, nil, function()
+    local p = window.preview
+    local tileData = {
+        x = p.x,
+        y = p.y,
+        w = p.width,
+        h = p.height,
+    }
+    global.editorSession:addTile(tileData, window.tileset)
+    table.insert(window.tilesetPreviews, outlineBox.new(p.x, p.y, p.width, p.height, tileColorStatic))
+end)
+createTile:setText("Create Tile", nil, font)
+
+tabStatic:addChild(createTile)
+
+--[[TAB ANIMATION]]
 local tabAnimation = tabWindow.new("Animation", font)
 controller:addChild(tabAnimation)
 
