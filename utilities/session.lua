@@ -19,35 +19,36 @@ session.load = function()
 end
 
 --TODO copy to save dir
+--TODO if failed to load
 session.addTileset = function(self, path)
-    for _, tileset in ipairs(self.tilesets) do
+    for id, tileset in ipairs(self.tilesets) do
         if tileset.path == path then
             -- Reload image as the image may of changed
             tileset.image = lg.newImage(path)
-            return tileset.image
+            return id, tileset.image
         end
     end
-    --TODO if failed to load
     
     local image = lg.newImage(path)
     insert(self.tilesets, {
         path = path,
-        image = image
+        image = image,
+        tiles = {}
     })
-    return image
+    return #self.tilesets, image
 end
 
---TODO check if already existing
-session.addTile = function(self, tileData, tilesetImage)
-    if not tileData.tileset then
-        for key, tileset in ipairs(self.tilesets) do
-            if tileset.image == tilesetImage then
-                tileData.tileset = key
-                insert(self.tiles, tileData)
-            end
-        end
+session.addTile = function(self, tileData, tilesetId)
+    if not self.tilesets[tilesetId] then
+        error("Invalid tilesetId :"..tostring(tilesetId))
+    end
+    
+    if not tileData.id then
+        insert(self.tilesets[tilesetId].tiles, tileData)
+        tileData.id = #self.tilesets[tilesetId].tiles
+        tileData.tilesetId = tilesetId
     else
-        insert(self.tiles, tileData)
+        error("Already added tile")
     end
 end
 

@@ -34,7 +34,7 @@ touchController.setPressedCallback(function(x, y)
         if aabb(x,y, 0,0,w,h) then
             local x, y, w, h = grid:positionToTile(x, y)
             if x ~= -1 and y ~= -1 then
-                editorWindow.updatePreview(x, y, w, h)
+                editorWindow.selectPreview(x,y, w,h)
             end
         end
     end

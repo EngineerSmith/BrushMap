@@ -2,24 +2,63 @@ local window = require("ui.base.window").new()
 
 local lg = love.graphics
 
+local global = require("global")
+
 window.tilesizeX, window.tilesizeY = 16,16
 window.tileoffsetX, window.tileoffsetY = 0,0
 window.paddingX, window.paddingY = 0,0
 
-local outlineBox = require("utilities.outlineBox")
+local updateStaticQuad = function()
+    if window.tileset then
+        local x, y, w, h = window.preview:getRect()
+        window.previewQuad = lg.newQuad(x,y, w,h, window.tileset:getDimensions())
+        window.staticpreview:setQuad(window.previewQuad)
+    end
+end
 
-window.preview = outlineBox.new(0,0,4,4, {0,.8,.8})
+local outlineBox = require("utilities.outlineBox")
 
 local tileColorStatic    = {1,0,0}
 local tileColorAnimated  = {0,1,0}
 local tileColorBitmasked = {0,0,1}
 
+window.outlineBox = outlineBox.new(0,0,0,0)
+window.preview = outlineBox.new(0,0,4,4, {0,.8,.8})
+
+window.updatePreview = function(x, y, w, h)
+    local pre = window.preview
+    pre.x = x
+    pre.y = y
+    pre.width = w
+    pre.height = h
+    local sta = window.static
+    sta.x.value = x
+    sta.y.value = y
+    sta.w.value = w
+    sta.h.value = h
+    updateStaticQuad()
+end
+
+window.selectPreview = function(x, y, w, h)
+    for _, tile in ipairs(global.editorSession.tilesets[window.tilesetId].tiles) do
+            if tile.x == x and tile.y == y then
+                --EDIT
+                window.static.button:setText("Edit Tile")
+                window.tile = tile
+                window.updatePreview(x,y,tile.w,tile.h)
+                return
+            end
+    end
+    --CREATE
+    window.tile = nil
+    window.static.button:setText("Create Tile")
+    window.updatePreview(x,y,w,h)
+end
+
 local maxNum = 9999
 
 local windowFileDialog = require("scene.ui.fileDialog")
 window:addChild(windowFileDialog)
-
-local global = require("global")
 
 local anchor = require("ui.base.anchor")
 
@@ -73,9 +112,28 @@ window:addChild(controller)
 window.controller = controller
 
 window.drawOutlines = function(scale)
-    if window.controller.activeChild then
+    for _, tileset in ipairs(global.editorSession.tilesets) do
+    for _, tile in ipairs(tileset.tiles) do
+        if tile ~= window.tile then
+            if tile.type == "static" then
+                window.outlineBox:setColor(tileColorStatic)
+                window.outlineBox:setRect(tile.x, tile.y, tile.w, tile.h)
+                window.outlineBox:draw(scale)
+            elseif tile.type == "animated" then
+                window.outlineBox:setColor(tileColorAnimated)
+                error("TODO")
+            elseif tile.type == "bitmasked" then
+                window.outlineBox:setColor(tileColorBitmasked)
+                error("TODO")
+            end
+        end
+    end
+    end
+    
+    if controller.activeChild and controller.activeChild ~= controller.tileset then
         window.preview:draw(scale)
     end
+    
     if window.tilesetPreviews then
         for _, tile in ipairs(window.tilesetPreviews) do
             tile:draw(scale)
@@ -87,6 +145,7 @@ end
 
 local tabTileset = tabWindow.new("Tileset", font)
 controller:addChild(tabTileset)
+controller.tileset = tabTileset
 
 local anchor = anchor.new("NorthWest", 10,30, -1,40, 20,0)
 local backgroundColor = button.new(anchor, nil, showPicker)
@@ -97,8 +156,9 @@ tabTileset:addChild(backgroundColor)
 local fileDialogCallback = function(success, path)
     togglePicker(false)
     if success then
-        window.tileset = global.editorSession:addTileset(path)
-        
+        local id, image = global.editorSession:addTileset(path)
+        window.tilesetId = id
+        window.tileset = image
         window.tileset:setFilter("nearest","nearest")
         window.staticpreview:setImage(window.tileset)
         window.tilesetPreviews = {}
@@ -234,14 +294,6 @@ tabTileset:addChild(checkboxMirror)
 local tabStatic = tabWindow.new("Static", font)
 controller:addChild(tabStatic)
 
-local updateStaticQuad = function()
-    if window.tileset then
-        local x, y, w, h = window.preview:getRect()
-        window.previewQuad = lg.newQuad(x,y, w,h, window.tileset:getDimensions())
-        window.staticpreview:setQuad(window.previewQuad)
-    end
-end
-
 local anchor = anchor.new("NorthWest", 10,30, -1,-2, 20,0)
 window.staticpreview = image.new(anchor, nil)
 window.staticpreview:setBackgroundColor({0,0,0})
@@ -323,33 +375,25 @@ window.static.y = tileY
 window.static.w = tileW
 window.static.h = tileH
 
-window.updatePreview = function(x, y, w, h)
-    window.preview.x = x
-    window.preview.y = y
-    window.preview.width = w
-    window.preview.height = h
-    tileX.value = x
-    tileY.value = y
-    tileW.value = w
-    tileH.value = h
-    updateStaticQuad()
-end
-
 local anchor = anchor.new("NorthWest", 10,220+height, -1,40, 20,0)
-local createTile = button.new(anchor, nil, function()
+local addStaticTile = button.new(anchor, nil, function()
     local p = window.preview
-    local tileData = {
-        x = p.x,
-        y = p.y,
-        w = p.width,
-        h = p.height,
-    }
-    global.editorSession:addTile(tileData, window.tileset)
-    table.insert(window.tilesetPreviews, outlineBox.new(p.x, p.y, p.width, p.height, tileColorStatic))
+    
+    local tileData = window.tile or {type = "static"}
+    
+    tileData.x = p.x
+    tileData.y = p.y
+    tileData.w = p.width
+    tileData.h = p.height
+    
+    if not tileData.id then
+        global.editorSession:addTile(tileData, window.tilesetId)
+    end
 end)
-createTile:setText("Create Tile", nil, font)
+addStaticTile:setText("Add Tile", nil, font)
 
-tabStatic:addChild(createTile)
+tabStatic:addChild(addStaticTile)
+window.static.button = addStaticTile
 
 --[[TAB ANIMATION]]
 local tabAnimation = tabWindow.new("Animation", font)

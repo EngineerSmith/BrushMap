@@ -20,6 +20,17 @@ outlineBox.new = function(x, y, width, height, color)
     return self
 end
 
+outlineBox.setColor = function(self, color)
+    self.color = color
+end
+
+outlineBox.setRect = function(self, x, y, width, height)
+    self.x = x or self.x 
+    self.y = y or self.y 
+    self.width = width or self.width
+    self.height = height or self.height
+end
+
 outlineBox.getRect = function(self)
     return self.x, self.y, self.width, self.height
 end
