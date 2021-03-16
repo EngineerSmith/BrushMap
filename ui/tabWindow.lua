@@ -28,6 +28,9 @@ tabWindow.new = function(title, font, windowWidth)
     return self
 end
 
+--To be overriden 
+tabWindow.createUI = function(self) end
+
 tabWindow.setTitleRect = function(self, x,y,w,h)
     self.titleRect[1], self.titleRect[2], self.titleRect[3], self.titleRect[4] =x,y,w,h
 end
