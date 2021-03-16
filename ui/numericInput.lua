@@ -10,12 +10,13 @@ local aabb = require("utilities.aabb")
 local buttonWidth = 40
 local halfButtonWidth = floor(buttonWidth/2)
 
-numericInput.new = function(anchor, min, max, baseValue, font)
+numericInput.new = function(anchor, min, max, baseValue, font, increment)
     local self = setmetatable(ui.new(anchor), numericInput)
     
     self.value = baseValue or min
     self.min, self.max = min, max
     self.font = font or lg.getFont()
+    self.increment = increment or 1
     self.active = true
     return self
 end
@@ -111,14 +112,14 @@ numericInput.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy
     if self.active then
         local x,y,w,h = self.anchor:getRect()
         if aabb(pressedX, pressedY, x,y,buttonWidth,h) then
-            self.value = self.value - 1
+            self.value = self.value - self.increment
             if not self:checkValue(self.value < self.min, self.min) then
                 self.value = oldvalue
             end
             return true
         end
         if aabb(pressedX, pressedY, x+w-buttonWidth,y,buttonWidth,h) then
-            self.value = self.value + 1
+            self.value = self.value + self.increment
             if not self:checkValue(self.value > self.max, self.max) then
                 self.value = oldvalue
             end

@@ -44,8 +44,7 @@ scene.update = function(dt)
     touchController.update()
     editorWindow:update(dt)
     
-    
-    
+    --TODO Make it look better, pass grid to tileset?
     grid:setTileSize(editorWindow.controller.tabTileset.x, editorWindow.controller.tabTileset.y)
     grid:setTileOffset(editorWindow.controller.tabTileset.gridoffsetX,editorWindow.controller.tabTileset.gridoffsetY)
     grid:setPadding(editorWindow.controller.tabTileset.paddingX, editorWindow.controller.tabTileset.paddingY)

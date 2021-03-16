@@ -51,8 +51,10 @@ tabController.setActive = function(self, value, child)
                 c.active = false
             end
         end
+        self.activeChild = child
+    else
+        self.activeChild = nil
     end
-    self.activeChild = child
     
     if self.active ~= value then
         self.active = value

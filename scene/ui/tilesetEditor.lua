@@ -4,9 +4,8 @@ local global = require("global")
 
 local anchor = require("ui.base.anchor")
 local tabController = require("ui.tabController")
-local tabWindow = require("ui.tabWindow")
-local button = require("ui.button")
 local colorPicker = require("ui.colorPicker")
+local button = require("ui.button")
 local outlineBox = require("utilities.outlineBox")
 
 local lg = love.graphics
@@ -39,17 +38,15 @@ end
 
 window.selectPreview = function(x, y, w, h)
     for _, tile in ipairs(global.editorSession.tilesets[window.tilesetId].tiles) do
-            if tile.x == x and tile.y == y then
-                --EDIT
+            if tile.x == x and tile.y == y then --EDIT
                 controller.tabStatic.create:setText("Edit Tile")
                 controller.tabStatic.delete.enabled = true
                 window.tile = tile
                 window.updatePreview(x,y,tile.w,tile.h)
                 return
             end
-    end
-    --CREATE
-    window.tile = nil
+    end --CREATE
+    window.tile = nil 
     controller.tabStatic.create:setText("Create Tile")
     controller.tabStatic.delete.enabled = false
     window.updatePreview(x,y,w,h)
@@ -227,11 +224,15 @@ controller.tabStatic:createUI()
 controller:addChild(controller.tabStatic)
 
 --[[ TAB ANIMATION ]]
-local tabAnimation = tabWindow.new("Animation", font)
-controller:addChild(tabAnimation)
+controller.tabAnimation = require("scene.ui.tilesetEditor.tabAnimation")(font, controller)
 
---[[ TAB BITMASKED ]]
-local tabBitmask = tabWindow.new("Bitmask", font)
-controller:addChild(tabBitmask)
+controller.tabAnimation:createUI()
+controller:addChild(controller.tabAnimation)
+
+--[[ TAB BITMASK ]]
+controller.tabBitmask = require("scene.ui.tilesetEditor.tabBitmask")(font, controller)
+
+controller.tabBitmask:createUI()
+controller:addChild(controller.tabBitmask)
 
 return window

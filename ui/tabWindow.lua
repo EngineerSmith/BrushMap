@@ -134,7 +134,6 @@ tabWindow.touchmovedElement = function(self, id, pressedX, pressedY, dx, dy, pre
 end
 
 tabWindow.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
-    
     local key = getTouch(self.touches, id)
     if key ~= -1 then
         local trigger = self.touches[key].trigger
@@ -154,21 +153,21 @@ tabWindow.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, 
     end
 end
 
-tabWindow.touchpressedChildren = function(self, ...)
+tabWindow.touchpressedChildren = function(self, id, x, y, ...)
     if self.active then
-        ui.touchpressedChildren(self, ...)
+        ui.touchpressedChildren(self, id, x, y - self.offsetY, ...)
     end
 end
 
-tabWindow.touchmovedChildren = function(self, ...)
+tabWindow.touchmovedChildren = function(self, id, x, y, ...)
     if self.active then
-        ui.touchmovedChildren(self, ...)
+        ui.touchmovedChildren(self, id, x, y - self.offsetY, ...)
     end
 end
 
-tabWindow.touchreleasedChildren = function(self, ...)
+tabWindow.touchreleasedChildren = function(self, id, x, y, ...)
     if self.active then
-        ui.touchreleasedChildren(self, ...)
+        ui.touchreleasedChildren(self, id, x, y - self.offsetY, ...)
     end
 end
 

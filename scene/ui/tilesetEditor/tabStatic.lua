@@ -17,7 +17,7 @@ end
 
 tabStatic.createUI = function(self)
     local anchor = anchor.new("NorthWest", 10,30, -1,-2, 20,0)
-    self.preview = image.new(anchor, nil)
+    self.preview = image.new(anchor)
     self.preview:setBackgroundColor({0,0,0})
     self:addChild(self.preview)
     
