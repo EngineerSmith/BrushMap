@@ -3,7 +3,7 @@ session.__index = session
 
 local lg = love.graphics
 
-local insert = table.insert
+local insert, remove = table.insert, table.remove
 
 session.new = function()
     local self = setmetatable({}, session)
@@ -50,6 +50,14 @@ session.addTile = function(self, tileData, tilesetId)
     else
         error("Already added tile")
     end
+end
+
+session.removeTile = function(self, tileData)
+    if not tileData.id and tileData.tilesetId then
+        error("Tile not added")
+    end
+    
+    remove(self.tilesets[tileData.tilesetId].tiles, tileData.id)
 end
 
 return session

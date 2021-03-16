@@ -58,10 +58,15 @@ tabStatic.createUI = function(self)
     self:addChild(self.h)
     
     local anchor = anchor.new("NorthWest", 10,220+height, -1,40, 20,0)
-    local addStaticTile = button.new(anchor, nil, controller.staticTileCallback)
-    addStaticTile:setText("Add Tile", nil, font)
-    self:addChild(addStaticTile)
-    self.button = addStaticTile
+    self.create = button.new(anchor, nil, controller.staticCreateButton)
+    self.create:setText("Add Tile", nil, font)
+    self:addChild(self.create)
+    
+    local anchor = anchor.new("NorthWest", 10,270+height, -1,40, 20,0)
+    self.delete = button.new(anchor, nil, controller.staticDeleteButton)
+    self.delete:setText("Delete Tile", nil, font)
+    self:addChild(self.delete)
+    self.delete.enabled = false
 end
 
 return tabStatic 

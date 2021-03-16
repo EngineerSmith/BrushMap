@@ -41,7 +41,8 @@ window.selectPreview = function(x, y, w, h)
     for _, tile in ipairs(global.editorSession.tilesets[window.tilesetId].tiles) do
             if tile.x == x and tile.y == y then
                 --EDIT
-                controller.tabStatic.button:setText("Edit Tile")
+                controller.tabStatic.create:setText("Edit Tile")
+                controller.tabStatic.delete.enabled = true
                 window.tile = tile
                 window.updatePreview(x,y,tile.w,tile.h)
                 return
@@ -49,7 +50,8 @@ window.selectPreview = function(x, y, w, h)
     end
     --CREATE
     window.tile = nil
-    controller.tabStatic.button:setText("Create Tile")
+    controller.tabStatic.create:setText("Create Tile")
+    controller.tabStatic.delete.enabled = false
     window.updatePreview(x,y,w,h)
 end
 
@@ -197,7 +199,7 @@ controller.staticHCallback = function(_, value)
     return true
 end
 
-controller.staticTileCallback = function()
+controller.staticCreateButton = function()
     local p = window.preview
     
     local tileData = window.tile or {type = "static"}
@@ -209,7 +211,15 @@ controller.staticTileCallback = function()
     
     if not tileData.id then
         global.editorSession:addTile(tileData, window.tilesetId)
-        window.selectPreview(p.x,p.y,p.width,p.height)
+        window.selectPreview(p.x, p.y, p.width, p.height)
+    end
+end
+
+controller.staticDeleteButton = function()
+    if window.tile then
+        global.editorSession:removeTile(window.tile)
+        local p = window.preview
+        window.selectPreview(p.x, p.y, p.width, p.height)
     end
 end
 
