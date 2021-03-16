@@ -43,7 +43,6 @@ image.drawElement = function(self)
     if self.image then
         local s = (width > height and width or height) / self.imageLength
         
-        
         lg.setColor(self.color)
         if self.quad then
             local _,_,w,h = self.quad:getViewport()
