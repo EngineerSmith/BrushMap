@@ -1,6 +1,9 @@
+local global = require("global")
+
 local tabWindow = require("ui.tabWindow")
 local anchor = require("ui.base.anchor")
 local imageAnimation = require("ui.imageAnimation")
+local buttonFrameSelect = require("ui.buttonFrameSelect")
 
 return function(font, controller)
 local tabAnimation = tabWindow.new("Animation", font)
@@ -11,8 +14,12 @@ tabAnimation.createUI = function(self)
     self.preview:setBackgroundColor({0,0,0})
     self:addChild(self.preview)
     
-    local rect = self.preview.anchor.rect
-    local height = rect[2] + rect[4]
+    local x,y,w,h = self.preview.anchor:getRect()
+    local height = y + h
+    
+    local anchor = anchor.new("NorthWest", 10, 10+height, w,w/3, 20,0)
+    self.frameSelect = buttonFrameSelect.new(anchor, global.assets["font.robotoReg25"], global.assets["icon.plus"])
+    self:addChild(self.frameSelect)
 end
 
 return tabAnimation
