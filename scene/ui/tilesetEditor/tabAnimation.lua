@@ -11,6 +11,15 @@ local button = require("ui.button")
 return function(font, controller)
 local tabAnimation = tabWindow.new("Animation", font)
 
+tabAnimation.reset = function(self)
+    self.preview:reset()
+    self.frameSelect:reset()
+    self.time:reset()
+    self.deleteFrame:setActive(false)
+    self.create:setActive(false)
+    self.delete:setActive(false)
+end
+
 tabAnimation.createUI = function(self)
     local anchor = anchor.new("NorthWest", 10,30, -1,-2, 20,0)
     self.preview = imageAnimation.new(anchor)
@@ -22,6 +31,7 @@ tabAnimation.createUI = function(self)
     
     local anchor = anchor.new("NorthWest", 10, 10+height, w,w/3, 20,0)
     self.frameSelect = buttonFrameSelect.new(anchor, global.assets["font.robotoReg25"], global.assets["icon.plus"])
+    self.frameSelect.indexedChangedCallback = controller.animationIndexedChanged
     self:addChild(self.frameSelect)
     
     local x,y,w,h = self.frameSelect.anchor:getRect()
@@ -31,23 +41,27 @@ tabAnimation.createUI = function(self)
     local titleTime = text.new(anchor, "Time (Seconds)", font)
     local anchor = anchor.new("NorthWest", 10, 40+height, -1,40, 20,0)
     self.time = numericInput.new(anchor, 0.05, 3000, 0.2, font, 0.05)
+    self.time:setValueChangedCallback(controller.animationTimeChanged)
     self:addChild(titleTime)
     self:addChild(self.time)
     
     local anchor = anchor.new("NorthWest", 10,100+height, -1,40, 20,0)
-    local deleteFrame = button.new(anchor)
-    deleteFrame:setText("Delete Frame", nil, font)
-    self:addChild(deleteFrame)
+    self.deleteFrame = button.new(anchor, nil, controller.animationDeleteFrameButton)
+    self.deleteFrame:setText("Delete Frame", nil, font)
+    self:addChild(self.deleteFrame)
+    self.deleteFrame:setActive(false)
     
     local anchor = anchor.new("NorthWest", 10,150+height, -1,40, 20,0)
-    local create = button.new(anchor)
-    create:setText("Create Tile", nil, font)
-    self:addChild(create)
+    self.create = button.new(anchor, nil, controller.animationCreateButton)
+    self.create:setText("Create Tile", nil, font)
+    self:addChild(self.create)
+    self.create:setActive(false)
     
     local anchor = anchor.new("NorthWest", 10,200+height, -1,40, 20,0)
-    local delete = button.new(anchor)
-    delete:setText("Delete Title", nil, font)
-    self:addChild(delete)
+    self.delete = button.new(anchor, nil, controller.animationDeleteButton)
+    self.delete:setText("Delete Title", nil, font)
+    self:addChild(self.delete)
+    self.delete:setActive(false)
 end
 
 return tabAnimation

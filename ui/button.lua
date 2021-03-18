@@ -8,6 +8,7 @@ local imageUi = require("ui.image")
 local textUi = require("ui.text")
 
 local lg = love.graphics
+local insert, remove = table.insert, table.remove
 local floor = math.floor
 local aabb = require("utilities.aabb")
 local nilFunc = function() end
@@ -20,6 +21,8 @@ button.new = function(anchor, color, callbackPressed, callbackReleased)
     
     self:setCallbackPressed(callbackPressed)
     self:setCallbackReleased(callbackReleased)
+    
+    self.touches = {}
     
     return self
 end
@@ -56,33 +59,35 @@ button.setRoundCorner = function(self, round)
 end
 
 button.setActive = function(self, value)
-    self.active = value
-    local prevColor = self.shape.color
-    if self.active then
-        self.shape.color = self.activeColor
-        if self.text and self.activeTextColor then
-            self.text:updateText(nil,nil, self.activeTextColor)
+    if self.active ~= value then
+        self.active = value
+        local prevColor = self.shape.color
+        if self.active then
+            self.shape.color = self.activeColor
+            if self.text and self.activeTextColor then
+                self.text:updateText(nil,nil, self.activeTextColor)
+            end
+            if self.image and self.activeImageColor then
+                self.image:updateImage(nil, self.activeImageColor)
+            end
+        else
+            local r,g,b = self.activeColor[1],self.activeColor[2],self.activeColor[3]
+            self.shape.color = {r-0.2,g-0.2,b-0.2}
+            if self.text then
+                local r,g,b = self.text.color[1],self.text.color[2],self.text.color[3]
+                self.activeTextColor = self.text.color
+                self.text:updateText(nil, nil, {r-0.4,g-0.4,b-0.4})
+            end
+            if self.image then
+                local r,g,b = self.image.color[1],self.image.color[2],self.image.color[3]
+                self.activeImageColor = self.image.color
+                self.image:setImage(nil, {r-0.4,g-0.4,b-0.4})
+            end
         end
-        if self.image and self.activeImageColor then
-            self.image:updateImage(nil, self.activeImageColor)
+        -- Set line color to current active color if it's own color hasn't been set
+        if self.shape.lineColor == prevColor then
+            self.shape.lineColor = self.shape.color
         end
-    else
-        local r,g,b = self.activeColor[1],self.activeColor[2],self.activeColor[3]
-        self.shape.color = {r-0.2,g-0.2,b-0.2}
-        if self.text and self.activeTextColor == nil then
-            local r,g,b = self.text.color[1],self.text.color[2],self.text.color[3]
-            self.activeTextColor = self.text.color
-            self.text:updateText(nil, nil, {r-0.4,g-0.4,b-0.4})
-        end
-        if self.image and self.activeImageColor == nil then
-            local r,g,b = self.image.color[1],self.image.color[2],self.image.color[3]
-            self.activeImageColor = self.image.color
-            self.image:setImage(nil, {r-0.4,g-0.4,b-0.4})
-        end
-    end
-    -- Set line color to current active color if it's own color hasn't been set
-    if self.shape.lineColor == prevColor then
-        self.shape.lineColor = self.shape.color
     end
 end
 
@@ -96,8 +101,16 @@ button.setCallbackReleased = function(self, callback)
     self:setActive(self.callbackPressed ~= nilFunc or self.callbackReleased ~= nilFunc)
 end
 
+local getTouch = function(touches, id)
+    for k,v in ipairs(touches) do
+        if v.id == id then return k,v end
+    end
+    return -1
+end
+
 button.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
-    if aabb(pressedX, pressedY, self.anchor:getRect()) then
+    if self.active and aabb(pressedX, pressedY, self.anchor:getRect()) then
+        insert(self.touches, {id=id, x=x, y=y})
         local result = self:callbackPressed()
         return result ~= nil and result or true
     end
@@ -105,9 +118,13 @@ button.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy, pres
 end
 
 button.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
-    if aabb(pressedX, pressedY, self.anchor:getRect()) then
-        local result = self:callbackReleased()
-        return result ~= nil and result or true
+    local key, touch = getTouch(self.touches, id)
+    if key ~= -1 then
+        if self.active and aabb(pressedX, pressedY, self.anchor:getRect()) then
+            local result = self:callbackReleased()
+            return result ~= nil and result or true
+        end
+        remove(self.touches, key)
     end
     return false
 end

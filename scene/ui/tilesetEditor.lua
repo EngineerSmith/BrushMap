@@ -9,18 +9,23 @@ local button = require("ui.button")
 local outlineBox = require("utilities.outlineBox")
 
 local lg = love.graphics
+local insert = table.insert
+
 local font = global.assets["font.robotoReg18"]
 
 local controller = tabController.new()
 window:addChild(controller)
 window.controller = controller
 
+local tileColorPreview   = {0,.8,.8}
 local tileColorStatic    = {1,0,0}
 local tileColorAnimated  = {0,1,0}
 local tileColorBitmasked = {0,0,1}
+local tileColorPreviewAlpha =  {tileColorPreview[1],tileColorPreview[2],tileColorPreview[3],0.5}
+local tileColorAnimatedAlpha = {tileColorAnimated[1],tileColorAnimated[2],tileColorAnimated[3],0.25}
 
 window.outlineBox = outlineBox.new(0,0,0,0)
-window.preview = outlineBox.new(0,0,4,4, {0,.8,.8})
+window.preview = outlineBox.new(0,0,4,4, tileColorPreview)
 
 window.updatePreview = function(x, y, w, h)
     local pre = window.preview
@@ -29,27 +34,79 @@ window.updatePreview = function(x, y, w, h)
     pre.width = w
     pre.height = h
     local sta = controller.tabStatic
-    sta.x.value = x
-    sta.y.value = y
-    sta.w.value = w
-    sta.h.value = h
+    if x~=-1 and y~=-1 and w ~=-1 and h ~=-1 then
+        sta.x.value = x
+        sta.y.value = y
+        sta.w.value = w
+        sta.h.value = h
+    else
+        sta.x:reset()
+        sta.y:reset()
+        sta.w:reset()
+        sta.h:reset()
+    end
     controller.tabStatic.updateStaticQuad()
+    local ani = controller.tabAnimation
+    local index = ani.frameSelect.index
+    if index > 0 then
+        local quad = ani.preview:getFrame(index)
+        if quad then
+            quad:setViewport(x,y,w,h)
+        end
+    end
 end
 
 window.selectPreview = function(x, y, w, h)
+    --EDIT
+    if x ~= -1 and y ~= -1 and w ~= -1 and h ~= -1 then
     for _, tile in ipairs(global.editorSession.tilesets[window.tilesetId].tiles) do
-            if tile.x == x and tile.y == y then --EDIT
-                controller.tabStatic.create:setText("Edit Tile")
-                controller.tabStatic.delete.enabled = true
+        if tile.type == "static" and tile.x == x and tile.y == y then
+            controller.tabStatic.create:setText("Edit Tile")
+            controller.tabStatic.create:setActive(true)
+            controller.tabStatic.delete:setActive(true)
+            window.tile = tile
+            window.updatePreview(x,y,tile.w,tile.h)
+            return
+        elseif tile.type == "animated" then
+            if tile.tiles[1].x == x and tile.tiles[1].y == y then
+                controller.tabStatic.create:setActive(false)
+                controller.tabStatic.delete:setActive(false)
+                controller.tabAnimation.create:setText("Edit Tile")
+                controller.tabAnimation.delete:setActive(true)
                 window.tile = tile
-                window.updatePreview(x,y,tile.w,tile.h)
+                window.updatePreview(x,y,tile.tiles[1].w,tile.tiles[1].h)
+                for _, tile in ipairs(tile.tiles) do
+                    local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, window.tileset)
+                    controller.tabAnimation.preview:addFrame(quad, tile.time)
+                end
+                controller.tabAnimation.frameSelect:setMaxindex(#tile.tiles)
                 return
             end
-    end --CREATE
-    window.tile = nil 
-    controller.tabStatic.create:setText("Create Tile")
-    controller.tabStatic.delete.enabled = false
-    window.updatePreview(x,y,w,h)
+        elseif tile.type == "bitmasked" then
+            error("TODO")
+        end
+    end
+    end
+    if window.tile and window.tile.type == "animated" then
+        -- EDIT ANIMATION
+        window.updatePreview(x,y,w,h)
+    else
+        --CREATE
+        window.tile = nil
+        if x~=-1 and y~=-1 and w~=-1 and h~=-1 then
+            controller.tabStatic.create:setText("Create Tile")
+            controller.tabStatic.create:setActive(true)
+            controller.tabStatic.delete:setActive(false)
+            controller.tabAnimation.create:setText("Create Tile")
+            controller.tabAnimation.delete:setActive(false)
+        else
+            controller.tabStatic.create:setActive(false)
+            controller.tabStatic.delete:setActive(false)
+            controller.tabAnimation.create:setActive(false)
+            controller.tabAnimation.delete:setActive(false)
+        end
+        window.updatePreview(x,y,w,h)
+    end
 end
 
 local windowFileDialog = require("scene.ui.fileDialog")
@@ -90,16 +147,28 @@ pickerReturn.enabled = false
 window:addChild(pickerReturn)
 
 window.drawOutlines = function(scale)
-    for _, tileset in ipairs(global.editorSession.tilesets) do
-    for _, tile in ipairs(tileset.tiles) do
+    local box = window.outlineBox
+    if window.tilesetId then
+    for _, tile in ipairs(global.editorSession.tilesets[window.tilesetId].tiles) do
         if tile ~= window.tile then
             if tile.type == "static" then
-                window.outlineBox:setColor(tileColorStatic)
-                window.outlineBox:setRect(tile.x, tile.y, tile.w, tile.h)
-                window.outlineBox:draw(scale)
+                box:setColor(tileColorStatic)
+                box:setRect(tile.x, tile.y, tile.w, tile.h)
+                box:draw(scale)
             elseif tile.type == "animated" then
-                window.outlineBox:setColor(tileColorAnimated)
-                error("TODO")
+                box:setColor(tileColorAnimated)
+                local tiles = tile.tiles
+                if #tiles > 0 then
+                    box:setRect(tiles[1].x, tiles[1].y, tiles[1].w, tiles[1].h)
+                    box:draw(scale)
+                    box:setColor(tileColorAnimatedAlpha)
+                    for i, tile in ipairs(tiles) do
+                        if i > 1 then
+                            box:setRect(tile.x, tile.y, tile.w, tile.h)
+                            box:draw(scale)
+                        end
+                    end
+                end
             elseif tile.type == "bitmasked" then
                 window.outlineBox:setColor(tileColorBitmasked)
                 error("TODO")
@@ -107,8 +176,17 @@ window.drawOutlines = function(scale)
         end
     end
     end
-    
     if controller.activeChild and controller.activeChild ~= controller.tabTileset then
+        if window.preview.x == -1 and window.preview.y == -1 and window.preview.width == -1 and window.preview.height == -1 then
+            return -- TO NOT DRAW
+        end
+        if controller.tabAnimation.preview.quads then
+            box:setColor(tileColorPreviewAlpha)
+            for _, quad in ipairs(controller.tabAnimation.preview.quads) do
+                box:setRect(quad:getViewport())
+                box:draw(scale)
+            end
+        end
         window.preview:draw(scale)
     end
 end
@@ -123,9 +201,13 @@ local fileDialogCallback = function(success, path)
         window.tilesetId = id
         window.tileset = image
         window.tileset:setFilter("nearest","nearest")
+        window.tileset:setWrap("clampzero")
         
         controller.tabStatic.preview:setImage(window.tileset)
         controller.tabStatic:updateLimits(window.tileset:getDimensions())
+        
+        controller.tabAnimation.preview:setImage(window.tileset)
+        controller.tabAnimation.preview:reset()
         
         if window.newTilesetCallback then
             window.newTilesetCallback(window.tileset)
@@ -174,7 +256,7 @@ end
 
 controller.staticWCallback = function(_, value)
     if window.tileset and window.preview.x + value > window.tileset:getWidth() then
-        if window.preview.x - 1 >= tileX.min then
+        if window.preview.x - 1 >= controller.tabStatic.x.min then
             window.preview.x = window.preview.x - 1
             controller.tabStatic.x:updateValue(window.preview.x)
         end
@@ -186,7 +268,7 @@ end
 
 controller.staticHCallback = function(_, value)
     if window.tileset and window.preview.y + value > window.tileset:getHeight() then
-        if window.preview.y - 1 >= tileY.min then
+        if window.preview.y - 1 >= controller.tabStatic.y.min then
             window.preview.y = window.preview.y - 1
             controller.tabStatic.y:updateValue(window.preview.y)
         end
@@ -199,7 +281,10 @@ end
 controller.staticCreateButton = function()
     local p = window.preview
     
-    local tileData = window.tile or {type = "static"}
+    local tileData = window.tile
+    if tileData == nil or tileData.type ~= "static" then
+        tileData = {type = "static"}
+    end
     
     tileData.x = p.x
     tileData.y = p.y
@@ -226,6 +311,93 @@ controller:addChild(controller.tabStatic)
 --[[ TAB ANIMATION ]]
 controller.tabAnimation = require("scene.ui.tilesetEditor.tabAnimation")(font, controller)
 
+controller.animationIndexedChanged = function(self, index)
+    local preview = controller.tabAnimation.preview
+    local p = window.preview
+    if p.x==-1 and p.y==-1 and p.width==-1 and p.height==-1 then
+        return false
+    end
+    if not preview:hasFrame(index) then
+        --Add frame
+        local quad = lg.newQuad(p.x,p.y, p.width,p.height, window.tileset:getDimensions())
+        local time = controller.tabAnimation.time.value
+        
+        preview:addFrame(quad, time)
+    else -- Already has a quad
+        local quad, time = preview:getFrame(index)
+        p.x, p.y, p.width, p.height = quad:getViewport()
+        controller.tabAnimation.time.value = time
+    end
+    
+    controller.tabAnimation.deleteFrame:setActive(#preview.quads > 1)
+    controller.tabAnimation.create:setActive(#preview.quads >= 2)
+    return true
+end
+
+controller.animationTimeChanged = function(self, value)
+    local preview = controller.tabAnimation.preview
+    local index = controller.tabAnimation.frameSelect.index
+    if index > 0 and preview:hasFrame(index) then
+        preview:setTime(index, value)
+    end
+    return true
+end
+
+controller.animationDeleteFrameButton = function(self)
+    local preview = controller.tabAnimation.preview
+    local frameSelect = controller.tabAnimation.frameSelect
+    local index = frameSelect.index
+    if index > 0 and preview:hasFrame(index) then
+        preview:removeFrame(index)
+        frameSelect.maxindex = frameSelect.maxindex - 1
+        if frameSelect.index > frameSelect.maxindex then
+            frameSelect.index = frameSelect.maxindex
+        end
+        controller.animationIndexedChanged(frameSelect, frameSelect.index)
+    end
+end
+
+controller.animationCreateButton = function(self)
+    local preview = controller.tabAnimation.preview
+    local quads = preview.quads
+    
+    
+    local tileData = window.tile 
+    if tileData == nil or tileData.type ~= "animated" then
+        tileData = {type = "animated"}
+    end 
+    tileData.tiles = {}
+    
+    for index, quad in ipairs(quads) do
+        local x,y,w,h = quad:getViewport()
+        local tile = {
+            x=x,
+            y=y,
+            w=w,
+            h=h,
+            time = preview:getTime(index)
+        }
+        insert(tileData.tiles, tile)
+    end
+    
+    if not tileData.id then
+        global.editorSession:addTile(tileData, window.tilesetId)
+    end
+    
+    controller.tabAnimation:reset()
+    window.tile = nil
+    window.selectPreview(-1,-1,-1,-1)
+end
+
+controller.animationDeleteButton = function(self)
+    if window.tile then
+        controller.tabAnimation:reset()
+        global.editorSession:removeTile(window.tile)
+        window.tile = nil
+        window.selectPreview(-1,-1,-1,-1)
+    end 
+end
+
 controller.tabAnimation:createUI()
 controller:addChild(controller.tabAnimation)
 
@@ -234,5 +406,4 @@ controller.tabBitmask = require("scene.ui.tilesetEditor.tabBitmask")(font, contr
 
 controller.tabBitmask:createUI()
 controller:addChild(controller.tabBitmask)
-
 return window

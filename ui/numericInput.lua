@@ -14,11 +14,16 @@ numericInput.new = function(anchor, min, max, baseValue, font, increment)
     local self = setmetatable(ui.new(anchor), numericInput)
     
     self.value = baseValue or min
+    self.basevalue = self.value
     self.min, self.max = min, max
     self.font = font or lg.getFont()
     self.increment = increment or 1
     self.active = true
     return self
+end
+
+numericInput.reset = function(self)
+    self.value = self.basevalue
 end
 
 numericInput.updateValue = function(self, value, min, max)

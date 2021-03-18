@@ -30,6 +30,14 @@ buttonFrameSelect.reset = function(self)
     self.maxindex = 0
 end
 
+buttonFrameSelect.setMaxindex = function(self, max)
+    self.index = 1
+    self.maxindex = max
+    if self.indexedChangedCallback then
+        self:indexedChangedCallback(self.index)
+    end
+end
+
 buttonFrameSelect.drawElement = function(self)
     local x, y = self.anchor:getRect()
     local strHeight = self.font:getHeight()
@@ -83,15 +91,36 @@ buttonFrameSelect.touchreleased = function(self, id, pressedX, pressedY, ...)
     if aabb(pressedX,pressedY, x+self.sideOffset,y, self.length*3-(self.sideOffset*2), self.length) then
 -- LEFT
         if self.index > 1 and aabb(pressedX,pressedY, x+self.sideOffset,y+self.sideOffset, self.length-self.sideOffset, self.length-(self.sideOffset*2)) then
-            self.index = self.index - 1
+            if self.indexedChangedCallback then
+                self.index = self.index - 1
+                if not self:indexedChangedCallback(self.index) then
+                    self.index = self.index + 1
+                end
+            else
+                self.index = self.index - 1
+            end
         end
 -- CENTRE
         if self.index == 0 and aabb(pressedX,pressedY, self.length+x,y, self.length,self.length) then
-            self.index = 1
+            if self.indexedChangedCallback then
+                self.index = 1
+                if not self:indexedChangedCallback(self.index) then
+                   self.index = 0 
+                end
+            else
+                self.index = 1
+            end
         end
 -- RIGHT
         if self.index > 0 and aabb(pressedX,pressedY, self.length*2+x,self.sideOffset+y, self.length-self.sideOffset,self.length-(self.sideOffset*2)) then
-            self.index = self.index + 1
+            if self.indexedChangedCallback then
+                self.index = self.index + 1
+                if not self:indexedChangedCallback(self.index) then
+                    self.index = self.index - 1
+                end
+            else
+                self.index = self.index + 1
+            end
             if self.index > self.maxindex then
                 self.maxindex = self.index
             end

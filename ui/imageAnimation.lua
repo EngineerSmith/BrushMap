@@ -10,21 +10,52 @@ imageAnimation.new = function(anchor, picture, color)
     local self = setmetatable(image.new(anchor, picture, color), imageAnimation)
     self.quads = {}
     self.times = {}
-    self.currentTime = 0
-    self.id = -1
+    self:conditionalReset() -- INIT id, currentTime
     return self
+end
+
+imageAnimation.conditionalReset = function(self)
+    if #self.quads > 0 then
+        self.id = 1
+        self.currentTime = 0
+    else
+        self.id = -1
+    end
+end
+
+imageAnimation.reset = function(self)
+    self.quads = {}
+    self.times = {}
+    self.id = -1
+    self.currentTime = 0
+end
+
+imageAnimation.hasFrame = function(self, position)
+    return self.quads[position] ~= nil
 end
 
 imageAnimation.addFrame = function(self, quad, time)
     insert(self.quads, quad)
     insert(self.times, time)
-    self.id = 1
+    self:conditionalReset()
+end
+
+imageAnimation.getFrame = function(self, position)
+    return self.quads[position], self.times[position]
+end
+
+imageAnimation.getTime = function(self, position)
+    return self.times[position]
+end
+
+imageAnimation.setTime = function(self, position, time)
+    self.times[position] = time
 end
 
 imageAnimation.removeFrame = function(self, position)
     remove(self.quads, position)
     remove(self.times, position)
-    self.id = 1
+    self:conditionalReset()
 end
 
 imageAnimation.updateElement = function(self, dt)
