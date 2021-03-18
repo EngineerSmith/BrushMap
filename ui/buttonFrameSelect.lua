@@ -35,7 +35,7 @@ buttonFrameSelect.drawElement = function(self)
     local strHeight = self.font:getHeight()
     local h = floor((self.length-self.sideOffset*2) / 2) - floor(strHeight / 2)
 -- LEFT
-    if self.index ~= 0 then
+    if self.index > 1 then
         lg.setColor(self.activeColor)
         lg.rectangle("fill", x+self.sideOffset,y+self.sideOffset, self.length-self.sideOffset, self.length-(self.sideOffset*2))
         lg.setColor(1,1,1)
