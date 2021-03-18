@@ -21,7 +21,7 @@ local tileColorPreview   = {0,.8,.8}
 local tileColorStatic    = {1,0,0}
 local tileColorAnimated  = {0,1,0}
 local tileColorBitmasked = {0,0,1}
-local tileColorPreviewAlpha =  {tileColorPreview[1],tileColorPreview[2],tileColorPreview[3],0.5}
+local tileColorPreviewAlpha =  {.1,.5,.5,0.4}
 local tileColorAnimatedAlpha = {tileColorAnimated[1],tileColorAnimated[2],tileColorAnimated[3],0.25}
 
 window.outlineBox = outlineBox.new(0,0,0,0)

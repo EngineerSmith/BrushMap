@@ -110,7 +110,7 @@ end
 
 button.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
     if self.active and aabb(pressedX, pressedY, self.anchor:getRect()) then
-        insert(self.touches, {id=id, x=x, y=y})
+        insert(self.touches, {id=id, x=pressedX, y=pressedY})
         local result = self:callbackPressed()
         return result ~= nil and result or true
     end
@@ -118,7 +118,7 @@ button.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy, pres
 end
 
 button.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
-    local key, touch = getTouch(self.touches, id)
+    local key = getTouch(self.touches, id)
     if key ~= -1 then
         if self.active and aabb(pressedX, pressedY, self.anchor:getRect()) then
             local result = self:callbackReleased()

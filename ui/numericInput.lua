@@ -4,6 +4,7 @@ numericInput.__index = numericInput
 
 local lg = love.graphics
 
+local insert, remove = table.insert, table.remove
 local floor = math.floor
 local aabb = require("utilities.aabb")
 
@@ -19,6 +20,7 @@ numericInput.new = function(anchor, min, max, baseValue, font, increment)
     self.font = font or lg.getFont()
     self.increment = increment or 1
     self.active = true
+    self.touches = {}
     return self
 end
 
@@ -51,6 +53,47 @@ numericInput.setClone = function(self, numericInput)
         self.clone.value = self.value
         if self.clone.valueChangedCallback then
             self.clone:valueChangedCallback(self.clone.value)
+        end
+    end
+end
+
+local updateTouch = function(touch)
+    local lastX, lastY = touch.x, touch.y
+    local dx,dy = 0,0
+    for k, move in ipairs(touch.moved) do
+        dx = dx + (move.x - lastX)
+        dy = dy + (move.y - lastY)
+        lastX, lastY = move.x, move.y
+        touch.moved[k] = nil
+    end
+    touch.x = lastX
+    touch.y = lastY
+    return dx, dy
+end
+
+numericInput.updateElement = function(self, dt)
+    for _, touch in ipairs(self.touches) do
+        updateTouch(touch)
+        local t = love.timer.getTime()
+        local time = t - touch.time
+        while time > 0.4 do
+            local oldvalue = self.value
+            local x,y,w,h = self.anchor:getRect()
+            if touch.side == "-" and aabb(touch.x,touch.y, x,y,buttonWidth,h) then
+                self.value = self.value - self.increment
+                if not self:checkValue(self.value < self.min, self.min) then
+                    self.value = oldvalue
+                    break
+                end
+            elseif touch.side == "+" and aabb(touch.x,touch.y, x+w-buttonWidth,y,buttonWidth,h) then
+                self.value = self.value + self.increment
+                if not self:checkValue(self.value > self.max, self.max) then
+                    self.value = oldvalue
+                    break
+                end
+            end
+            touch.time = touch.time + 0.1
+            time = t - touch.time
         end
     end
 end
@@ -112,7 +155,14 @@ numericInput.checkValue = function(self, bool, value)
     return true
 end
 
-numericInput.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
+local getTouch = function(touches, id)
+    for k,v in ipairs(touches) do
+        if v.id == id then return k,v end
+    end
+    return -1
+end
+
+numericInput.touchpressedElement = function(self, id, pressedX, pressedY, ...)
     local oldvalue = self.value
     if self.active then
         local x,y,w,h = self.anchor:getRect()
@@ -121,6 +171,7 @@ numericInput.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy
             if not self:checkValue(self.value < self.min, self.min) then
                 self.value = oldvalue
             end
+            insert(self.touches, {id=id, x=pressedX, y=pressedY, side="-", moved={}, time=love.timer.getTime()})
             return true
         end
         if aabb(pressedX, pressedY, x+w-buttonWidth,y,buttonWidth,h) then
@@ -128,10 +179,25 @@ numericInput.touchpressedElement = function(self, id, pressedX, pressedY, dx, dy
             if not self:checkValue(self.value > self.max, self.max) then
                 self.value = oldvalue
             end
+            insert(self.touches, {id=id, x=pressedX, y=pressedY, side="+", moved={}, time=love.timer.getTime()})
             return true
         end
     end
     return false
+end
+
+numericInput.touchmovedElement = function(self, id, x, y, ...)
+    local key, touch = getTouch(self.touches, id)
+    if key ~= -1 then
+        insert(touch.moved, {x=x, y=y})
+    end
+end
+
+numericInput.touchreleasedElement = function(self, id, ...)
+    local key = getTouch(self.touches, id)
+    if key ~= -1 then
+        remove(self.touches, key)
+    end
 end
 
 return numericInput
