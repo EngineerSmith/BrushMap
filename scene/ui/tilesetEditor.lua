@@ -21,10 +21,10 @@ local tileColorPreview   = {0,.8,.8}
 local tileColorStatic    = {1,0,0}
 local tileColorAnimated  = {0,1,0}
 local tileColorBitmasked = {0,0,1}
-local tileColorPreviewAlpha =  {.1,.5,.5,0.4}
+local tileColorPreviewAlpha =  {.1,.5,.5,0.5}
 local tileColorAnimatedAlpha = {tileColorAnimated[1],tileColorAnimated[2],tileColorAnimated[3],0.25}
 
-window.outlineBox = outlineBox.new(0,0,0,0)
+window.outlineBox = outlineBox.new(-1,-1,-1,-1)
 window.preview = outlineBox.new(0,0,4,4, tileColorPreview)
 
 window.updatePreview = function(x, y, w, h)
@@ -314,7 +314,7 @@ controller.tabAnimation = require("scene.ui.tilesetEditor.tabAnimation")(font, c
 controller.animationIndexedChanged = function(self, index)
     local preview = controller.tabAnimation.preview
     local p = window.preview
-    if p.x==-1 and p.y==-1 and p.width==-1 and p.height==-1 then
+    if not window.tileset or (p.x==-1 and p.y==-1 and p.width==-1 and p.height==-1) then
         return false
     end
     if not preview:hasFrame(index) then
