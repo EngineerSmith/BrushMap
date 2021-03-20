@@ -155,19 +155,19 @@ end
 
 tabWindow.touchpressedChildren = function(self, id, x, y, ...)
     if self.active then
-        ui.touchpressedChildren(self, id, x, y - self.offsetY, ...)
+        return ui.touchpressedChildren(self, id, x, y - self.offsetY, ...)
     end
 end
 
 tabWindow.touchmovedChildren = function(self, id, x, y, ...)
     if self.active then
-        ui.touchmovedChildren(self, id, x, y - self.offsetY, ...)
+        return ui.touchmovedChildren(self, id, x, y - self.offsetY, ...)
     end
 end
 
 tabWindow.touchreleasedChildren = function(self, id, x, y, ...)
     if self.active then
-        ui.touchreleasedChildren(self, id, x, y - self.offsetY, ...)
+        return ui.touchreleasedChildren(self, id, x, y - self.offsetY, ...)
     end
 end
 

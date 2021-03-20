@@ -57,6 +57,13 @@ numericInput.setClone = function(self, numericInput)
     end
 end
 
+local getTouch = function(touches, id)
+    for k,v in ipairs(touches) do
+        if v.id == id then return k,v end
+    end
+    return -1
+end
+
 local updateTouch = function(touch)
     local lastX, lastY = touch.x, touch.y
     local dx,dy = 0,0
@@ -76,7 +83,7 @@ numericInput.updateElement = function(self, dt)
         updateTouch(touch)
         local t = love.timer.getTime()
         local time = t - touch.time
-        while time > 0.4 do
+        while time > 0.3 do
             local oldvalue = self.value
             local x,y,w,h = self.anchor:getRect()
             if touch.side == "-" and aabb(touch.x,touch.y, x,y,buttonWidth,h) then
@@ -92,7 +99,7 @@ numericInput.updateElement = function(self, dt)
                     break
                 end
             end
-            touch.time = touch.time + 0.1
+            touch.time = touch.time + 0.07
             time = t - touch.time
         end
     end
@@ -155,13 +162,6 @@ numericInput.checkValue = function(self, bool, value)
     return true
 end
 
-local getTouch = function(touches, id)
-    for k,v in ipairs(touches) do
-        if v.id == id then return k,v end
-    end
-    return -1
-end
-
 numericInput.touchpressedElement = function(self, id, pressedX, pressedY, ...)
     local oldvalue = self.value
     if self.active then
@@ -190,6 +190,7 @@ numericInput.touchmovedElement = function(self, id, x, y, ...)
     local key, touch = getTouch(self.touches, id)
     if key ~= -1 then
         insert(touch.moved, {x=x, y=y})
+        return aabb(x, y, self.anchor:getRect())
     end
 end
 
