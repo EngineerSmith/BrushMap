@@ -47,10 +47,10 @@ numberSelect.drawElement = function(self)
     lg.setColor(self.centralColor)
     lg.rectangle("fill", self.length+x,y, self.length,self.length)
     lg.setColor(1,1,1)
-    local h = floor(self.length / 2) - floor(strHeight / 2)
+    local he = floor(self.length / 2) - floor(strHeight / 2)
     local width = self.font:getWidth(tostring(self.index))
     local w = floor(self.length / 2) - floor(width / 2)
-    lg.print(tostring(self.index), self.font, self.length+x+w,y+h)
+    lg.print(tostring(self.index), self.font, self.length+x+w,y+he)
 -- RIGHT
     if self.index < self.max then
         lg.setColor(self.activeColor)
@@ -58,7 +58,7 @@ numberSelect.drawElement = function(self)
         lg.setColor(1,1,1)
         local width = self.font:getWidth(tostring(self.index+1))
         local w = floor((self.length-self.sideOffset)/2) - floor(width/2)
-        lg.print(tostring(self.index+1), self.font, self.length*2+x+w,self.sideOffset+y+h)
+        lg.print(tostring(self.index+1), self.font, self.length*2+x+w,y+self.sideOffset+h)
     end
 end
 
