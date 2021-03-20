@@ -1,19 +1,19 @@
 local ui = require("ui.base.ui")
-local buttonFrameSelect = setmetatable({}, ui)
-buttonFrameSelect.__index = buttonFrameSelect
+local frameSelect = setmetatable({}, ui)
+frameSelect.__index = frameSelect
 
 local lg = love.graphics
 
 local floor = math.floor
 local aabb = require("utilities.aabb")
 
-buttonFrameSelect.zeroColor =   {.15,.57,.19}
-buttonFrameSelect.activeZero =  {.5,.5,.5}
-buttonFrameSelect.activeColor = {.4,.4,.4}
-buttonFrameSelect.unactiveColor={.2,.2,.2}
+frameSelect.zeroColor =   {.15,.57,.19}
+frameSelect.activeZero =  {.5,.5,.5}
+frameSelect.activeColor = {.4,.4,.4}
+frameSelect.unactiveColor={.2,.2,.2}
 
-buttonFrameSelect.new = function(anchor, font, zeroicon)
-    local self = setmetatable(ui.new(anchor), buttonFrameSelect)
+frameSelect.new = function(anchor, font, zeroicon)
+    local self = setmetatable(ui.new(anchor), frameSelect)
     self.font = font or lg.getFont()
     self.zeroicon = zeroicon
     
@@ -25,12 +25,12 @@ buttonFrameSelect.new = function(anchor, font, zeroicon)
     return self
 end
 
-buttonFrameSelect.reset = function(self)
+frameSelect.reset = function(self)
     self.index = 0
     self.maxindex = 0
 end
 
-buttonFrameSelect.setMaxindex = function(self, max)
+frameSelect.setMaxindex = function(self, max)
     self.index = 1
     self.maxindex = max
     if self.indexedChangedCallback then
@@ -38,7 +38,7 @@ buttonFrameSelect.setMaxindex = function(self, max)
     end
 end
 
-buttonFrameSelect.drawElement = function(self)
+frameSelect.drawElement = function(self)
     local x, y = self.anchor:getRect()
     local strHeight = self.font:getHeight()
     local h = floor((self.length-self.sideOffset*2) / 2) - floor(strHeight / 2)
@@ -85,7 +85,7 @@ buttonFrameSelect.drawElement = function(self)
     end
 end
 
-buttonFrameSelect.touchreleased = function(self, id, pressedX, pressedY, ...)
+frameSelect.touchreleased = function(self, id, pressedX, pressedY, ...)
     local x,y = self.anchor:getRect()
 -- General shape
     if aabb(pressedX,pressedY, x+self.sideOffset,y, self.length*3-(self.sideOffset*2), self.length) then
@@ -129,4 +129,4 @@ buttonFrameSelect.touchreleased = function(self, id, pressedX, pressedY, ...)
     end
 end
 
-return buttonFrameSelect
+return frameSelect

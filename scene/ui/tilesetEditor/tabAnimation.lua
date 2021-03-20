@@ -3,7 +3,7 @@ local global = require("global")
 local tabWindow = require("ui.tabWindow")
 local anchor = require("ui.base.anchor")
 local imageAnimation = require("ui.imageAnimation")
-local buttonFrameSelect = require("ui.buttonFrameSelect")
+local frameSelect = require("ui.frameSelect")
 local text = require("ui.text")
 local numericInput = require("ui.numericInput")
 local button = require("ui.button")
@@ -30,7 +30,7 @@ tabAnimation.createUI = function(self)
     local height = y + h
     
     local anchor = anchor.new("NorthWest", 10, 10+height, w,w/3, 20,0)
-    self.frameSelect = buttonFrameSelect.new(anchor, global.assets["font.robotoReg25"], global.assets["icon.plus"])
+    self.frameSelect = frameSelect.new(anchor, global.assets["font.robotoReg25"], global.assets["icon.plus"])
     self.frameSelect.indexedChangedCallback = controller.animationIndexedChanged
     self:addChild(self.frameSelect)
     
