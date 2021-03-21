@@ -54,11 +54,15 @@ bitmaskPreview.drawElement = function(self)
         lg.rectangle("fill", rx,ry, w,h)
     end
     local lenW, lenH = w / 3, h / 3
-    lg.setColor(.1,.5,.3)
     for i = 1, 9 do
         if i ~= 5 and (not self.evenDraw or i % 2 == 0)then
             if self.tileActive[i] then
                 local x, y =self:tileToPoint(i)
+                if i % 2 == 0 then
+                    lg.setColor(.1,.5,.3)
+                else
+                    lg.setColor(.1,.4,.25)
+                end
                 lg.rectangle("fill", rx+x, ry+y, lenW, lenH)
             end
         end
