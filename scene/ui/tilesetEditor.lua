@@ -68,6 +68,9 @@ window.selectPreview = function(x, y, w, h)
             window.updatePreview(x,y,tile.w,tile.h)
             return
         elseif tile.type == "animated" then
+            if window.tile == tile then
+                break
+            end
             if tile.tiles[1].x == x and tile.tiles[1].y == y then
                 controller.tabStatic.create:setActive(false)
                 controller.tabStatic.delete:setActive(false)
