@@ -4,6 +4,7 @@ local tabWindow = require("ui.tabWindow")
 local anchor = require("ui.base.anchor")
 local bitmaskPreview = require("ui.bitmaskPreview")
 local numberSelect = require("ui.numberSelect")
+local button = require("ui.button")
 
 return function(font, controller)
 local tabAnimation = tabWindow.new("Bitmask", font)
@@ -25,8 +26,27 @@ tabAnimation.createUI = function(self)
         self.numberSelect.index = sum
     end
     
-    self.preview:drawEvenDirectionsOnly(false)
-    self.preview:setActiveTiles(147)
+    self.numberSelect.indexedChangedCallback = function(_, index)
+        self.preview:setActiveTiles(index)
+    end
+    
+    local x,y,w,h = self.numberSelect.anchor:getRect()
+    local height = y + h
+    
+    local anchor = anchor.new("NorthWest", 10,10+height, -1,40, 20,0)
+    self.change = button.new(anchor)
+    self.change:setText("Edit Bitmask", nil, font)
+    self:addChild(self.change, nil)
+    self.change:setActive(false)
+    
+    local anchor = anchor.new("NorthWest", 10,60+height, -1,40, 20,0)
+    self.finish = button.new(anchor)
+    self.finish:setText("Create Bitmask", nil, font)
+    self:addChild(self.finish, nil)
+    self.finish:setActive(false)
+    
+    --self.preview:drawEvenDirectionsOnly(false)
+    --self.preview:setActiveTiles(147)
 end
 
 return tabAnimation

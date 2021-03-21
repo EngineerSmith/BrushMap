@@ -10,7 +10,7 @@ bitmaskPreview.tileBits = {
       8, 0,  2,
      64, 4, 32
 }
-
+-- Highest to lowest value
 bitmaskPreview.tileOrder = {
     1, 7, 9, 3, 4, 8, 6, 2, 5
 }
@@ -31,6 +31,10 @@ end
 
 bitmaskPreview.setBackgroundColor = function(self, color)
     self.backgroundColor = color
+end
+
+bitmaskPreview.setImage = function(self, image)
+    self.image = image
 end
 
 bitmaskPreview.drawEvenDirectionsOnly = function(self, bool)

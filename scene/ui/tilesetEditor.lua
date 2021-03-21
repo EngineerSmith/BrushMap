@@ -407,6 +407,31 @@ controller:addChild(controller.tabAnimation)
 --[[ TAB BITMASK ]]
 controller.tabBitmask = require("scene.ui.tilesetEditor.tabBitmask")(font, controller)
 
+controller.bitmaskChangeButton = function(self)
+    -- If not editing tile then
+    -- Edit button pressed,
+    -- Display bitmask tiles, wait for one to be selected
+    -- Once selected, process bitmask tile and load into preview as changed
+    -- Change lock tab, change buttons
+    
+    -- If editing tile then
+    -- Finished button pressed
+    -- Push bitmask tile if needed to session
+    -- Change lock tab, change buttons
+    
+end
+
+controller.bitmaskFinishedButton = function(self)
+    -- If not editing tile then
+    -- Create button pressed, set up new bitmask tile
+    -- Change lock tab, change buttons
+    
+    -- If editing tile then
+    -- Delete current editting tile
+    -- Change buttons back
+    -- Unlock tab
+end
+
 controller.tabBitmask:createUI()
 controller:addChild(controller.tabBitmask)
 return window
