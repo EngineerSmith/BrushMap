@@ -9,14 +9,14 @@ local togglebox = require("ui.togglebox")
 local text = require("ui.text")
 
 return function(font, controller)
-local tabAnimation = tabWindow.new("Bitmask", font)
+local tabBitmask = tabWindow.new("Bitmask", font)
 
-tabAnimation.reset = function(self)
+tabBitmask.reset = function(self)
    self.preview:reset()
    self.numberSelect:reset()
 end
 
-tabAnimation.setTile = function(self, tile)
+tabBitmask.setTile = function(self, tile)
     self.tile = tile
     local active = tile ~= nil
     self.preview.active = active
@@ -24,7 +24,7 @@ tabAnimation.setTile = function(self, tile)
     self.toggle.active = active
 end
 
-tabAnimation.createUI = function(self)
+tabBitmask.createUI = function(self)
     local anchor = anchor.new("NorthWest", 10,30, -1,-2, 20,0)
     self.preview = bitmaskPreview.new(anchor)
     self.preview:setBackgroundColor({0,0,0})
@@ -73,18 +73,18 @@ tabAnimation.createUI = function(self)
     self:addChild(self.toggle)
     
     local anchor = anchor.new("NorthWest", 10,100+height, -1,40, 20,0)
-    self.change = button.new(anchor)
+    self.change = button.new(anchor, nil, controller.bitmaskChangeButton)
     self.change:setText("Edit Bitmask", nil, font)
     self:addChild(self.change, nil)
     self.change:setActive(false)
     
     local anchor = anchor.new("NorthWest", 10,150+height, -1,40, 20,0)
-    self.finish = button.new(anchor)
+    self.finish = button.new(anchor, nil, controller.bitmaskFinishButton)
     self.finish:setText("Create Bitmask", nil, font)
     self:addChild(self.finish, nil)
     
     self:setTile(nil)
 end
 
-return tabAnimation
+return tabBitmask
 end

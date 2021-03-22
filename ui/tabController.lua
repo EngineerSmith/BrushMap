@@ -12,6 +12,7 @@ tabController.new = function(windowWidth)
     
     self.windowWidth = windowWidth or 200
     self.active = false
+    self.lock = false
     
     return self
 end
@@ -45,6 +46,9 @@ tabController.updateTabLocations = function(self)
 end
 
 tabController.setActive = function(self, value, child)
+    if self.lock then
+        return false
+    end
     if value then
         for _, c in ipairs(self.children) do
             if c ~= child then 
@@ -65,6 +69,11 @@ tabController.setActive = function(self, value, child)
         
         self:getAnchorUpdate()
     end
+    return true
+end
+
+tabController.setLock = function(self, bool)
+    self.lock = bool
 end
 
 return tabController

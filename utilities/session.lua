@@ -72,4 +72,21 @@ session.removeTile = function(self, tileData)
     end
 end
 
+session.getTile = function(self, id, tileset)
+     for _, tile in ipairs(tileset) do
+        if tile.id == id then
+            return tile
+        end
+    end
+end
+
+session.getTileUnknownTileset = function(self, id)
+    for _, tileset in ipairs(self.tilesets) do
+        local tile = self:getTile(id, tileset)
+        if tile then
+            return tile
+        end
+    end
+end
+
 return session

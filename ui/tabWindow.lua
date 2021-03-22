@@ -143,8 +143,9 @@ tabWindow.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, 
             local x,y,w,h = self:getTitleRect()
             x = x - (self.parent.active and w or 0)
             if aabb(pressedX, pressedY, x,y,w,h) then
-                self.active = not self.active
-                self.parent:setActive(self.active, self)
+                if self.parent:setActive(not self.active, self) then
+                    self.active = not self.active
+                end
                 return true
             end
         end

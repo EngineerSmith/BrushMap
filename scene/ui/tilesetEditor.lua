@@ -85,6 +85,7 @@ window.selectPreview = function(x, y, w, h)
                     controller.tabAnimation.preview:addFrame(quad, tile.time)
                 end
                 controller.tabAnimation.frameSelect:setMaxindex(#tile.tiles)
+                controller:setLock(true)
                 return
             end
         elseif tile.type == "bitmask" then
@@ -338,6 +339,7 @@ controller.animationIndexedChanged = function(self, index)
     
     controller.tabAnimation.deleteFrame:setActive(#preview.quads > 1)
     controller.tabAnimation.create:setActive(#preview.quads >= 2)
+    controller:setLock(true)
     return true
 end
 
@@ -394,6 +396,7 @@ controller.animationCreateButton = function(self)
     controller.tabAnimation:reset()
     window.tile = nil
     window.selectPreview(-1,-1,-1,-1)
+    controller:setLock(false)
 end
 
 controller.animationDeleteButton = function(self)
@@ -402,7 +405,8 @@ controller.animationDeleteButton = function(self)
         global.editorSession:removeTile(window.tile)
         window.tile = nil
         window.selectPreview(-1,-1,-1,-1)
-    end 
+        controller:setLock(false)
+    end
 end
 
 controller.tabAnimation:createUI()
@@ -420,7 +424,7 @@ controller.bitmaskChangeButton = function(self)
     -- Once selected, process bitmask tile and load into preview as changed
     -- Change lock tab, change buttons
         controller.tabBitmask.change:setText("Finished Tile")
-        controller.tabBitmask.finished:setText("Delete Tile")
+        controller.tabBitmask.finish:setText("Delete Tile")
     else
     -- If editing tile then
         window.bitmaskEditing = false
@@ -428,29 +432,32 @@ controller.bitmaskChangeButton = function(self)
     -- Push bitmask tile if needed to session
     -- Change lock tab, change buttons
         controller.tabBitmask.change:setText("Edit Tile")
-        controller.tabBitmask.finished:setText("Create Tile")
+        controller.tabBitmask.finish:setText("Create Tile")
     end
+    controller:setLock(window.bitmaskEditing)
 end
 
-controller.bitmaskFinishedButton = function(self)
+controller.bitmaskFinishButton = function(self)
     -- If not editing tile then
     if not window.bitmaskEditing then
         window.bitmaskEditing = true
     -- Create button pressed, set up new bitmask tile
-        
-        window.tabBitmask:setTile(window.tile)
+        window.tile = {type="bitmask", tiles={}}
+        controller.tabBitmask:setTile(window.tile)
     -- Change lock tab
         controller.tabBitmask.change:setText("Finished Tile")
-        controller.tabBitmask.finished:setText("Delete Tile")
+        controller.tabBitmask.finish:setText("Delete Tile")
     else
     -- If editing tile then
         window.bitmaskEditing = false
     -- Delete current editting tile
+        window.tile = nil
     -- Unlock tab
         controller.tabBitmask.change:setText("Edit Tile")
-        controller.tabBitmask.finished:setText("Create Tile")
+        controller.tabBitmask.finish:setText("Create Tile")
+        
     end
-    
+    controller:setLock(window.bitmaskEditing)
 end
 
 controller.tabBitmask:createUI()
