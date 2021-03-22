@@ -11,11 +11,25 @@ local text = require("ui.text")
 return function(font, controller)
 local tabAnimation = tabWindow.new("Bitmask", font)
 
+tabAnimation.reset = function(self)
+   self.preview:reset()
+   self.numberSelect:reset()
+end
+
+tabAnimation.setTile = function(self, tile)
+    self.tile = tile
+    local active = tile ~= nil
+    self.preview.active = active
+    self.numberSelect.active = active
+    self.toggle.active = active
+end
+
 tabAnimation.createUI = function(self)
     local anchor = anchor.new("NorthWest", 10,30, -1,-2, 20,0)
     self.preview = bitmaskPreview.new(anchor)
     self.preview:setBackgroundColor({0,0,0})
     self:addChild(self.preview)
+    self.active = false
     
     local x,y,w,h = self.preview.anchor:getRect()
     local height = y + h
@@ -40,17 +54,21 @@ tabAnimation.createUI = function(self)
     local titleToggle = text.new(anchor, "Number of directions", font)
     local anchor = anchor.new("NorthWest", 10, 40+height, -1,40, 20,0)
     self.toggle = togglebox.new(anchor, true)
-    self.toggle.valueChangedCallback = function(_, selected)
-        if not selected then
-            self.preview:drawEvenDirectionsOnly(true)
-            self.numberSelect.max = 15
-            self.preview:setActiveTiles(15)
-        else
-            self.preview:drawEvenDirectionsOnly(false)
-            self.numberSelect.max = 255
-            self.preview:setActiveTiles(255)
+    self.toggle:setValueChangedCallback(function(_, selected)
+        if self.tile then
+            if not selected then
+                self.preview:drawEvenDirectionsOnly(true)
+                self.numberSelect.max = 15
+                self.preview:setActiveTiles(15)
+                self.tile.directions = 4
+            else
+                self.preview:drawEvenDirectionsOnly(false)
+                self.numberSelect.max = 255
+                self.preview:setActiveTiles(255)
+                self.tile.directions = 8
+            end
         end
-    end
+    end)
     self:addChild(titleToggle)
     self:addChild(self.toggle)
     
@@ -64,9 +82,8 @@ tabAnimation.createUI = function(self)
     self.finish = button.new(anchor)
     self.finish:setText("Create Bitmask", nil, font)
     self:addChild(self.finish, nil)
-    self.finish:setActive(false)
     
-    
+    self:setTile(nil)
 end
 
 return tabAnimation

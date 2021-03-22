@@ -26,13 +26,17 @@ checkbox.drawElement = function(self)
     lg.setColor(.3,.3,.3)
     lg.rectangle("fill",x+3,y+3,w-6,h-6)
     if self.selected then
-        lg.setColor(.6,.6,.6)
+        if self.active then
+            lg.setColor(.6,.6,.6)
+        else
+            lg.setColor(.5,.5,.5)
+        end
         lg.rectangle("fill", x+6,y+6,w-12,h-12)
     end
 end
 
 checkbox.touchpressedElement = function(self, id, x,y)
-    if aabb(x,y, self.anchor:getRect()) then
+    if self.active and aabb(x,y, self.anchor:getRect()) then
         self.selected = not self.selected
         if self.valueChangedCallback then
             self:valueChangedCallback(self.selected)

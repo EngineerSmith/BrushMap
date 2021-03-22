@@ -21,32 +21,39 @@ end
 --TODO copy to save dir
 --TODO if failed to load
 session.addTileset = function(self, path)
-    for id, tileset in ipairs(self.tilesets) do
+    for _, tileset in ipairs(self.tilesets) do
         if tileset.path == path then
             -- Reload image as the image may of changed
             tileset.image = lg.newImage(path)
-            return id, tileset.image
+            return tileset
         end
     end
     
     local image = lg.newImage(path)
-    insert(self.tilesets, {
+    local tileset = {
         path = path,
         image = image,
-        tiles = {}
-    })
-    return #self.tilesets, image
+        tiles = {},
+        id = os.time()
+    }
+    insert(self.tilesets, tileset)
+    return tileset
 end
 
-session.addTile = function(self, tileData, tilesetId)
-    if not self.tilesets[tilesetId] then
-        error("Invalid tilesetId :"..tostring(tilesetId))
+session.getTileset = function(self, id)
+    for _, tileset in ipairs(self.tilesets) do
+        if tileset.id == id then
+            return tileset
+        end
     end
-    
+    return nil
+end
+
+session.addTile = function(self, tileData, tileset)
     if not tileData.id then
-        insert(self.tilesets[tilesetId].tiles, tileData)
-        tileData.id = #self.tilesets[tilesetId].tiles
-        tileData.tilesetId = tilesetId
+        insert(tileset.tiles, tileData)
+        tileData.id = os.time()
+        tileData.tilesetId = tileset.id
     else
         error("Already added tile")
     end
@@ -56,8 +63,13 @@ session.removeTile = function(self, tileData)
     if not tileData.id and tileData.tilesetId then
         error("Tile not added")
     end
-    
-    remove(self.tilesets[tileData.tilesetId].tiles, tileData.id)
+    local tileset = self:getTileset(tileData.tilesetId)
+    for key, tile in ipairs(tileset.tiles) do
+        if tile == tileData then
+            remove(tileset.tiles, key)
+            break
+        end
+    end
 end
 
 return session

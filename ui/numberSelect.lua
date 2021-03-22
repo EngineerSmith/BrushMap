@@ -63,32 +63,34 @@ numberSelect.drawElement = function(self)
 end
 
 numberSelect.touchreleased = function(self, id, pressedX, pressedY, ...)
-    local x,y = self.anchor:getRect()
--- General shape
-    if aabb(pressedX,pressedY, x+self.sideOffset,y, self.length*3-(self.sideOffset*2), self.length) then
--- LEFT
-        if self.index > self.min and aabb(pressedX,pressedY, x+self.sideOffset,y+self.sideOffset, self.length-self.sideOffset, self.length-(self.sideOffset*2)) then
-            if self.indexedChangedCallback then
-                self.index = self.index - 1
-                if not self:indexedChangedCallback(self.index) then
-                    self.index = self.index + 1
-                end
-            else
-                self.index = self.index - 1
-            end
-        end
--- RIGHT
-        if self.index < self.max and aabb(pressedX,pressedY, self.length*2+x,self.sideOffset+y, self.length-self.sideOffset,self.length-(self.sideOffset*2)) then
-            if self.indexedChangedCallback then
-                self.index = self.index + 1
-                if not self:indexedChangedCallback(self.index) then
+    if self.active then
+        local x,y = self.anchor:getRect()
+    -- General shape
+        if aabb(pressedX,pressedY, x+self.sideOffset,y, self.length*3-(self.sideOffset*2), self.length) then
+    -- LEFT
+            if self.index > self.min and aabb(pressedX,pressedY, x+self.sideOffset,y+self.sideOffset, self.length-self.sideOffset, self.length-(self.sideOffset*2)) then
+                if self.indexedChangedCallback then
+                    self.index = self.index - 1
+                    if not self:indexedChangedCallback(self.index) then
+                        self.index = self.index + 1
+                    end
+                else
                     self.index = self.index - 1
                 end
-            else
-                self.index = self.index + 1
             end
+    -- RIGHT
+            if self.index < self.max and aabb(pressedX,pressedY, self.length*2+x,self.sideOffset+y, self.length-self.sideOffset,self.length-(self.sideOffset*2)) then
+                if self.indexedChangedCallback then
+                    self.index = self.index + 1
+                    if not self:indexedChangedCallback(self.index) then
+                        self.index = self.index - 1
+                    end
+                else
+                    self.index = self.index + 1
+                end
+            end
+            return true
         end
-        return true
     end
 end
 

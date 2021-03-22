@@ -29,7 +29,7 @@ touchController.setPressedCallback(function(x, y)
     if editorWindow.tileset then
         x, y = touchController.touchToWorld(x, y)
         
-        local w, h = editorWindow.tileset:getDimensions()
+        local w, h = editorWindow.tileset.image:getDimensions()
         
         if aabb(x,y, 0,0,w,h) then
             local x, y, w, h = grid:positionToTile(x, y)
@@ -53,7 +53,7 @@ scene.update = function(dt)
         local scale = touchController.scale
         local x,y = touchController.x, touchController.y
         local tw, th = w * scale, h * scale
-        local w, h = editorWindow.tileset:getDimensions()
+        local w, h = editorWindow.tileset.image:getDimensions()
         w, h = w * scale, h * scale
         if not aabbBox(0,0,tw,th, x,y,w,h) then
             touchController.reset()
@@ -75,7 +75,7 @@ scene.draw = function()
     lg.translate(touchController.x, touchController.y)
     if editorWindow.tileset then
         lg.setColor(1,1,1)
-        lg.draw(editorWindow.tileset)
+        lg.draw(editorWindow.tileset.image)
     end
     
     if editorWindow.tileset then

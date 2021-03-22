@@ -20,12 +20,14 @@ window.controller = controller
 local tileColorPreview   = {0,.8,.8}
 local tileColorStatic    = {1,0,0}
 local tileColorAnimated  = {0,1,0}
-local tileColorBitmasked = {0,0,1}
+local tileColorBitmask = {0,0,1}
 local tileColorPreviewAlpha =  {.1,.5,.5,0.5}
 local tileColorAnimatedAlpha = {tileColorAnimated[1],tileColorAnimated[2],tileColorAnimated[3],0.25}
 
 window.outlineBox = outlineBox.new(-1,-1,-1,-1)
 window.preview = outlineBox.new(0,0,4,4, tileColorPreview)
+
+window.bitmaskEditing = false
 
 window.updatePreview = function(x, y, w, h)
     local pre = window.preview
@@ -59,7 +61,7 @@ end
 window.selectPreview = function(x, y, w, h)
     --EDIT
     if x ~= -1 and y ~= -1 and w ~= -1 and h ~= -1 then
-    for _, tile in ipairs(global.editorSession.tilesets[window.tilesetId].tiles) do
+    for _, tile in ipairs(window.tileset.tiles) do
         if tile.type == "static" and tile.x == x and tile.y == y then
             controller.tabStatic.create:setText("Edit Tile")
             controller.tabStatic.create:setActive(true)
@@ -79,13 +81,13 @@ window.selectPreview = function(x, y, w, h)
                 window.tile = tile
                 window.updatePreview(x,y,tile.tiles[1].w,tile.tiles[1].h)
                 for _, tile in ipairs(tile.tiles) do
-                    local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, window.tileset)
+                    local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, window.tileset.image:getDimensions())
                     controller.tabAnimation.preview:addFrame(quad, tile.time)
                 end
                 controller.tabAnimation.frameSelect:setMaxindex(#tile.tiles)
                 return
             end
-        elseif tile.type == "bitmasked" then
+        elseif tile.type == "bitmask" then
             error("TODO")
         end
     end
@@ -151,8 +153,8 @@ window:addChild(pickerReturn)
 
 window.drawOutlines = function(scale)
     local box = window.outlineBox
-    if window.tilesetId then
-    for _, tile in ipairs(global.editorSession.tilesets[window.tilesetId].tiles) do
+    if window.tileset then
+    for _, tile in ipairs(window.tileset.tiles) do
         if tile ~= window.tile then
             if tile.type == "static" then
                 box:setColor(tileColorStatic)
@@ -172,8 +174,8 @@ window.drawOutlines = function(scale)
                         end
                     end
                 end
-            elseif tile.type == "bitmasked" then
-                window.outlineBox:setColor(tileColorBitmasked)
+            elseif tile.type == "bitmask" then
+                window.outlineBox:setColor(tileColorBitmask)
                 error("TODO")
             end
         end
@@ -200,20 +202,22 @@ controller.tabTileset = require("scene.ui.tilesetEditor.tabTileset")(font, contr
 local fileDialogCallback = function(success, path)
     togglePicker(false)
     if success then
-        local id, image = global.editorSession:addTileset(path)
-        window.tilesetId = id
-        window.tileset = image
-        window.tileset:setFilter("nearest","nearest")
-        window.tileset:setWrap("clampzero")
+        local tileset = global.editorSession:addTileset(path)
+        window.tileset = tileset
+        window.tileset.image:setFilter("nearest","nearest")
+        window.tileset.image:setWrap("clampzero")
         
-        controller.tabStatic.preview:setImage(window.tileset)
-        controller.tabStatic:updateLimits(window.tileset:getDimensions())
+        controller.tabStatic.preview:setImage(window.tileset.image)
+        controller.tabStatic:updateLimits(window.tileset.image:getDimensions())
         
-        controller.tabAnimation.preview:setImage(window.tileset)
+        controller.tabAnimation.preview:setImage(window.tileset.image)
         controller.tabAnimation.preview:reset()
         
+        controller.tabBitmask.preview:setImage(window.tileset.image)
+        controller.tabBitmask:reset()
+        
         if window.newTilesetCallback then
-            window.newTilesetCallback(window.tileset)
+            window.newTilesetCallback(window.tileset.image)
         end
     end
 end
@@ -234,13 +238,13 @@ controller.tabStatic = require("scene.ui.tilesetEditor.tabStatic")(font, control
 controller.tabStatic.updateStaticQuad = function()
     if window.tileset then
         local x, y, w, h = window.preview:getRect()
-        local quad = lg.newQuad(x,y, w,h, window.tileset:getDimensions())
+        local quad = lg.newQuad(x,y, w,h, window.tileset.image:getDimensions())
         controller.tabStatic.preview:setQuad(quad)
     end
 end
 
 controller.staticXCallback = function(_, value)
-    if window.tileset and value + window.preview.width > window.tileset:getWidth() then
+    if window.tileset and value + window.preview.width > window.tileset.image:getWidth() then
         return false
     end
     window.preview.x = value
@@ -249,7 +253,7 @@ controller.staticXCallback = function(_, value)
 end
 
 controller.staticYCallback = function(_, value)
-    if window.tileset and value + window.preview.height > window.tileset:getHeight() then
+    if window.tileset and value + window.preview.height > window.tileset.image:getHeight() then
         return false
     end
     window.preview.y = value
@@ -258,7 +262,7 @@ controller.staticYCallback = function(_, value)
 end
 
 controller.staticWCallback = function(_, value)
-    if window.tileset and window.preview.x + value > window.tileset:getWidth() then
+    if window.tileset and window.preview.x + value > window.tileset.image:getWidth() then
         if window.preview.x - 1 >= controller.tabStatic.x.min then
             window.preview.x = window.preview.x - 1
             controller.tabStatic.x:updateValue(window.preview.x)
@@ -270,7 +274,7 @@ controller.staticWCallback = function(_, value)
 end
 
 controller.staticHCallback = function(_, value)
-    if window.tileset and window.preview.y + value > window.tileset:getHeight() then
+    if window.tileset and window.preview.y + value > window.tileset.image:getHeight() then
         if window.preview.y - 1 >= controller.tabStatic.y.min then
             window.preview.y = window.preview.y - 1
             controller.tabStatic.y:updateValue(window.preview.y)
@@ -295,7 +299,7 @@ controller.staticCreateButton = function()
     tileData.h = p.height
     
     if not tileData.id then
-        global.editorSession:addTile(tileData, window.tilesetId)
+        global.editorSession:addTile(tileData, window.tileset)
         window.selectPreview(p.x, p.y, p.width, p.height)
     end
 end
@@ -322,7 +326,7 @@ controller.animationIndexedChanged = function(self, index)
     end
     if not preview:hasFrame(index) then
         --Add frame
-        local quad = lg.newQuad(p.x,p.y, p.width,p.height, window.tileset:getDimensions())
+        local quad = lg.newQuad(p.x,p.y, p.width,p.height, window.tileset.image:getDimensions())
         local time = controller.tabAnimation.time.value
         
         preview:addFrame(quad, time)
@@ -384,7 +388,7 @@ controller.animationCreateButton = function(self)
     end
     
     if not tileData.id then
-        global.editorSession:addTile(tileData, window.tilesetId)
+        global.editorSession:addTile(tileData, window.tileset)
     end
     
     controller.tabAnimation:reset()
@@ -409,27 +413,44 @@ controller.tabBitmask = require("scene.ui.tilesetEditor.tabBitmask")(font, contr
 
 controller.bitmaskChangeButton = function(self)
     -- If not editing tile then
+    if not window.bitmaskEditing then
+        window.bitmaskEditing = true
     -- Edit button pressed,
     -- Display bitmask tiles, wait for one to be selected
     -- Once selected, process bitmask tile and load into preview as changed
     -- Change lock tab, change buttons
-    
+        controller.tabBitmask.change:setText("Finished Tile")
+        controller.tabBitmask.finished:setText("Delete Tile")
+    else
     -- If editing tile then
+        window.bitmaskEditing = false
     -- Finished button pressed
     -- Push bitmask tile if needed to session
     -- Change lock tab, change buttons
-    
+        controller.tabBitmask.change:setText("Edit Tile")
+        controller.tabBitmask.finished:setText("Create Tile")
+    end
 end
 
 controller.bitmaskFinishedButton = function(self)
     -- If not editing tile then
+    if not window.bitmaskEditing then
+        window.bitmaskEditing = true
     -- Create button pressed, set up new bitmask tile
-    -- Change lock tab, change buttons
-    
+        
+        window.tabBitmask:setTile(window.tile)
+    -- Change lock tab
+        controller.tabBitmask.change:setText("Finished Tile")
+        controller.tabBitmask.finished:setText("Delete Tile")
+    else
     -- If editing tile then
+        window.bitmaskEditing = false
     -- Delete current editting tile
-    -- Change buttons back
     -- Unlock tab
+        controller.tabBitmask.change:setText("Edit Tile")
+        controller.tabBitmask.finished:setText("Create Tile")
+    end
+    
 end
 
 controller.tabBitmask:createUI()

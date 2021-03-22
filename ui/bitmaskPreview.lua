@@ -47,23 +47,31 @@ bitmaskPreview.reset = function(self)
     end
 end
 
+bitmaskPreview.updateElement = function(self, dt)
+    if self.active then
+        -- Run animation if tile is animated
+    end
+end
+
 bitmaskPreview.drawElement = function(self)
     local rx, ry, w, h = self.anchor:getRect()
     if self.backgroundColor then
         lg.setColor(self.backgroundColor)
         lg.rectangle("fill", rx,ry, w,h)
     end
-    local lenW, lenH = w / 3, h / 3
-    for i = 1, 9 do
-        if i ~= 5 and (not self.evenDraw or i % 2 == 0)then
-            if self.tileActive[i] then
-                local x, y =self:tileToPoint(i)
-                if i % 2 == 0 then
-                    lg.setColor(.1,.5,.3)
-                else
-                    lg.setColor(.1,.4,.25)
+    if self.active then
+        local lenW, lenH = w / 3, h / 3
+        for i = 1, 9 do
+            if i ~= 5 and (not self.evenDraw or i % 2 == 0)then
+                if self.tileActive[i] then
+                    local x, y =self:tileToPoint(i)
+                    if i % 2 == 0 then
+                        lg.setColor(.1,.5,.3)
+                    else
+                        lg.setColor(.1,.4,.25)
+                    end
+                    lg.rectangle("fill", rx+x, ry+y, lenW, lenH)
                 end
-                lg.rectangle("fill", rx+x, ry+y, lenW, lenH)
             end
         end
     end
@@ -112,17 +120,19 @@ bitmaskPreview.pointToTile = function(self, x, y)
 end
 
 bitmaskPreview.touchpressedElement = function(self, id, x, y, ...)
-    local tile = self:pointToTile(x, y)
-    if tile == -1 then
-        return false
-    end
-    if not self.evenDraw or tile % 2 == 0 then
-        self.tileActive[tile] = not self.tileActive[tile]
-        if self.valueChangedCallback then
-            self:valueChangedCallback(self:sumActiveTiles())
+    if self.active then
+        local tile = self:pointToTile(x, y)
+        if tile == -1 then
+            return false
         end
+        if not self.evenDraw or tile % 2 == 0 then
+            self.tileActive[tile] = not self.tileActive[tile]
+            if self.valueChangedCallback then
+                self:valueChangedCallback(self:sumActiveTiles())
+            end
+        end
+        return true
     end
-    return true
 end
 
 return bitmaskPreview
