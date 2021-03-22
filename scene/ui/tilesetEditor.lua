@@ -156,7 +156,7 @@ window.drawOutlines = function(scale)
     local box = window.outlineBox
     if window.tileset then
     for _, tile in ipairs(window.tileset.tiles) do
-        if tile ~= window.tile then
+        if tile ~= window.tile or not controller.activeChild then
             if tile.type == "static" then
                 box:setColor(tileColorStatic)
                 box:setRect(tile.x, tile.y, tile.w, tile.h)
