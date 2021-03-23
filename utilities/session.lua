@@ -3,13 +3,15 @@ session.__index = session
 
 local lg = love.graphics
 
+local list = require("utilities.list")
+
 local insert, remove = table.insert, table.remove
 
 session.new = function()
     local self = setmetatable({}, session)
     
-    self.tilesets = {}
-    self.tiles = {}
+    self.tilesets = list.new()
+    self.static, self.animated, self.bitmask = 0, 0, 0
     
     return self
 end
@@ -21,7 +23,7 @@ end
 --TODO copy to save dir
 --TODO if failed to load
 session.addTileset = function(self, path)
-    for _, tileset in ipairs(self.tilesets) do
+    for _, tileset in ipairs(self.tilesets.items) do
         if tileset.path == path then
             -- Reload image as the image may of changed
             tileset.image = lg.newImage(path)
@@ -33,55 +35,41 @@ session.addTileset = function(self, path)
     local tileset = {
         path = path,
         image = image,
-        tiles = {},
+        tiles = list.new(),
         id = os.time()
     }
-    insert(self.tilesets, tileset)
+    self.tilesets:add(tileset)
     return tileset
 end
 
 session.getTileset = function(self, id)
-    for _, tileset in ipairs(self.tilesets) do
-        if tileset.id == id then
-            return tileset
-        end
-    end
-    return nil
+    return self.tilesets:get(id)
 end
 
 session.addTile = function(self, tileData, tileset)
-    if not tileData.id then
-        insert(tileset.tiles, tileData)
+    if not tileset.tiles:has(tileData) and not tileData.id then
         tileData.id = os.time()
         tileData.tilesetId = tileset.id
+        tileset.tiles:add(tileData)
+        
+        self[tileData.type] = self[tileData.type] + 1
     else
         error("Already added tile")
     end
 end
 
 session.removeTile = function(self, tileData)
-    if not tileData.id and tileData.tilesetId then
-        error("Tile not added")
-    end
     local tileset = self:getTileset(tileData.tilesetId)
-    for key, tile in ipairs(tileset.tiles) do
-        if tile == tileData then
-            remove(tileset.tiles, key)
-            break
-        end
-    end
+    tileset:remove(tileData)
+    self[tileData.type] = self[tileData.type] - 1
 end
 
 session.getTile = function(self, id, tileset)
-     for _, tile in ipairs(tileset) do
-        if tile.id == id then
-            return tile
-        end
-    end
+    return tileset.tiles:get(id)
 end
 
 session.getTileUnknownTileset = function(self, id)
-    for _, tileset in ipairs(self.tilesets) do
+    for _, tileset in ipairs(self.tilesets.items) do
         local tile = self:getTile(id, tileset)
         if tile then
             return tile

@@ -61,7 +61,7 @@ end
 window.selectPreview = function(x, y, w, h)
     --EDIT
     if x ~= -1 and y ~= -1 and w ~= -1 and h ~= -1 then
-    for _, tile in ipairs(window.tileset.tiles) do
+    for _, tile in ipairs(window.tileset.tiles.items) do
         if tile.type == "static" and tile.x == x and tile.y == y then
             controller.tabStatic.create:setText("Edit Tile")
             controller.tabStatic.create:setActive(true)
@@ -155,8 +155,19 @@ window:addChild(pickerReturn)
 window.drawOutlines = function(scale)
     local box = window.outlineBox
     if window.tileset then
-    for _, tile in ipairs(window.tileset.tiles) do
-        if tile ~= window.tile or not controller.activeChild then
+    for _, tile in ipairs(window.tileset.tiles.items) do
+        if window.bitmaskEditPick then
+            box:setColor(tileColorBitmask)
+            if tile.type == "bitmask" then
+               for i=0, (60*tile.direction)-255 do
+                    if tile.tiles[i] then
+                         local t = global.editorSession:getTile(tile.tiles[i], window.tileset)
+                         box:setRect(t.x, t.y, t.w, t.h)
+                         box:draw()
+                    end
+                end
+            end
+        elseif tile ~= window.tile or not controller.activeChild then
             if tile.type == "static" then
                 box:setColor(tileColorStatic)
                 box:setRect(tile.x, tile.y, tile.w, tile.h)
@@ -164,20 +175,17 @@ window.drawOutlines = function(scale)
             elseif tile.type == "animated" then
                 box:setColor(tileColorAnimated)
                 local tiles = tile.tiles
-                if #tiles > 0 then
-                    box:setRect(tiles[1].x, tiles[1].y, tiles[1].w, tiles[1].h)
-                    box:draw(scale)
-                    box:setColor(tileColorAnimatedAlpha)
-                    for i, tile in ipairs(tiles) do
-                        if i > 1 then
-                            box:setRect(tile.x, tile.y, tile.w, tile.h)
-                            box:draw(scale)
-                        end
+                box:setRect(tiles[1].x, tiles[1].y, tiles[1].w, tiles[1].h)
+                box:draw(scale)
+                box:setColor(tileColorAnimatedAlpha)
+                for i, tile in ipairs(tiles) do
+                    if i > 1 then
+                        box:setRect(tile.x, tile.y, tile.w, tile.h)
+                        box:draw(scale)
                     end
                 end
             elseif tile.type == "bitmask" then
-                window.outlineBox:setColor(tileColorBitmask)
-                error("TODO")
+                --error("TODO")
             end
         end
     end
@@ -415,48 +423,49 @@ controller:addChild(controller.tabAnimation)
 --[[ TAB BITMASK ]]
 controller.tabBitmask = require("scene.ui.tilesetEditor.tabBitmask")(font, controller)
 
+local tabBit = controller.tabBitmask
+
 controller.bitmaskChangeButton = function(self)
-    -- If not editing tile then
+    if not window.tileset then
+        return
+    end
     if not window.bitmaskEditing then
         window.bitmaskEditing = true
+        window.bitmaskEditPick = true
     -- Edit button pressed,
     -- Display bitmask tiles, wait for one to be selected
     -- Once selected, process bitmask tile and load into preview as changed
     -- Change lock tab, change buttons
-        controller.tabBitmask.change:setText("Finished Tile")
-        controller.tabBitmask.finish:setText("Delete Tile")
+        tab:setState("edit", false)
     else
-    -- If editing tile then
         window.bitmaskEditing = false
-    -- Finished button pressed
-    -- Push bitmask tile if needed to session
-    -- Change lock tab, change buttons
-        controller.tabBitmask.change:setText("Edit Tile")
-        controller.tabBitmask.finish:setText("Create Tile")
+        window.bitmaskEditPick = false
+        tab:setState("new")
     end
+    tabBit:setTile(window.tile)
     controller:setLock(window.bitmaskEditing)
 end
 
 controller.bitmaskFinishButton = function(self)
-    -- If not editing tile then
+    if not window.tileset then
+        return
+    end
     if not window.bitmaskEditing then
         window.bitmaskEditing = true
-    -- Create button pressed, set up new bitmask tile
-        window.tile = {type="bitmask", tiles={}}
-        controller.tabBitmask:setTile(window.tile)
-    -- Change lock tab
-        controller.tabBitmask.change:setText("Finished Tile")
-        controller.tabBitmask.finish:setText("Delete Tile")
-    else
-    -- If editing tile then
-        window.bitmaskEditing = false
-    -- Delete current editting tile
-        window.tile = nil
-    -- Unlock tab
-        controller.tabBitmask.change:setText("Edit Tile")
-        controller.tabBitmask.finish:setText("Create Tile")
         
+        window.tile = {type="bitmask", tiles={}}
+        global.editorSession:addTile(window.tile, window.tileset)
+        
+        tabBit:setState("edit", true)
+    else
+        window.bitmaskEditing = false
+        
+        global.editorSession:removeTile(window.tile)
+        window.tile = nil
+        
+        tabBit:setState("new")
     end
+    tabBit:setTile(window.tile)
     controller:setLock(window.bitmaskEditing)
 end
 

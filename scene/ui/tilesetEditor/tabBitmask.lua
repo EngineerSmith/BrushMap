@@ -24,6 +24,20 @@ tabBitmask.setTile = function(self, tile)
     self.toggle.active = active
 end
 
+tabBitmask.setState = function(self, state, ...)
+    if state == "edit" then
+        self.change:setActive(true)
+        self.change:setText("Finished Tile")
+        self.finish:setActive(select(1, ...))
+        self.finish:setText("Delete Tile")
+    elseif state == "new" then
+        self.change:setActive(global.editorSession.bitmask > 0)
+        self.change:setText("Edit Tile")
+        self.finish:setActive(true)
+        self.finish:setText("Create Tile")
+    end
+end
+
 tabBitmask.createUI = function(self)
     local anchor = anchor.new("NorthWest", 10,30, -1,-2, 20,0)
     self.preview = bitmaskPreview.new(anchor)

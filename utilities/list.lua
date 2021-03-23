@@ -44,7 +44,10 @@ list.removeItem = function(self, item, index)
 end
 
 list.get = function(self, itemId)
-    return self.items[self.hash[itemId]]
+    if self.hash[itemID] ~= nil then
+        return self.items[self.hash[itemId]]
+    end
+    return nil
 end
 
 list.has = function(self, item)
