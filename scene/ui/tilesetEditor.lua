@@ -141,17 +141,11 @@ local togglePicker = function(bool)
     window.showTexture = picker.bgImage.enabled
 end
 
-controller.showPicker = function()
-    togglePicker(true)
-end
-
-controller.hidePicker = function()
+local anchor = anchor.new("NorthEast", 40,40, 80,80)
+pickerReturn = button.new(anchor, nil, function()
     togglePicker(false)
     love.graphics.setBackgroundColor(picker:getColor())
-end
-
-local anchor = anchor.new("NorthEast", 40,40, 80,80)
-pickerReturn = button.new(anchor, nil, controller.hidePicker)
+end)
 pickerReturn:setText("Return", nil, font)
 pickerReturn:setOutline(true, 4, 2)
 pickerReturn:setRoundCorner(7)
