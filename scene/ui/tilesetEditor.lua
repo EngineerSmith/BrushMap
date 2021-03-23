@@ -95,7 +95,7 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
                 end
             end
         elseif tile.type == "bitmask" and window.bitmaskEditPick then
-            for i=0, (60*tile.direction)-255 do
+            for i=0, (60*tile.direction)-225 do
                 local t = tile.tiles[i]
                 if t and aabb(pressedX, pressedY, t.x, t.y, t.w, t.h) then
                     -- Set `tile` as tile to edit
@@ -161,7 +161,7 @@ window.drawScene = function(scale)
         if window.bitmaskEditPick then
             box:setColor(tileColorBitmask)
             if tile.type == "bitmask" then
-               for i=0, (60*tile.direction)-255 do
+               for i=0, (60*tile.direction)-225 do
                     if tile.tiles[i] then
                          local t = global.editorSession:getTile(tile.tiles[i], window.tileset)
                          box:setRect(t.x, t.y, t.w, t.h)
@@ -169,7 +169,7 @@ window.drawScene = function(scale)
                     end
                 end
             end
-        elseif tile ~= window.tile or not controller.activeChild then
+        elseif tile ~= window.tile or not controller.activeChild or window.bitmaskEditing then
             if tile.type == "static" then
                 box:setColor(tileColorStatic)
                 box:setRect(tile.x, tile.y, tile.w, tile.h)
@@ -186,8 +186,6 @@ window.drawScene = function(scale)
                         box:draw(scale)
                     end
                 end
-            elseif tile.type == "bitmask" then
-                --error("TODO")
             end
         end
     end
