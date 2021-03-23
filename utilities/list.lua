@@ -27,7 +27,7 @@ list.add = function(self, item)
     return self
 end
 
-list.removeItem = function(self, item, index)
+list.remove = function(self, item, index)
     index = index or self.hash[item.id]
     local size = self.size
     
@@ -44,7 +44,7 @@ list.removeItem = function(self, item, index)
 end
 
 list.get = function(self, itemId)
-    if self.hash[itemID] ~= nil then
+    if self.hash[itemId] ~= nil then
         return self.items[self.hash[itemId]]
     end
     return nil

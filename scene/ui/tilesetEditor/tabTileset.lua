@@ -7,8 +7,14 @@ local checkbox = require("ui.checkbox")
 
 local maxNum = 9999
 
-return function(font, controller)
+return function(font, controller, window)
 local tabTileset = tabWindow.new("Tileset", font)
+
+tabTileset.updateElement = function(self, dt)
+    window.grid:setTileSize(tabTileset.x, tabTileset.y)
+    window.grid:setTileOffset(tabTileset.gridoffsetX, tabTileset.gridoffsetY)
+    window.grid:setPadding(tabTileset.paddingX, tabTileset.paddingY)
+end
 
 tabTileset.createUI = function(self)
 --[[ BUTTONS ]]

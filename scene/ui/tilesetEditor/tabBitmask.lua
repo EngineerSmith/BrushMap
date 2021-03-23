@@ -8,8 +8,13 @@ local button = require("ui.button")
 local togglebox = require("ui.togglebox")
 local text = require("ui.text")
 
-return function(font, controller)
+return function(font, controller, window)
 local tabBitmask = tabWindow.new("Bitmask", font)
+
+tabBitmask.newTileset = function(self, tileset)
+    self.preview:setImage(tileset)
+    tabBitmask:reset()
+end
 
 tabBitmask.reset = function(self)
    self.preview:reset()

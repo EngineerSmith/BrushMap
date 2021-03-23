@@ -27,11 +27,15 @@ session.addTileset = function(self, path)
         if tileset.path == path then
             -- Reload image as the image may of changed
             tileset.image = lg.newImage(path)
+            tileset.image:setFilter("nearest","nearest")
+            tileset.image:setWrap("clampzero")
             return tileset
         end
     end
     
     local image = lg.newImage(path)
+    image:setFilter("nearest","nearest")
+    image:setWrap("clampzero")
     local tileset = {
         path = path,
         image = image,
@@ -40,10 +44,6 @@ session.addTileset = function(self, path)
     }
     self.tilesets:add(tileset)
     return tileset
-end
-
-session.getTileset = function(self, id)
-    return self.tilesets:get(id)
 end
 
 session.addTile = function(self, tileData, tileset)
@@ -59,8 +59,8 @@ session.addTile = function(self, tileData, tileset)
 end
 
 session.removeTile = function(self, tileData)
-    local tileset = self:getTileset(tileData.tilesetId)
-    tileset:remove(tileData)
+    local tileset = self.tilesets:get(tileData.tilesetId)
+    tileset.tiles:remove(tileData)
     self[tileData.type] = self[tileData.type] - 1
 end
 
