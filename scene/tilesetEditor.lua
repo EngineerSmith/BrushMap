@@ -34,9 +34,10 @@ touchController.setPressedCallback(function(x, y)
         local w, h = editorWindow.tileset.image:getDimensions()
         
         if aabb(x,y, 0,0,w,h) then
+            local pressedX, pressedY = x, y
             local x, y, w, h = grid:positionToTile(x, y)
             if x ~= -1 and y ~= -1 then
-                editorWindow.selectPreview(x,y, w,h)
+                editorWindow.selectPreview(x, y, w, h, pressedX, pressedY)
             end
         end
     end
@@ -60,12 +61,13 @@ end
 
 local texture = global.assets["texture.checkerboard"]
 local _,_, width, height = love.window.getSafeArea()
-local quad = lg.newQuad(0,0, width/4, height/4, texture:getDimensions())
+local scale = 4
+local quad = lg.newQuad(0,0, width/scale, height/scale, texture:getDimensions())
 
 scene.draw = function()
     if editorWindow.showTexture then
         lg.setColor(lg.getBackgroundColor())
-        lg.draw(texture, quad, 0,0, 0, 4,4)
+        lg.draw(texture, quad, 0,0, 0, scale,scale)
     end
     lg.push("all")
     lg.scale(touchController.scale)
@@ -75,11 +77,7 @@ scene.draw = function()
         lg.draw(editorWindow.tileset.image)
     end
     
-    if editorWindow.tileset then
-        grid:draw(touchController.scale / 1.5)    
-    end
-    
-    editorWindow.drawOutlines(touchController.scale / 1.5)
+    editorWindow.drawScene(touchController.scale / 1.5)
     
     lg.pop()
     editorWindow:draw()

@@ -19,6 +19,21 @@ tabStatic.newTileset = function(self, tileset)
     self:updateLimits(tileset:getDimensions())
 end
 
+tabStatic.setState = function(self, state)
+    if state == "edit" then
+        self.create:setText("Edit Tile")
+        self.create:setActive(true)
+        self.delete:setActive(true) 
+    elseif state == "new" then
+        self.create:setText("Create Tile")
+        self.create:setActive(true)
+        self.delete:setActive(false)
+    elseif state == "deactive" then
+        self.create:setActive(false)
+        self.delete:setActive(false)
+    end
+end
+
 tabStatic.updateLimits = function(self, maxW, maxH)
     self.w:updateValue(nil,nil, maxW)
     self.h:updateValue(nil,nil, maxH)
@@ -122,7 +137,8 @@ tabStatic.createUI = function(self)
         
         if not tileData.id then
             global.editorSession:addTile(tileData, window.tileset)
-            window.selectPreview(p.x, p.y, p.width, p.height)
+            window.tile = tileData
+            self:setState("edit")
         end
     end)
     self.create:setText("Add Tile", nil, font)
@@ -135,6 +151,7 @@ tabStatic.createUI = function(self)
             global.editorSession:removeTile(window.tile)
             local p = window.preview
             window.selectPreview(p.x, p.y, p.width, p.height)
+            self:setState("new")
         end
     end)
     self.delete:setText("Delete Tile", nil, font)

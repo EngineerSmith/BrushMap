@@ -16,17 +16,17 @@ tabBitmask.newTileset = function(self, tileset)
     tabBitmask:reset()
 end
 
-tabBitmask.reset = function(self)
-   self.preview:reset()
-   self.numberSelect:reset()
-end
-
 tabBitmask.setTile = function(self, tile)
     self.tile = tile
     local active = tile ~= nil
     self.preview.active = active
     self.numberSelect.active = active
     self.toggle.active = active
+end
+
+tabBitmask.reset = function(self)
+   self.preview:reset()
+   self.numberSelect:reset()
 end
 
 tabBitmask.setState = function(self, state, ...)

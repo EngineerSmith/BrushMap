@@ -6,6 +6,7 @@ local anchor = require("ui.base.anchor")
 local tabController = require("ui.tabController")
 local colorPicker = require("ui.colorPicker")
 local button = require("ui.button")
+local aabb = require("utilities.aabb")
 local outlineBox = require("utilities.outlineBox")
 
 local lg = love.graphics
@@ -58,64 +59,48 @@ window.updatePreview = function(x, y, w, h)
     end
 end
 
-window.selectPreview = function(x, y, w, h)
+window.selectPreview = function(x, y, w, h, pressedX, pressedY)
     --EDIT
-    if x ~= -1 and y ~= -1 and w ~= -1 and h ~= -1 then
+    if x ~= -1 and y ~= -1 and w ~= -1 and h ~= -1 and pressedX and pressedY then
     for _, tile in ipairs(window.tileset.tiles.items) do
-        if window.bitmaskEditing then
-            if window.bitmaskEditPick then
-                
+        if tile.type == "static" then
+            if aabb(pressedX, pressedY, tile.x, tile.y, tile.w, tile.h) then
+                controller.tabStatic:setState("edit")
+                window.tile = tile
+                window.updatePreview(tile.x,tile.y,tile.w,tile.h)
+                return
             end
-        elseif tile.type == "static" and tile.x == x and tile.y == y then
-            controller.tabStatic.create:setText("Edit Tile")
-            controller.tabStatic.create:setActive(true)
-            controller.tabStatic.delete:setActive(true)
-            window.tile = tile
-            window.updatePreview(x,y,tile.w,tile.h)
-            return
         elseif tile.type == "animated" then
             if window.tile == tile then
                 break
             end
-            if tile.tiles[1].x == x and tile.tiles[1].y == y then
-                controller.tabStatic.create:setActive(false)
-                controller.tabStatic.delete:setActive(false)
-                controller.tabAnimation.create:setText("Edit Tile")
-                controller.tabAnimation.delete:setActive(true)
+            local t = tile.tiles[1]
+            if aabb(pressedX, pressedY, t.x, t.y, t.w, t.h) then
                 window.tile = tile
-                window.updatePreview(x,y,tile.tiles[1].w,tile.tiles[1].h)
+                window.updatePreview(t.x, t.y, t.w, t.h)
                 for _, tile in ipairs(tile.tiles) do
                     local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, window.tileset.image:getDimensions())
                     controller.tabAnimation.preview:addFrame(quad, tile.time)
                 end
-                controller.tabAnimation.frameSelect:setMaxindex(#tile.tiles)
+                controller.tabAnimation:setState("edit")
                 controller:setLock(true)
                 return
             end
-        elseif tile.type == "bitmask" then
-            error("TODO")
         end
     end
     end
     if window.tile and window.tile.type == "animated" then
-        -- EDIT ANIMATION
         window.updatePreview(x,y,w,h)
     elseif window.tile and window.tile.type == "bitmask" then
         error("TODO")
     else
-        --CREATE
         window.tile = nil
         if x~=-1 and y~=-1 and w~=-1 and h~=-1 then
-            controller.tabStatic.create:setText("Create Tile")
-            controller.tabStatic.create:setActive(true)
-            controller.tabStatic.delete:setActive(false)
-            controller.tabAnimation.create:setText("Create Tile")
-            controller.tabAnimation.delete:setActive(false)
+            controller.tabStatic:setState("new")
+            controller.tabAnimation:setState("new")
         else
-            controller.tabStatic.create:setActive(false)
-            controller.tabStatic.delete:setActive(false)
-            controller.tabAnimation.create:setActive(false)
-            controller.tabAnimation.delete:setActive(false)
+            controller.tabStatic:setActive("deactive")
+            controller.tabAnimation:setState("deactive")
         end
         window.updatePreview(x,y,w,h)
     end
@@ -152,7 +137,11 @@ pickerReturn:setRoundCorner(7)
 pickerReturn.enabled = false
 window:addChild(pickerReturn)
 
-window.drawOutlines = function(scale)
+window.drawScene = function(scale)
+    if window.tileset then
+        window.grid:draw(scale)
+    end
+    
     local box = window.outlineBox
     if window.tileset then
     for _, tile in ipairs(window.tileset.tiles.items) do

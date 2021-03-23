@@ -20,13 +20,26 @@ tabAnimation.newTileset = function(self, tileset)
    self:reset()
 end
 
+tabAnimation.setState = function(self, state)
+    if state == "edit" then
+        self.create:setText("Edit Tile")
+        self.delete:setActive(true)
+        self.frameSelect:setMaxindex(#self.preview.quads)
+    elseif state == "new" then
+        self.create:setText("Create Tile")
+        self.delete:setActive(false)
+    elseif state == "deactive" then
+        self.deleteFrame:setActive(false)
+        self.create:setActive(false)
+        self.delete:setActive(false)
+    end
+end
+
 tabAnimation.reset = function(self)
     self.preview:reset()
     self.frameSelect:reset()
     self.time:reset()
-    self.deleteFrame:setActive(false)
-    self.create:setActive(false)
-    self.delete:setActive(false)
+    self:setState("deactive")
 end
 
 tabAnimation.createUI = function(self)
