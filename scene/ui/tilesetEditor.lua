@@ -249,52 +249,7 @@ controller:addChild(controller.tabAnimation)
 --[[ TAB BITMASK ]]
 controller.tabBitmask = require("scene.ui.tilesetEditor.tabBitmask")(font, controller, window)
 
-local tabBit = controller.tabBitmask
-
-controller.bitmaskChangeButton = function(self)
-    if not window.tileset then
-        return
-    end
-    if not window.bitmaskEditing then
-        window.bitmaskEditing = true
-        window.bitmaskEditPick = true
-    -- Edit button pressed,
-    -- Display bitmask tiles, wait for one to be selected
-    -- Once selected, process bitmask tile and load into preview as changed
-    -- Change lock tab, change buttons
-        tab:setState("edit", false)
-    else
-        window.bitmaskEditing = false
-        window.bitmaskEditPick = false
-        tab:setState("new")
-    end
-    tabBit:setTile(window.tile)
-    controller:setLock(window.bitmaskEditing)
-end
-
-controller.bitmaskFinishButton = function(self)
-    if not window.tileset then
-        return
-    end
-    if not window.bitmaskEditing then
-        window.bitmaskEditing = true
-        
-        window.tile = {type="bitmask", tiles={}}
-        global.editorSession:addTile(window.tile, window.tileset)
-        
-        tabBit:setState("edit", true)
-    else
-        window.bitmaskEditing = false
-        
-        global.editorSession:removeTile(window.tile)
-        window.tile = nil
-        
-        tabBit:setState("new")
-    end
-    tabBit:setTile(window.tile)
-    controller:setLock(window.bitmaskEditing)
-end
-
 controller.tabBitmask:createUI()
 controller:addChild(controller.tabBitmask)
+
 return window

@@ -92,13 +92,53 @@ tabBitmask.createUI = function(self)
     self:addChild(self.toggle)
     
     local anchor = anchor.new("NorthWest", 10,100+height, -1,40, 20,0)
-    self.change = button.new(anchor, nil, controller.bitmaskChangeButton)
+    self.change = button.new(anchor, nil, function(_)
+        if not window.tileset then
+            return
+        end
+        if not window.bitmaskEditing then
+            window.bitmaskEditing = true
+            window.bitmaskEditPick = true
+        -- Edit button pressed,
+        -- Display bitmask tiles, wait for one to be selected
+        -- Once selected, process bitmask tile and load into preview as changed
+        -- Change lock tab, change buttons
+            self:setState("edit", false)
+        else
+            window.bitmaskEditing = false
+            window.bitmaskEditPick = false
+            self:setState("new")
+        end
+        self:setTile(window.tile)
+        controller:setLock(window.bitmaskEditing)
+    end)
     self.change:setText("Edit Bitmask", nil, font)
     self:addChild(self.change, nil)
     self.change:setActive(false)
     
     local anchor = anchor.new("NorthWest", 10,150+height, -1,40, 20,0)
-    self.finish = button.new(anchor, nil, controller.bitmaskFinishButton)
+    self.finish = button.new(anchor, nil, function(_)
+        if not window.tileset then
+            return
+        end
+        if not window.bitmaskEditing then
+            window.bitmaskEditing = true
+            
+            window.tile = {type="bitmask", tiles={}}
+            global.editorSession:addTile(window.tile, window.tileset)
+            
+            self:setState("edit", true)
+        else
+            window.bitmaskEditing = false
+            
+            global.editorSession:removeTile(window.tile)
+            window.tile = nil
+            
+            self:setState("new")
+        end
+        self:setTile(window.tile)
+        controller:setLock(window.bitmaskEditing)
+    end)
     self.finish:setText("Create Bitmask", nil, font)
     self:addChild(self.finish, nil)
     
