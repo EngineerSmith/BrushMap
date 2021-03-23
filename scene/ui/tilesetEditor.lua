@@ -64,11 +64,15 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
     if x ~= -1 and y ~= -1 and w ~= -1 and h ~= -1 and pressedX and pressedY then
     for _, tile in ipairs(window.tileset.tiles.items) do
         if tile.type == "static" then
-            if aabb(pressedX, pressedY, tile.x, tile.y, tile.w, tile.h) then
-                controller.tabStatic:setState("edit")
-                window.tile = tile
-                window.updatePreview(tile.x,tile.y,tile.w,tile.h)
-                return
+            if window.tile ~= tile and aabb(pressedX, pressedY, tile.x, tile.y, tile.w, tile.h) then
+                if window.bitmaskEditing then
+                    -- TODO Set current bitmask to `tile`
+                else
+                    controller.tabStatic:setState("edit")
+                    window.tile = tile
+                    window.updatePreview(tile.x,tile.y,tile.w,tile.h)
+                    return
+                end
             end
         elseif tile.type == "animated" then
             if window.tile == tile then
@@ -76,23 +80,32 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
             end
             local t = tile.tiles[1]
             if aabb(pressedX, pressedY, t.x, t.y, t.w, t.h) then
-                window.tile = tile
-                window.updatePreview(t.x, t.y, t.w, t.h)
-                for _, tile in ipairs(tile.tiles) do
-                    local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, window.tileset.image:getDimensions())
-                    controller.tabAnimation.preview:addFrame(quad, tile.time)
+                if window.bitmaskEditing then
+                    -- TODO Set current bitmask to `tile`
+                else
+                    window.tile = tile
+                    window.updatePreview(t.x, t.y, t.w, t.h)
+                    for _, tile in ipairs(tile.tiles) do
+                        local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, window.tileset.image:getDimensions())
+                        controller.tabAnimation.preview:addFrame(quad, tile.time)
+                    end
+                    controller.tabAnimation:setState("edit")
+                    controller:setLock(true)
+                    return
                 end
-                controller.tabAnimation:setState("edit")
-                controller:setLock(true)
-                return
             end
+        elseif tile.type == "bitmask" and window.bitmaskEditPick then
+            for i=0, (60*tile.direction)-255 do
+                local t = tile.tiles[i]
+                if t and aabb(pressedX, pressedY, t.x, t.y, t.w, t.h) then
+                    -- Set `tile` as tile to edit
+                end
+            end 
         end
     end
     end
     if window.tile and window.tile.type == "animated" then
         window.updatePreview(x,y,w,h)
-    elseif window.tile and window.tile.type == "bitmask" then
-        error("TODO")
     else
         window.tile = nil
         if x~=-1 and y~=-1 and w~=-1 and h~=-1 then
