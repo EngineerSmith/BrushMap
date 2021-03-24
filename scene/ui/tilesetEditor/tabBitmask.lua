@@ -41,6 +41,7 @@ tabBitmask.setState = function(self, state, ...)
         self.change:setText("Finished Tile")
         self.finish:setActive(select(1, ...))
         self.finish:setText("Delete Tile")
+        window.updatePreview(-1,-1,-1,-1)
     elseif state == "new" then
         self:reset()
         self.change:setActive(global.editorSession.bitmask > 0)
@@ -60,14 +61,14 @@ tabBitmask.setTileToPreview = function(self, tile)
     if tile.type == "static" then
         local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, self.preview.image:getDimensions())
         self.preview:addQuad(quad)
-    elseif tile.type == "animation" then
+    elseif tile.type == "animated" then
         local iw, ih = self.preview.image:getDimensions()
         for _, tile in ipairs(tile.tiles) do
             local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, iw, ih)
             self.preview:addQuad(quad, tile.time)
         end
     else
-        error("You shouldn't reach here: tabBitmask.lua 55")
+        error("You shouldn't reach here: tabBitmask.lua")
     end
 end
 
@@ -92,9 +93,13 @@ tabBitmask.createUI = function(self)
     self.numberSelect.indexedChangedCallback = function(_, index)
         self.preview:setActiveTiles(index)
         local id = self.tile.tiles[index]
-        if window.tileset and id then
-            local tile = global.editorSession:getTile(id, window.tileset)
-            self:setTileToPreview(tile)
+        if window.tileset then
+            if id then
+                local tile = global.editorSession:getTile(id, window.tileset)
+                self:setTileToPreview(tile)
+            else
+                self.preview:resetQuads()
+            end
         end
         return true
     end

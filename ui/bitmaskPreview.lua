@@ -71,7 +71,7 @@ bitmaskPreview.updateElement = function(self, dt)
         while self.currentTime > self.quads[self.id].time do
             self.currentTime = self.currentTime - self.quads[self.id].time
             self.id = self.id + 1
-            if self.id > #self.times then
+            if self.id > #self.quads then
                 self.id = 1
             end
         end

@@ -67,13 +67,13 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
             if window.tile ~= tile and aabb(pressedX, pressedY, tile.x, tile.y, tile.w, tile.h) then
                 if window.bitmaskEditing then
                     controller.tabBitmask:addTileToBit(tile)
-                    return
+                    
                 else
                     controller.tabStatic:setState("edit")
                     window.tile = tile
-                    window.updatePreview(tile.x,tile.y,tile.w,tile.h)
-                    return
                 end
+                window.updatePreview(tile.x,tile.y,tile.w,tile.h)
+                return
             end
         elseif tile.type == "animated" then
             if window.tile == tile then
@@ -83,6 +83,7 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
             if aabb(pressedX, pressedY, t.x, t.y, t.w, t.h) then
                 if window.bitmaskEditing then
                     controller.tabBitmask:addTileToBit(tile)
+                    window.updatePreview(t.x, t.y, t.w, t.h)
                     return
                 else
                     window.tile = tile
@@ -99,15 +100,23 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
         elseif tile.type == "bitmask" and window.bitmaskEditPick then
             for i=0, (60*tile.directions)-225 do
                 local t = global.editorSession:getTile(tile.tiles[i], window.tileset)
-                if t and aabb(pressedX, pressedY, t.x, t.y, t.w, t.h) then
-                    -- Set `tile` as tile to edit
-                    tabBitmask.setTile(tile)
+                if t then
+                    local tiles = t.tiles
+                    if (t.type == "static" and  aabb(pressedX, pressedY, t.x, t.y, t.w, t.h)) or
+                       (t.type == "animated"and aabb(pressedX, pressedY, tiles[1].x, tiles[1].y, tiles[1].w, tiles[1].h)) then
+                        window.bitmaskEditPick = false
+                        tabBitmask.setTile(tile)
+                    end
                 end
             end 
         end
     end
     end
-    if window.tile and window.tile.type == "animated" then
+    if window.tile and window.tile == "bitmask" then
+        if window.bitmaskEditing then
+           window.updatePreview(-1,-1,-1,-1)
+        end
+    elseif window.tile and window.tile.type == "animated" then
         window.updatePreview(x,y,w,h)
     else
         window.tile = nil
@@ -115,7 +124,7 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
             controller.tabStatic:setState("new")
             controller.tabAnimation:setState("new")
         else
-            controller.tabStatic:setActive("deactive")
+            controller.tabStatic:setState("deactive")
             controller.tabAnimation:setState("deactive")
         end
         window.updatePreview(x,y,w,h)
