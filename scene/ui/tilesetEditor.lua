@@ -66,7 +66,8 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
         if tile.type == "static" then
             if window.tile ~= tile and aabb(pressedX, pressedY, tile.x, tile.y, tile.w, tile.h) then
                 if window.bitmaskEditing then
-                    -- TODO Set current bitmask to `tile`
+                    controller.tabBitmask:addTileToBit(tile)
+                    return
                 else
                     controller.tabStatic:setState("edit")
                     window.tile = tile
@@ -81,7 +82,8 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
             local t = tile.tiles[1]
             if aabb(pressedX, pressedY, t.x, t.y, t.w, t.h) then
                 if window.bitmaskEditing then
-                    -- TODO Set current bitmask to `tile`
+                    controller.tabBitmask:addTileToBit(tile)
+                    return
                 else
                     window.tile = tile
                     window.updatePreview(t.x, t.y, t.w, t.h)
@@ -95,10 +97,11 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
                 end
             end
         elseif tile.type == "bitmask" and window.bitmaskEditPick then
-            for i=0, (60*tile.direction)-225 do
-                local t = tile.tiles[i]
+            for i=0, (60*tile.directions)-225 do
+                local t = global.editorSession:getTile(tile.tiles[i], window.tileset)
                 if t and aabb(pressedX, pressedY, t.x, t.y, t.w, t.h) then
                     -- Set `tile` as tile to edit
+                    tabBitmask.setTile(tile)
                 end
             end 
         end
@@ -161,11 +164,11 @@ window.drawScene = function(scale)
         if window.bitmaskEditPick then
             box:setColor(tileColorBitmask)
             if tile.type == "bitmask" then
-               for i=0, (60*tile.direction)-225 do
+               for i=0, (60*tile.directions)-225 do
                     if tile.tiles[i] then
                          local t = global.editorSession:getTile(tile.tiles[i], window.tileset)
                          box:setRect(t.x, t.y, t.w, t.h)
-                         box:draw()
+                         box:draw(scale)
                     end
                 end
             end

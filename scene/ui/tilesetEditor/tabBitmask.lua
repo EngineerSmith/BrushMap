@@ -1,5 +1,7 @@
 local global = require("global")
 
+local lg = love.graphics
+
 local tabWindow = require("ui.tabWindow")
 local anchor = require("ui.base.anchor")
 local bitmaskPreview = require("ui.bitmaskPreview")
@@ -18,10 +20,14 @@ end
 
 tabBitmask.setTile = function(self, tile)
     self.tile = tile
+    window.tile = tile
     local active = tile ~= nil
     self.preview.active = active
     self.numberSelect.active = active
     self.toggle.active = active
+    if active then
+        self.toggle.selected = self.tile.directions == 8
+    end
 end
 
 tabBitmask.reset = function(self)
@@ -36,10 +42,32 @@ tabBitmask.setState = function(self, state, ...)
         self.finish:setActive(select(1, ...))
         self.finish:setText("Delete Tile")
     elseif state == "new" then
+        self:reset()
         self.change:setActive(global.editorSession.bitmask > 0)
         self.change:setText("Edit Tile")
         self.finish:setActive(true)
         self.finish:setText("Create Tile")
+    end
+end
+
+tabBitmask.addTileToBit = function(self, tile)
+    self.tile.tiles[self.numberSelect.index] = tile.id
+    self:setTileToPreview(tile)
+end
+
+tabBitmask.setTileToPreview = function(self, tile)
+    self.preview:resetQuads()
+    if tile.type == "static" then
+        local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, self.preview.image:getDimensions())
+        self.preview:addQuad(quad)
+    elseif tile.type == "animation" then
+        local iw, ih = self.preview.image:getDimensions()
+        for _, tile in ipairs(tile.tiles) do
+            local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, iw, ih)
+            self.preview:addQuad(quad, tile.time)
+        end
+    else
+        error("You shouldn't reach here: tabBitmask.lua 55")
     end
 end
 
@@ -63,6 +91,11 @@ tabBitmask.createUI = function(self)
     
     self.numberSelect.indexedChangedCallback = function(_, index)
         self.preview:setActiveTiles(index)
+        local id = self.tile.tiles[index]
+        if window.tileset and id then
+            local tile = global.editorSession:getTile(id, window.tileset)
+            self:setTileToPreview(tile)
+        end
         return true
     end
     
@@ -109,7 +142,7 @@ tabBitmask.createUI = function(self)
             window.bitmaskEditPick = false
             self:setState("new")
         end
-        self:setTile(window.tile)
+        self:setTile(self.tile)
         controller:setLock(window.bitmaskEditing)
     end)
     self.change:setText("Edit Bitmask", nil, font)
@@ -124,19 +157,19 @@ tabBitmask.createUI = function(self)
         if not window.bitmaskEditing then
             window.bitmaskEditing = true
             
-            window.tile = {type="bitmask", tiles={}}
-            global.editorSession:addTile(window.tile, window.tileset)
+            self.tile = {type="bitmask", tiles={}, directions=self.toggle.selected and 8 or 4}
+            global.editorSession:addTile(self.tile, window.tileset)
             
             self:setState("edit", true)
         else
             window.bitmaskEditing = false
             
-            global.editorSession:removeTile(window.tile)
-            window.tile = nil
+            global.editorSession:removeTile(self.tile)
             
+            self.tile = nil
             self:setState("new")
         end
-        self:setTile(window.tile)
+        self:setTile(self.tile)
         controller:setLock(window.bitmaskEditing)
     end)
     self.finish:setText("Create Bitmask", nil, font)

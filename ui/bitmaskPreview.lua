@@ -3,6 +3,7 @@ local bitmaskPreview = setmetatable({}, ui)
 bitmaskPreview.__index = bitmaskPreview
 
 local lg = love.graphics
+local insert = table.insert
 local ceil = math.ceil
 
 bitmaskPreview.tileBits = {
@@ -26,6 +27,10 @@ bitmaskPreview.new = function(anchor)
     
     self.evenDraw = false
     
+    self.image = nil
+    self.quads = {}
+    self.id = -1
+    self.currentTime = 0
     return self
 end
 
@@ -37,6 +42,12 @@ bitmaskPreview.setImage = function(self, image)
     self.image = image
 end
 
+bitmaskPreview.addQuad = function(self, quad, time)
+    insert(self.quads, {quad = quad, time = time or -1})
+    self.id = 1
+    self.currentTime = 0
+end
+
 bitmaskPreview.drawEvenDirectionsOnly = function(self, bool)
     self.evenDraw = bool
 end
@@ -45,11 +56,25 @@ bitmaskPreview.reset = function(self)
     for i=1, 9 do
         self.tileActive[i] = false
     end
+    self:resetQuads()
+end
+
+bitmaskPreview.resetQuads = function(self)
+    self.quads = {}
+    self.id = -1
+    self.currentTime = 0
 end
 
 bitmaskPreview.updateElement = function(self, dt)
-    if self.active then
-        -- Run animation if tile is animated
+    if self.active and self.id ~= -1 and self.quads[self.id].time ~= -1 then
+        self.currentTime = self.currentTime + dt
+        while self.currentTime > self.quads[self.id].time do
+            self.currentTime = self.currentTime - self.quads[self.id].time
+            self.id = self.id + 1
+            if self.id > #self.times then
+                self.id = 1
+            end
+        end
     end
 end
 
@@ -73,6 +98,15 @@ bitmaskPreview.drawElement = function(self)
                     lg.rectangle("fill", rx+x, ry+y, lenW, lenH)
                 end
             end
+        end
+        if self.id ~= -1 then
+            local quad = self.quads[self.id].quad
+            
+            local _,_, tw,th = quad:getViewport()
+            local quadLen = tw > th and tw or th
+            local s = (lenW > lenH and lenW or lenH) / quadLen
+            lg.setColor(1,1,1)
+            lg.draw(self.image, quad, rx+lenW, ry+lenH, 0, s, s)
         end
     end
 end
