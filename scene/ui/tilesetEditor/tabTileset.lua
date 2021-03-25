@@ -19,7 +19,9 @@ end
 tabTileset.createUI = function(self)
 --[[ BUTTONS ]]
     local anchor = anchor.new("NorthWest", 10,30, -1,40, 20,0)
-    local bgColorPicker = button.new(anchor, nil, controller.showPicker)
+    local bgColorPicker = button.new(anchor, nil, function()
+        window.togglePicker(true)
+    end)
     bgColorPicker:setText("Background Colour", nil, font)
     self:addChild(bgColorPicker)
    

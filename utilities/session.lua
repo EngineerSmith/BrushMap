@@ -20,6 +20,12 @@ session.load = function()
     error("TODO")
 end
 
+local id = os.time()
+session.getUniqueId = function()
+    id = id + 1
+    return id
+end
+
 --TODO copy to save dir
 --TODO if failed to load
 session.addTileset = function(self, path)
@@ -32,7 +38,6 @@ session.addTileset = function(self, path)
             return tileset
         end
     end
-    
     local image = lg.newImage(path)
     image:setFilter("nearest","nearest")
     image:setWrap("clampzero")
@@ -40,7 +45,7 @@ session.addTileset = function(self, path)
         path = path,
         image = image,
         tiles = list.new(),
-        id = os.time()
+        id = self.getUniqueId()
     }
     self.tilesets:add(tileset)
     return tileset
@@ -48,7 +53,7 @@ end
 
 session.addTile = function(self, tileData, tileset)
     if not tileset.tiles:has(tileData) and not tileData.id then
-        tileData.id = os.time()
+        tileData.id = self.getUniqueId()
         tileData.tilesetId = tileset.id
         tileset.tiles:add(tileData)
         

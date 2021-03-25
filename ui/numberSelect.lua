@@ -18,12 +18,40 @@ numberSelect.new = function(anchor, font, min, max, base)
     self.index = base or min
     self.base = self.index
     self.min = min
+    self.basemin = self.min
     self.max = max
+    self.basemax = self.max
     
     self.length = floor(anchor.width.max / 3)
     self.sideOffset = floor(self.length * 0.125)
     
     return self
+end
+
+numberSelect.setList = function(self, list)
+   self.list = list
+   self.min = list and 1 or self.basemin
+   self.max = list and #list or self.basemax
+end
+
+numberSelect.setIndex = function(self, index)
+    if self.list then
+        for i, v in ipairs(self.list) do
+            if index == v then
+                self.index = i
+                return
+            end
+        end
+    else
+        self.index = index
+    end
+end
+
+numberSelect.getValue = function(self)
+    if self.list then
+        return self.list[self.index]
+    end
+    return self.index
 end
 
 numberSelect.reset = function(self)
@@ -39,26 +67,29 @@ numberSelect.drawElement = function(self)
         lg.setColor(self.activeColor)
         lg.rectangle("fill", x+self.sideOffset,y+self.sideOffset, self.length-self.sideOffset, self.length-(self.sideOffset*2))
         lg.setColor(1,1,1)
-        local width = self.font:getWidth(tostring(self.index-1))
+        local str = self.list and self.list[self.index-1] or tostring(self.index-1)
+        local width = self.font:getWidth(str)
         local w = floor((self.length-self.sideOffset)/2) - floor(width/2)
-        lg.print(tostring(self.index-1), self.font, x+self.sideOffset+w, y+self.sideOffset+h)
+        lg.print(str, self.font, x+self.sideOffset+w, y+self.sideOffset+h)
     end
 -- CENTRE
     lg.setColor(self.centralColor)
     lg.rectangle("fill", self.length+x,y, self.length,self.length)
     lg.setColor(1,1,1)
     local he = floor(self.length / 2) - floor(strHeight / 2)
-    local width = self.font:getWidth(tostring(self.index))
+    local str = self.list and self.list[self.index] or tostring(self.index)
+    local width = self.font:getWidth(str)
     local w = floor(self.length / 2) - floor(width / 2)
-    lg.print(tostring(self.index), self.font, self.length+x+w,y+he)
+    lg.print(str, self.font, self.length+x+w,y+he)
 -- RIGHT
     if self.index < self.max then
         lg.setColor(self.activeColor)
         lg.rectangle("fill", self.length*2+x,self.sideOffset+y, self.length-self.sideOffset, self.length-(self.sideOffset*2))
         lg.setColor(1,1,1)
-        local width = self.font:getWidth(tostring(self.index+1))
+        local str = self.list and self.list[self.index+1] or tostring(self.index+1)
+        local width = self.font:getWidth(str)
         local w = floor((self.length-self.sideOffset)/2) - floor(width/2)
-        lg.print(tostring(self.index+1), self.font, self.length*2+x+w,y+self.sideOffset+h)
+        lg.print(str, self.font, self.length*2+x+w,y+self.sideOffset+h)
     end
 end
 

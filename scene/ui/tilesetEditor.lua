@@ -63,11 +63,10 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
     --EDIT
     if x ~= -1 and y ~= -1 and w ~= -1 and h ~= -1 and pressedX and pressedY then
     for _, tile in ipairs(window.tileset.tiles.items) do
-        if tile.type == "static" then
+        if not window.bitmaskEditPick and tile.type == "static" then
             if window.tile ~= tile and aabb(pressedX, pressedY, tile.x, tile.y, tile.w, tile.h) then
                 if window.bitmaskEditing then
                     controller.tabBitmask:addTileToBit(tile)
-                    
                 else
                     controller.tabStatic:setState("edit")
                     window.tile = tile
@@ -75,7 +74,7 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
                 window.updatePreview(tile.x,tile.y,tile.w,tile.h)
                 return
             end
-        elseif tile.type == "animated" then
+        elseif not window.bitmaskEditPick and tile.type == "animated" then
             if window.tile == tile then
                 break
             end
@@ -97,15 +96,18 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
                     return
                 end
             end
-        elseif tile.type == "bitmask" and window.bitmaskEditPick then
-            for i=0, (60*tile.directions)-225 do
+        elseif window.bitmaskEditPick and tile.type == "bitmask" then
+            local count = tile.tileCount == 15 and 15 or 255
+            for i=0, count do
                 local t = global.editorSession:getTile(tile.tiles[i], window.tileset)
                 if t then
                     local tiles = t.tiles
                     if (t.type == "static" and  aabb(pressedX, pressedY, t.x, t.y, t.w, t.h)) or
                        (t.type == "animated"and aabb(pressedX, pressedY, tiles[1].x, tiles[1].y, tiles[1].w, tiles[1].h)) then
                         window.bitmaskEditPick = false
-                        tabBitmask.setTile(tile)
+                        controller.tabBitmask:setTile(tile)
+                        controller.tabBitmask:setState("edit", true)
+                        return
                     end
                 end
             end 
@@ -141,7 +143,7 @@ window.picker = picker
 
 local pickerReturn
 
-local togglePicker = function(bool)
+window.togglePicker = function(bool)
     for _, child in ipairs(window.children) do
         if child ~= windowFileDialog then
             child.enabled = not bool end
@@ -153,7 +155,7 @@ end
 
 local anchor = anchor.new("NorthEast", 40,40, 80,80)
 pickerReturn = button.new(anchor, nil, function()
-    togglePicker(false)
+    window.togglePicker(false)
     love.graphics.setBackgroundColor(picker:getColor())
 end)
 pickerReturn:setText("Return", nil, font)
@@ -173,7 +175,8 @@ window.drawScene = function(scale)
         if window.bitmaskEditPick then
             box:setColor(tileColorBitmask)
             if tile.type == "bitmask" then
-               for i=0, (60*tile.directions)-225 do
+                local count = tile.tileCount == 15 and 15 or 255
+                for i=0, count do
                     if tile.tiles[i] then
                          local t = global.editorSession:getTile(tile.tiles[i], window.tileset)
                          box:setRect(t.x, t.y, t.w, t.h)
@@ -221,7 +224,7 @@ end
 controller.tabTileset = require("scene.ui.tilesetEditor.tabTileset")(font, controller, window)
 
 local fileDialogCallback = function(success, path)
-    togglePicker(false)
+    window.togglePicker(false)
     if success then
         window.tileset = global.editorSession:addTileset(path)
         local img = window.tileset.image

@@ -9,6 +9,8 @@ local aabb = require("utilities.aabb")
 checkbox.new = function(anchor, selected)
     local self = setmetatable(ui.new(anchor), checkbox)
     self.selected = selected or false
+    self.owned = {}
+    self.owner = nil
     return self
 end
 
@@ -16,6 +18,25 @@ checkbox.setValueChangedCallback = function(self, callback)
     self.valueChangedCallback = callback
     if self.valueChangedCallback then
         self:valueChangedCallback(self.selected)
+    end
+end
+
+checkbox.addOwnership = function(self, box)
+    for _, own in ipairs(self.owned) do
+        if own == box then
+            return
+        end
+    end
+    table.insert(self.owned, box)
+    box.owner = self
+end
+
+checkbox.childChanged = function(self, child)
+    self.selected = not child.selected
+    for _, own in ipairs(self.owned) do
+        if own ~= child then
+            own.selected = not child.selected
+        end
     end
 end
 
@@ -37,7 +58,21 @@ end
 
 checkbox.touchpressedElement = function(self, id, x,y)
     if self.active and aabb(x,y, self.anchor:getRect()) then
-        self.selected = not self.selected
+        if self.owner then
+            if not self.selected then
+                self.selected = true
+                self.owner:childChanged(self)
+            end
+        elseif #self.owned > 0 then
+            if not self.selected then
+                self.selected = true
+                for _, own in ipairs(self.owned) do
+                    own.selected = false
+                end
+            end
+        else
+            self.selected = not self.selected
+        end
         if self.valueChangedCallback then
             self:valueChangedCallback(self.selected)
         end
