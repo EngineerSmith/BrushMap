@@ -61,7 +61,6 @@ numberSelect.reset = function(self)
 end
 
 numberSelect.drawElement = function(self)
-    str = tostring(self.index)
     local x, y = self.anchor:getRect()
     local strHeight = self.font:getHeight()
     local h = floor((self.length-self.sideOffset*2) / 2) - floor(strHeight / 2)
@@ -126,7 +125,6 @@ numberSelect.touchreleased = function(self, id, pressedX, pressedY, ...)
             return true
         end
     end
-    
 end
 
 return numberSelect
