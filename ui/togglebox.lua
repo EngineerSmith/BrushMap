@@ -24,15 +24,13 @@ togglebox.drawElement = function(self)
     
     if self.active then
         lg.setColor(.6,.6,.6)
-    else
-        lg.setColor(.5,.5,.5)
+        if self.selected then
+            lg.circle("fill", x+w-r-1, y+r, r-6)
+        else    
+            lg.circle("fill", x+1+r, y+r, r-6)
+        end
     end
     
-    if self.selected then
-        lg.circle("fill", x+w-r-1, y+r, r-6)
-    else    
-        lg.circle("fill", x+1+r, y+r, r-6)
-    end
 end
 
 return togglebox
