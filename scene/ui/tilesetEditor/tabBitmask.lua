@@ -137,12 +137,16 @@ tabBitmask.createUI = function(self)
     self:addChild(self.numberSelect)
     
     self.preview.valueChangedCallback = function(_, sum)
-        self.numberSelect:setIndex(sum)
+        if not self.numberSelect:setIndex(sum) then
+            self.preview.negative = true
+        else
+            self.preview.negative = false
+        end
         self:setPreviewToBit(sum)
     end
     
-    self.numberSelect.indexedChangedCallback = function(_, index)
-        self.preview:setActiveTiles(index)
+    self.numberSelect.indexedChangedCallback = function(_, index, value)
+        self.preview:setActiveTiles(value or index)
         return true
     end
     
@@ -152,10 +156,10 @@ tabBitmask.createUI = function(self)
     local anchor = anchor.new("NorthWest", 10, 10+height, -1,20, 20,0)
     local titleToggle = text.new(anchor, "Number of Tiles", font)
     self:addChild(titleToggle)
-    local anchor = anchor.new("NorthWest", 10, 55+height)
+    local anchor = anchor.new("NorthWest", 10, 45+height)
     local text16 = text.new(anchor, "16", font)
     self:addChild(text16)
-    local anchor = anchor.new("NorthWest", 35, 50+height, 30,30)
+    local anchor = anchor.new("NorthWest", 35, 40+height, 30,30)
     self.check16 = checkbox.new(anchor, false)
     self.check16:setValueChangedCallback(function(_, selected)
         if selected then
@@ -168,10 +172,10 @@ tabBitmask.createUI = function(self)
         end
     end)
     self:addChild(self.check16)
-    local anchor = anchor.new("NorthWest", 75, 55+height)
+    local anchor = anchor.new("NorthWest", 75, 45+height)
     local text48 = text.new(anchor, "48", font)
     self:addChild(text48)
-    local anchor = anchor.new("NorthWest", 100, 50+height, 30,30)
+    local anchor = anchor.new("NorthWest", 100, 40+height, 30,30)
     self.check48 = checkbox.new(anchor, false)
     self.check48:setValueChangedCallback(function(_, selected)
         if selected then
@@ -184,10 +188,10 @@ tabBitmask.createUI = function(self)
     end)
     self.check16:addOwnership(self.check48)
     self:addChild(self.check48)
-    local anchor = anchor.new("NorthWest", 145, 55+height)
+    local anchor = anchor.new("NorthWest", 145, 45+height)
     local text256 = text.new(anchor, "256", font)
     self:addChild(text256)
-    local anchor = anchor.new("NorthWest", 180, 50+height, 30,30)
+    local anchor = anchor.new("NorthWest", 180, 40+height, 30,30)
     self.check256 = checkbox.new(anchor, true)
     self.check256:setValueChangedCallback(function(_, selected)
         if selected then
@@ -204,7 +208,7 @@ tabBitmask.createUI = function(self)
     self.check16:addOwnership(self.check256)
     self:addChild(self.check256)
     
-    local anchor = anchor.new("NorthWest", 10,90+height, -1,40, 20,0)
+    local anchor = anchor.new("NorthWest", 10,80+height, -1,40, 20,0)
     self.change = button.new(anchor, nil, function(_)
         if not window.tileset then
             return
@@ -230,7 +234,7 @@ tabBitmask.createUI = function(self)
     self:addChild(self.change, nil)
     self.change:setActive(false)
     
-    local anchor = anchor.new("NorthWest", 10,140+height, -1,40, 20,0)
+    local anchor = anchor.new("NorthWest", 10,130+height, -1,40, 20,0)
     self.finish = button.new(anchor, nil, function(_)
         if not window.tileset then
             return

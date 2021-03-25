@@ -31,6 +31,7 @@ bitmaskPreview.new = function(anchor)
     self.quads = {}
     self.id = -1
     self.currentTime = 0
+    self.negative = false
     return self
 end
 
@@ -91,9 +92,17 @@ bitmaskPreview.drawElement = function(self)
                 if self.tileActive[i] then
                     local x, y =self:tileToPoint(i)
                     if i % 2 == 0 then
-                        lg.setColor(.1,.5,.3)
+                        if self.negative then
+                            lg.setColor(.5,.1,.2)
+                        else
+                            lg.setColor(.1,.5,.3)
+                        end
                     else
-                        lg.setColor(.1,.4,.25)
+                        if self.negative then
+                            lg.setColor(.4,.1,.15)
+                        else
+                            lg.setColor(.1,.4,.25)
+                        end
                     end
                     lg.rectangle("fill", rx+x, ry+y, lenW, lenH)
                 end

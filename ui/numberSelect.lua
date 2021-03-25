@@ -39,12 +39,14 @@ numberSelect.setIndex = function(self, index)
         for i, v in ipairs(self.list) do
             if index == v then
                 self.index = i
-                return
+                return true
             end
         end
     else
         self.index = index
+        return true
     end
+    return false
 end
 
 numberSelect.getValue = function(self)
@@ -59,6 +61,7 @@ numberSelect.reset = function(self)
 end
 
 numberSelect.drawElement = function(self)
+    str = tostring(self.index)
     local x, y = self.anchor:getRect()
     local strHeight = self.font:getHeight()
     local h = floor((self.length-self.sideOffset*2) / 2) - floor(strHeight / 2)
@@ -102,7 +105,7 @@ numberSelect.touchreleased = function(self, id, pressedX, pressedY, ...)
             if self.index > self.min and aabb(pressedX,pressedY, x+self.sideOffset,y+self.sideOffset, self.length-self.sideOffset, self.length-(self.sideOffset*2)) then
                 if self.indexedChangedCallback then
                     self.index = self.index - 1
-                    if not self:indexedChangedCallback(self.index) then
+                    if not self:indexedChangedCallback(self.index, self.list and self.list[self.index]) then
                         self.index = self.index + 1
                     end
                 else
@@ -113,7 +116,7 @@ numberSelect.touchreleased = function(self, id, pressedX, pressedY, ...)
             if self.index < self.max and aabb(pressedX,pressedY, self.length*2+x,self.sideOffset+y, self.length-self.sideOffset,self.length-(self.sideOffset*2)) then
                 if self.indexedChangedCallback then
                     self.index = self.index + 1
-                    if not self:indexedChangedCallback(self.index) then
+                    if not self:indexedChangedCallback(self.index, self.list and self.list[self.index]) then
                         self.index = self.index - 1
                     end
                 else
@@ -123,6 +126,7 @@ numberSelect.touchreleased = function(self, id, pressedX, pressedY, ...)
             return true
         end
     end
+    
 end
 
 return numberSelect
