@@ -82,7 +82,7 @@ frameSelect.touchreleased = function(self, id, pressedX, pressedY, ...)
 -- General shape
     if aabb(pressedX,pressedY, x+self.sideOffset,y, self.length*3-(self.sideOffset*2), self.length) then
 -- LEFT
-        if self.index > self.min and aabb(pressedX,pressedY, x+self.sideOffset,y+self.sideOffset, self.length-self.sideOffset, self.length-(self.sideOffset*2)) then
+        if self.index > 1 and aabb(pressedX,pressedY, x+self.sideOffset,y+self.sideOffset, self.length-self.sideOffset, self.length-(self.sideOffset*2)) then
             if self.indexedChangedCallback then
                 self.index = self.index - 1
                 if not self:indexedChangedCallback(self.index) then
