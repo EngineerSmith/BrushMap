@@ -114,10 +114,8 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
         end
     end
     end
-    if window.tile and window.tile == "bitmask" then
-        if window.bitmaskEditing then
-           window.updatePreview(-1,-1,-1,-1)
-        end
+    if window.tile and window.tile.type == "bitmask" then
+        return
     elseif window.tile and window.tile.type == "animated" then
         window.updatePreview(x,y,w,h)
     else
