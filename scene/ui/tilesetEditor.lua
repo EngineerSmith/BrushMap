@@ -178,9 +178,12 @@ window.drawScene = function(scale)
                 local count = tile.tileCount == 15 and 15 or 255
                 for i=0, count do
                     if tile.tiles[i] then
-                         local t = global.editorSession:getTile(tile.tiles[i], window.tileset)
-                         box:setRect(t.x, t.y, t.w, t.h)
-                         box:draw(scale)
+                        local t = global.editorSession:getTile(tile.tiles[i], window.tileset)
+                        if t.type == "animated" then
+                            t = t.tiles[1] 
+                        end
+                        box:setRect(t.x, t.y, t.w, t.h)
+                        box:draw(scale)
                     end
                 end
             end
