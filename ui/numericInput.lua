@@ -28,6 +28,10 @@ numericInput.reset = function(self)
     self.value = self.basevalue
 end
 
+numericInput.setActive = function(self, active)
+    self.active = active
+end
+
 numericInput.updateValue = function(self, value, min, max)
     self.value = value or self.value
     self.min = min or self.min

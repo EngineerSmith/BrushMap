@@ -31,6 +31,10 @@ tabStatic.setState = function(self, state)
     elseif state == "deactive" then
         self.create:setActive(false)
         self.delete:setActive(false)
+        self.x:setActive(false)
+        self.y:setActive(false)
+        self.w:setActive(false)
+        self.h:setActive(false)
     end
 end
 
@@ -42,6 +46,12 @@ end
 tabStatic.updatePreview = function(self, x, y, w, h)
     if self.preview.image then
         self.preview:setQuad(lg.newQuad(x,y, w,h, self.preview.image:getDimensions()))
+        if x~=-1 and y~=-1 and w~=-1 and h~=-1 then
+            self.x:setActive(true)
+            self.y:setActive(true)
+            self.w:setActive(true)
+            self.h:setActive(true)
+        end
     end
 end
 
