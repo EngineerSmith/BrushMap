@@ -73,7 +73,6 @@ tabBitmask.setState = function(self, state, ...)
         self.change:setText("Finished Tile")
         self.finish:setActive(select(1, ...))
         self.finish:setText("Delete Tile")
-        window.updatePreview(-1,-1,-1,-1)
     elseif state == "new" then
         self:reset()
         self.change:setActive(global.editorSession.bitmask > 0)
