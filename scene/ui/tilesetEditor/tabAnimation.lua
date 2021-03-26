@@ -27,7 +27,7 @@ tabAnimation.setState = function(self, state)
         self.frameSelect:setMaxindex(#self.preview.quads)
     elseif state == "new" then
         self.create:setText("Create Tile")
-        self.delete:setActive(false)
+        self.delete:setActive(#self.preview.quads > 0)
     elseif state == "deactive" then
         self.deleteFrame:setActive(false)
         self.create:setActive(false)
@@ -72,6 +72,7 @@ tabAnimation.createUI = function(self)
             self.time.value = time
         end
         
+        self.delete:setActive(#preview.quads > 0)
         self.deleteFrame:setActive(#preview.quads > 1)
         self.create:setActive(#preview.quads >= 2)
         controller:setLock(true)
@@ -155,6 +156,9 @@ tabAnimation.createUI = function(self)
             global.editorSession:removeTile(window.tile)
             window.tile = nil
             window.selectPreview(-1,-1,-1,-1)
+            controller:setLock(false)
+        else
+            controller.tabAnimation:reset()
             controller:setLock(false)
         end
     end)
