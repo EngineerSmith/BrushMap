@@ -5,7 +5,6 @@ local global = require("global")
 local lg, lt = love.graphics, love.touch
 
 local aabb = require("utilities.aabb")
-local aabbBox = require("utilities.aabbBox")
 
 local floor = math.floor
 
@@ -49,18 +48,21 @@ touchController.setPressedCallback(function(x, y)
     end
 end)
 
+local boundary = 50
 scene.update = function(dt)
+    local px, py, ps = touchController.x, touchController.y, touchController.scale
+    
     touchController.update()
     editorWindow:update(dt)
     
     if editorWindow.tileset then
         local scale = touchController.scale
-        local x,y = touchController.x, touchController.y
-        local tw, th = w * scale, h * scale
+        local x, y, tw, th = touchController.getRect()
         local w, h = editorWindow.tileset.image:getDimensions()
-        w, h = w * scale, h * scale
-        if not aabbBox(0,0,tw,th, x,y,w,h) then
-            touchController.reset()
+        if not (boundary < x + w and tw - boundary > x and
+                boundary < y + h and th - boundary > y) then
+            touchController.x, touchController.y = px, py
+            touchController.scale = ps
         end
     end
 end

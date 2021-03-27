@@ -38,6 +38,10 @@ controller.setLimitScale = function(low, high)
     }
 end
 
+controller.getRect = function()
+    return controller.x, controller.y, controller.width / controller.scale, controller.height / controller.scale
+end
+
 controller.touchToWorld = function(x, y)
     x = (x / controller.scale) - controller.x
     y = (y / controller.scale) - controller.y
