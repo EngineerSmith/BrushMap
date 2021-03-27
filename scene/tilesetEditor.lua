@@ -1,11 +1,13 @@
 local scene = {}
 
-local lg, lt = love.graphics, love.touch
-
 local global = require("global")
+
+local lg, lt = love.graphics, love.touch
 
 local aabb = require("utilities.aabb")
 local aabbBox = require("utilities.aabbBox")
+
+local floor = math.floor
 
 local editorWindow = require("scene.ui.tilesetEditor")
 local touchController = require("input.touch")
@@ -20,7 +22,11 @@ editorWindow.newTilesetCallback = function(tileset)
     local low, high = 0.8, 5
     touchController.setLimitScale(low, high)
     touchController.reset()
-    grid:setDimensions(tileset:getDimensions())
+    local width, height = tileset:getDimensions()
+    local _,_,w,h = love.window.getSafeArea()
+    touchController.x = floor(w/2) - floor(width/2)
+    touchController.y = floor(h/2) - floor(height/2)
+    grid:setDimensions(width, height)
     local x, y, w, h = grid:positionToTile(0,0)
     if x ~= -1 and y ~= -1 then
         editorWindow.updatePreview(x,y, w,h)
