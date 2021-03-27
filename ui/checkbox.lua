@@ -9,6 +9,7 @@ local aabb = require("utilities.aabb")
 checkbox.new = function(anchor, selected)
     local self = setmetatable(ui.new(anchor), checkbox)
     self.selected = selected or false
+    self.active = true
     self.owned = {}
     self.owner = nil
     return self
