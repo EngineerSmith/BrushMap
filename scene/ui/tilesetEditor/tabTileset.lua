@@ -19,18 +19,17 @@ end
 tabTileset.createUI = function(self)
 --[[ BUTTONS ]]
     local anchor = anchor.new("NorthWest", 10,30, -1,40, 20,0)
+    local tilesetSelect = button.new(anchor, nil, controller.tilesetSelect)
+    tilesetSelect:setText("Select Tileset", nil, font)
+    self:addChild(tilesetSelect)
+    
+    local anchor = anchor.new("NorthWest", 10,80, -1,40, 20,0)
     local bgColorPicker = button.new(anchor, nil, function()
         window.togglePicker(true)
     end)
     bgColorPicker:setText("Background Colour", nil, font)
     self:addChild(bgColorPicker)
    
-    local anchor = anchor.new("NorthWest", 10,80, -1,40, 20,0)
-    local tilesetSelect = button.new(anchor, nil, controller.tilesetSelect)
-    tilesetSelect:setText("Select Tileset", nil, font)
-    self:addChild(tilesetSelect)
-    
-    
 --[[ TILE SIZE ]]
     local anchor = anchor.new("NorthWest", 10, 130, -1,20, 20,0)
     local titleTilesize = text.new(anchor, "Tile Size", font)
