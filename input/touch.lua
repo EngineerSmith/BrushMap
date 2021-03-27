@@ -58,7 +58,7 @@ local updateTouch = function(touch)
     return dx, dy
 end
 
-local A, B, C, D = {}, {}, {}, {}
+local A, B = {}, {}
 
 controller.update = function()
     if #touches == 1 then
@@ -97,7 +97,7 @@ controller.update = function()
             
             controller.x = controller.x + (-focalX * ((nextWidth - prevWidth) / nextWidth))
             controller.y = controller.y + (-focalY * ((nextHeight - prevHeight) / nextHeight))
-            str = tostring(controller.scale)
+            
             prevWidth, prevHeight = nextWidth, nextHeight
         end
     end
