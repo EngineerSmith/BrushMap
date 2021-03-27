@@ -4,7 +4,7 @@ bitmaskPreview.__index = bitmaskPreview
 
 local lg = love.graphics
 local insert = table.insert
-local ceil = math.ceil
+local ceil, floor = math.ceil, math.floor
 
 bitmaskPreview.tileBits = {
     128, 1, 16,
@@ -115,7 +115,9 @@ bitmaskPreview.drawElement = function(self)
             local quadLen = tw > th and tw or th
             local s = (lenW > lenH and lenW or lenH) / quadLen
             lg.setColor(1,1,1)
-            lg.draw(self.image, quad, rx+lenW, ry+lenH, 0, s, s)
+            local x = floor(lenW/2) - floor((tw*s)/2)
+            local y = floor(lenH/2) - floor((th*s)/2)
+            lg.draw(self.image, quad, rx+lenW+x, ry+lenH+y, 0, s, s)
         end
     end
 end
