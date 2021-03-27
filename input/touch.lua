@@ -58,7 +58,7 @@ local updateTouch = function(touch)
     return dx, dy
 end
 
-local A, B = {}, {}
+local A, B, C, D = {}, {}, {}, {}
 
 controller.update = function()
     if #touches == 1 then
@@ -70,8 +70,8 @@ controller.update = function()
         if #touches[1].moved > 0 or #touches[2].moved > 0 then
             updateTouch(touches[1])
             updateTouch(touches[2])
-            A.x, B.x = touches[1].x, touches[2].x
-            A.y, B.y = touches[1].y, touches[2].y
+            A.x, A.y = touches[1].x, touches[1].y
+            B.x, B.y = touches[2].x, touches[2].y
             --Scale
             local dx,dy = B.x - A.x, B.y - A.y
             local dist = sqrt(dx*dx+dy*dy)
@@ -87,18 +87,17 @@ controller.update = function()
                 end
             end
             --Translate
-            A.x, B.x = (A.x / controller.scale) - controller.x, (B.x / controller.scale) - controller.x
-            A.y, B.y = (A.y / controller.scale) - controller.y, (B.y / controller.scale) - controller.y
+            A.x, A.y = A.x / controller.scale, A.y / controller.scale
+            B.x, B.y = B.x / controller.scale, B.y / controller.scale
             
             local focalX = (A.x + B.x) / 2
             local focalY = (A.y + B.y) / 2
-            
             local nextWidth = controller.width * controller.scale
             local nextHeight= controller.height * controller.scale
             
-            controller.x = controller.x + (-(focalX / controller.scale) * (nextWidth - prevWidth) / nextWidth)
-            controller.y = controller.y + (-(focalY / controller.scale) * (nextHeight - prevHeight) / nextHeight)
-            
+            controller.x = controller.x + (-focalX * ((nextWidth - prevWidth) / nextWidth))
+            controller.y = controller.y + (-focalY * ((nextHeight - prevHeight) / nextHeight))
+            str = tostring(controller.scale)
             prevWidth, prevHeight = nextWidth, nextHeight
         end
     end

@@ -88,7 +88,7 @@ scene.draw = function()
     lg.pop()
     editorWindow:draw()
     lg.setColor(1,1,1)
-    local str = str or ""
+    local str = str or "" -- debug, global str
     lg.print(str, 50,50)
 end
 
