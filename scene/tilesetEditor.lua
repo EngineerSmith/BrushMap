@@ -92,7 +92,7 @@ scene.draw = function()
     editorWindow:draw()
     lg.setColor(1,1,1)
     local str = str or "" -- debug, global str
-    lg.print(str, 50,50)
+    lg.print(str, 100,50)
 end
 
 scene.touchpressed = function(...)
