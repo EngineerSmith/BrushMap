@@ -274,13 +274,10 @@ local controllerWest = tabController.new("West", 120)
 window:addChild(controllerWest)
 window.controllerWest = controllerWest
 
-local tabWindow = require("ui.tabWindow")
-local tabTilemap = tabWindow.new("Tilemap", font, controllerWest)
-controllerWest:addChild(tabTilemap)
 
-local anchor = anchor.new("NorthWest", 10,30, -1,40, 20,0)
-local tilemapReturn = button.new(anchor, nil)
-tilemapReturn:setText("Return", nil, font)
-tabTilemap:addChild(tilemapReturn)
+controllerWest.tabTilemap = require("scene.ui.tilesetEditor.tabTilemap")(font, controllerWest, window)
+
+controllerWest.tabTilemap:createUI()
+controllerWest:addChild(controllerWest.tabTilemap)
 
 return window
