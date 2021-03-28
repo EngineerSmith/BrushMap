@@ -14,9 +14,9 @@ local insert = table.insert
 
 local font = global.assets["font.robotoReg18"]
 
-local controller = tabController.new()
-window:addChild(controller)
-window.controller = controller
+local controllerEast = tabController.new("East", 240)
+window:addChild(controllerEast)
+window.controllerEast = controllerEast
 
 local tileColorPreview   = {0,.8,.8}
 local tileColorStatic    = {1,0,0}
@@ -36,7 +36,7 @@ window.updatePreview = function(x, y, w, h)
     pre.y = y
     pre.width = w
     pre.height = h
-    local sta = controller.tabStatic
+    local sta = controllerEast.tabStatic
     if x~=-1 and y~=-1 and w ~=-1 and h ~=-1 then
         sta.x.value = x
         sta.y.value = y
@@ -48,8 +48,8 @@ window.updatePreview = function(x, y, w, h)
         sta.w:reset()
         sta.h:reset()
     end
-    controller.tabStatic:updatePreview(window.preview:getRect())
-    local ani = controller.tabAnimation
+    controllerEast.tabStatic:updatePreview(window.preview:getRect())
+    local ani = controllerEast.tabAnimation
     local index = ani.frameSelect.index
     if index > 0 then
         local quad = ani.preview:getFrame(index)
@@ -66,9 +66,9 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
         if not window.bitmaskEditPick and tile.type == "static" then
             if window.tile ~= tile and aabb(pressedX, pressedY, tile.x, tile.y, tile.w, tile.h) then
                 if window.bitmaskEditing then
-                    controller.tabBitmask:addTileToBit(tile)
+                    controllerEast.tabBitmask:addTileToBit(tile)
                 else
-                    controller.tabStatic:setState("edit")
+                    controllerEast.tabStatic:setState("edit")
                     window.tile = tile
                 end
                 window.updatePreview(tile.x,tile.y,tile.w,tile.h)
@@ -81,7 +81,7 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
             local t = tile.tiles[1]
             if aabb(pressedX, pressedY, t.x, t.y, t.w, t.h) then
                 if window.bitmaskEditing then
-                    controller.tabBitmask:addTileToBit(tile)
+                    controllerEast.tabBitmask:addTileToBit(tile)
                     window.updatePreview(t.x, t.y, t.w, t.h)
                     return
                 else
@@ -89,10 +89,10 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
                     window.updatePreview(t.x, t.y, t.w, t.h)
                     for _, tile in ipairs(tile.tiles) do
                         local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, window.tileset.image:getDimensions())
-                        controller.tabAnimation.preview:addFrame(quad, tile.time)
+                        controllerEast.tabAnimation.preview:addFrame(quad, tile.time)
                     end
-                    controller.tabAnimation:setState("edit")
-                    controller:setLock(true)
+                    controllerEast.tabAnimation:setState("edit")
+                    controllerEast:setLock(true)
                     return
                 end
             end
@@ -105,8 +105,8 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
                     if (t.type == "static" and  aabb(pressedX, pressedY, t.x, t.y, t.w, t.h)) or
                        (t.type == "animated"and aabb(pressedX, pressedY, tiles[1].x, tiles[1].y, tiles[1].w, tiles[1].h)) then
                         window.bitmaskEditPick = false
-                        controller.tabBitmask:setTile(tile)
-                        controller.tabBitmask:setState("edit", true)
+                        controllerEast.tabBitmask:setTile(tile)
+                        controllerEast.tabBitmask:setState("edit", true)
                         return
                     end
                 end
@@ -121,11 +121,11 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
     else
         window.tile = nil
         if x~=-1 and y~=-1 and w~=-1 and h~=-1 then
-            controller.tabStatic:setState("new")
-            controller.tabAnimation:setState("new")
+            controllerEast.tabStatic:setState("new")
+            controllerEast.tabAnimation:setState("new")
         else
-            controller.tabStatic:setState("deactive")
-            controller.tabAnimation:setState("deactive")
+            controllerEast.tabStatic:setState("deactive")
+            controllerEast.tabAnimation:setState("deactive")
         end
         window.updatePreview(x,y,w,h)
     end
@@ -185,7 +185,7 @@ window.drawScene = function(scale)
                     end
                 end
             end
-        elseif tile ~= window.tile or not controller.activeChild or window.bitmaskEditing then
+        elseif tile ~= window.tile or not controllerEast.activeChild or window.bitmaskEditing then
             if tile.type == "static" then
                 box:setColor(tileColorStatic)
                 box:setRect(tile.x, tile.y, tile.w, tile.h)
@@ -206,13 +206,13 @@ window.drawScene = function(scale)
         end
     end
     end
-    if controller.activeChild and controller.activeChild ~= controller.tabTileset then
+    if controllerEast.activeChild and controllerEast.activeChild ~= controllerEast.tabTileset then
         if window.preview.x == -1 and window.preview.y == -1 and window.preview.width == -1 and window.preview.height == -1 then
             return -- TO NOT DRAW
         end
-        if controller.tabAnimation.preview.quads then
+        if controllerEast.tabAnimation.preview.quads then
             box:setColor(tileColorPreviewAlpha)
-            for _, quad in ipairs(controller.tabAnimation.preview.quads) do
+            for _, quad in ipairs(controllerEast.tabAnimation.preview.quads) do
                 box:setRect(quad:getViewport())
                 box:draw(scale)
             end
@@ -222,7 +222,7 @@ window.drawScene = function(scale)
 end
 
 --[[ TAB TILESET ]]
-controller.tabTileset = require("scene.ui.tilesetEditor.tabTileset")(font, controller, window)
+controllerEast.tabTileset = require("scene.ui.tilesetEditor.tabTileset")(font, controllerEast, window)
 
 local fileDialogCallback = function(success, path)
     window.togglePicker(false)
@@ -230,9 +230,9 @@ local fileDialogCallback = function(success, path)
         window.tileset = global.editorSession:addTileset(path)
         local img = window.tileset.image
         
-        controller.tabStatic:newTileset(img)
-        controller.tabAnimation:newTileset(img)
-        controller.tabBitmask:newTileset(img)
+        controllerEast.tabStatic:newTileset(img)
+        controllerEast.tabAnimation:newTileset(img)
+        controllerEast.tabBitmask:newTileset(img)
         
         if window.newTilesetCallback then
             window.newTilesetCallback(img)
@@ -240,32 +240,47 @@ local fileDialogCallback = function(success, path)
     end
 end
 
-controller.tilesetSelect = function()
+controllerEast.tilesetSelect = function()
     for _, child in ipairs(window.children) do
         child.enabled = false
     end
     windowFileDialog.dialog("load", fileDialogCallback)
 end
 
-controller.tabTileset:createUI()
-controller:addChild(controller.tabTileset)
+controllerEast.tabTileset:createUI()
+controllerEast:addChild(controllerEast.tabTileset)
 
 --[[ TAB STATIC ]]
-controller.tabStatic = require("scene.ui.tilesetEditor.tabStatic")(font, controller, window)
+controllerEast.tabStatic = require("scene.ui.tilesetEditor.tabStatic")(font, controllerEast, window)
 
-controller.tabStatic:createUI()
-controller:addChild(controller.tabStatic)
+controllerEast.tabStatic:createUI()
+controllerEast:addChild(controllerEast.tabStatic)
 
 --[[ TAB ANIMATION ]]
-controller.tabAnimation = require("scene.ui.tilesetEditor.tabAnimation")(font, controller, window)
+controllerEast.tabAnimation = require("scene.ui.tilesetEditor.tabAnimation")(font, controllerEast, window)
 
-controller.tabAnimation:createUI()
-controller:addChild(controller.tabAnimation)
+controllerEast.tabAnimation:createUI()
+controllerEast:addChild(controllerEast.tabAnimation)
 
 --[[ TAB BITMASK ]]
-controller.tabBitmask = require("scene.ui.tilesetEditor.tabBitmask")(font, controller, window)
+controllerEast.tabBitmask = require("scene.ui.tilesetEditor.tabBitmask")(font, controllerEast, window)
 
-controller.tabBitmask:createUI()
-controller:addChild(controller.tabBitmask)
+controllerEast.tabBitmask:createUI()
+controllerEast:addChild(controllerEast.tabBitmask)
+
+--[[ Controller West]]
+
+local controllerWest = tabController.new("West", 120)
+window:addChild(controllerWest)
+window.controllerWest = controllerWest
+
+local tabWindow = require("ui.tabWindow")
+local tabTilemap = tabWindow.new("Tilemap", font, controllerWest)
+controllerWest:addChild(tabTilemap)
+
+local anchor = anchor.new("NorthWest", 10,30, -1,40, 20,0)
+local tilemapReturn = button.new(anchor, nil)
+tilemapReturn:setText("Return", nil, font)
+tabTilemap:addChild(tilemapReturn)
 
 return window

@@ -6,11 +6,19 @@ local anchor = require("ui.base.anchor")
 
 local tabTitleWidth = 40
 
-tabController.new = function(windowWidth)
-    local anchor = anchor.new("NorthEast", tabTitleWidth,0, 0,-1)
-    local self = setmetatable(ui.new(anchor), tabController)
+tabController.new = function(side, windowWidth)
+    local anch
+    if side == "West" then
+        anch = anchor.new("NorthWest", 0,0, 0,-1)
+    elseif side == "East" then
+        anch = anchor.new("NorthEast", tabTitleWidth,0, 0,-1)
+    else
+        error("Unaccepted side for tabController: "..tostring(side))
+    end
+    local self = setmetatable(ui.new(anch), tabController)
     
-    self.windowWidth = windowWidth or 200
+    self.side = side
+    self.windowWidth = windowWidth or 240
     self.active = false
     self.lock = false
     
@@ -45,6 +53,11 @@ tabController.updateTabLocations = function(self)
     end
 end
 
+tabController.getTabWindowAnchor = function(self)
+    local width = self.windowWidth
+    return anchor.new(self.anchor.pointStr, -width,0, width,-1)
+end
+
 tabController.setActive = function(self, value, child)
     if self.lock then
         return false
@@ -63,9 +76,15 @@ tabController.setActive = function(self, value, child)
     if self.active ~= value then
         self.active = value
         
-        local dir = self.active and 1 or -1
+        local dir = 0
+        if self.side == "West" then
+            dir = self.active and 1 or -1
+            self.anchor.x = self.anchor.x + self.windowWidth * dir
+        elseif self.side == "East" then
+            dir = self.active and 1 or -1
+            self.anchor.x = self.anchor.x + (self.windowWidth - tabTitleWidth) * dir
+        end
         
-        self.anchor.x = self.anchor.x + self.windowWidth * dir
         
         self:getAnchorUpdate()
     end

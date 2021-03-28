@@ -8,7 +8,7 @@ local checkbox = require("ui.checkbox")
 local maxNum = 9999
 
 return function(font, controller, window)
-local tabTileset = tabWindow.new("Tileset", font)
+local tabTileset = tabWindow.new("Tileset", font, controller)
 
 tabTileset.updateElement = function(self, dt)
     window.grid:setTileSize(tabTileset.x, tabTileset.y)

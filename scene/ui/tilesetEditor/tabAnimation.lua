@@ -13,7 +13,7 @@ local button = require("ui.button")
 local insert = table.insert
 
 return function(font, controller, window)
-local tabAnimation = tabWindow.new("Animation", font)
+local tabAnimation = tabWindow.new("Animation", font, controller)
 
 tabAnimation.newTileset = function(self, tileset)
    self.preview:setImage(tileset)

@@ -11,7 +11,7 @@ local checkbox = require("ui.checkbox")
 local text = require("ui.text")
 
 return function(font, controller, window)
-local tabBitmask = tabWindow.new("Bitmask", font)
+local tabBitmask = tabWindow.new("Bitmask", font, controller)
 
 tabBitmask.directions48 = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 19, 23, 27, 31, 38, 39, 46, 47, 55, 63, 76, 77, 78, 79, 95, 110, 111, 127, 137, 139, 141, 143, 155, 159, 175, 191, 205, 207, 223, 239, 255
@@ -171,10 +171,10 @@ tabBitmask.createUI = function(self)
         end
     end)
     self:addChild(self.check16)
-    local anchor = anchor.new("NorthWest", 75, 45+height)
+    local anchor = anchor.new("NorthWest", 72, 45+height)
     local text48 = text.new(anchor, "48", font)
     self:addChild(text48)
-    local anchor = anchor.new("NorthWest", 100, 40+height, 30,30)
+    local anchor = anchor.new("NorthWest", 97, 40+height, 30,30)
     self.check48 = checkbox.new(anchor, false)
     self.check48:setValueChangedCallback(function(_, selected)
         if selected then
@@ -187,10 +187,10 @@ tabBitmask.createUI = function(self)
     end)
     self.check16:addOwnership(self.check48)
     self:addChild(self.check48)
-    local anchor = anchor.new("NorthWest", 145, 45+height)
+    local anchor = anchor.new("NorthWest", 134, 45+height)
     local text256 = text.new(anchor, "256", font)
     self:addChild(text256)
-    local anchor = anchor.new("NorthWest", 180, 40+height, 30,30)
+    local anchor = anchor.new("NorthWest", 169, 40+height, 30,30)
     self.check256 = checkbox.new(anchor, true)
     self.check256:setValueChangedCallback(function(_, selected)
         if selected then
@@ -215,10 +215,6 @@ tabBitmask.createUI = function(self)
         if not window.bitmaskEditing then
             window.bitmaskEditing = true
             window.bitmaskEditPick = true
-        -- 
-        -- Display bitmask tiles, wait for one to be selected
-        -- Once selected, process bitmask tile and load into preview as changed
-        -- 
             self:setState("edit", false)
         else
             window.bitmaskEditing = false

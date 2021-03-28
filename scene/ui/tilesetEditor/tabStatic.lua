@@ -12,7 +12,7 @@ local button = require("ui.button")
 local maxNum = 9999
 
 return function(font, controller, window)
-local tabStatic = tabWindow.new("Static", font)
+local tabStatic = tabWindow.new("Static", font, controller)
 
 tabStatic.newTileset = function(self, tileset)
     self.preview:setImage(tileset)

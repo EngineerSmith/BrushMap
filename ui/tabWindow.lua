@@ -11,8 +11,8 @@ local inbetween = require("utilities.inbetween")
 local insert, remove = table.insert, table.remove
 local floor = math.floor
 
-tabWindow.new = function(title, font, windowWidth)
-    local anchor = anchor.new("NorthEast", -(windowWidth or 240),0, windowWidth or 240,-1)
+tabWindow.new = function(title, font, controller)
+    local anchor = controller:getTabWindowAnchor()
     local self = setmetatable(ui.new(anchor), tabWindow)
     
     self.title = title
@@ -62,12 +62,12 @@ end
 tabWindow.draw = function(self)
     if self.enabled then
         self:drawElement()
-        lg.push()
-        lg.translate(0, self.offsetY)
         if self.active then 
+            lg.push()
+            lg.translate(0, self.offsetY)
             self:drawChildren()
+            lg.pop()
         end
-        lg.pop()
     end
 end
 
@@ -75,7 +75,11 @@ tabWindow.drawElement = function(self)
     local x,y,w,h = self:getTitleRect()
     
     if self.parent.active then
-        x = x - w
+        if self.parent.side == "West" then
+            x = x
+        elseif self.parent.side == "East" then 
+            x = x - w
+        end
     end
     
     if self.active then
@@ -107,7 +111,14 @@ end
 
 tabWindow.touchpressedElement = function(self, id, pressedX, pressedY, ...)
     local x,y,w,h = self:getTitleRect()
-    x = x - (self.parent.active and w or 0)
+    if self.parent.active then
+        if self.parent.side == "West" then
+            x = x - w + 40
+        elseif self.parent.side == "East" then 
+            x = x - w
+        end
+    end
+    
     if aabb(pressedX, pressedY, x,y,w,h) then
         insert(self.touches, {id=id, trigger=true})
         return true
@@ -120,7 +131,13 @@ end
 
 tabWindow.touchmovedElement = function(self, id, pressedX, pressedY, dx, dy, pressure)
     local x,y,w,h = self:getTitleRect()
-    x = x - (self.parent.active and w or 0)
+    if self.parent.active then
+        if self.parent.side == "West" then
+            x = x - w + 40
+        elseif self.parent.side == "East" then 
+            x = x - w
+        end
+    end
     if (aabb(pressedX, pressedY, x,y,w,h)) or (self.active and aabb(pressedX, pressedY, self.anchor:getRect())) then
         local key = getTouch(self.touches, id)
         if key ~= -1 then
@@ -141,7 +158,13 @@ tabWindow.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, 
         
         if trigger then
             local x,y,w,h = self:getTitleRect()
-            x = x - (self.parent.active and w or 0)
+            if self.parent.active then
+                if self.parent.side == "West" then
+                    x = x - w + 40
+                elseif self.parent.side == "East" then 
+                    x = x - w
+                end
+            end
             if aabb(pressedX, pressedY, x,y,w,h) then
                 if self.parent:setActive(not self.active, self) then
                     self.active = not self.active
