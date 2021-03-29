@@ -270,7 +270,7 @@ controllerEast:addChild(controllerEast.tabBitmask)
 
 --[[ Controller West]]
 
-local controllerWest = tabController.new("West", 120)
+local controllerWest = tabController.new("West", 150)
 window:addChild(controllerWest)
 window.controllerWest = controllerWest
 
