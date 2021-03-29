@@ -9,19 +9,19 @@ local aabb = require("utilities.aabb")
 local floor, max = math.floor, math.max
 
 local editorWindow = require("scene.ui.tilesetEditor")
-local touchController = require("input.touch")
+local touchController = require("input.touch").new()
 local grid = require("utilities.grid").new()
 
 editorWindow.grid = grid
 
 local _,_,w,h = love.window.getSafeArea()
-touchController.setDimensions(w,h)
+touchController:setDimensions(w,h)
 
 editorWindow.newTilesetCallback = function(tileset)
     local width, height = tileset:getDimensions()
     local low, high = max(width / 180, 2), max(width / 50, 5)
-    touchController.setLimitScale(low, high)
-    touchController.reset()
+    touchController:setLimitScale(low, high)
+    touchController:reset()
     touchController.scale = low
     touchController.prevWidth = touchController.width * low
     touchController.prevHeight = touchController.height * low
@@ -33,9 +33,9 @@ editorWindow.newTilesetCallback = function(tileset)
     editorWindow.updatePreview(-1, -1, -1, -1)
 end
 
-touchController.setPressedCallback(function(x, y)
+touchController:setPressedCallback(function(x, y)
     if editorWindow.tileset then
-        x, y = touchController.touchToWorld(x, y)
+        x, y = touchController:touchToWorld(x, y)
         
         local w, h = editorWindow.tileset.image:getDimensions()
         
@@ -53,12 +53,12 @@ local boundary = 50
 scene.update = function(dt)
     local px, py, ps = touchController.x, touchController.y, touchController.scale
     
-    touchController.update()
+    touchController:update()
     editorWindow:update(dt)
     
     if editorWindow.tileset then
         local scale = touchController.scale
-        local x, y, tw, th = touchController.getRect()
+        local x, y, tw, th = touchController:getRect()
         local w, h = editorWindow.tileset.image:getDimensions()
         if not (boundary < x + w and tw - boundary > x and
                 boundary < y + h and th - boundary > y) then
@@ -98,17 +98,17 @@ end
 scene.touchpressed = function(...)
     if editorWindow:touchpressed(...) then
         return end
-    touchController.touchpressed(...)
+    touchController:touchpressed(...)
 end
 
 scene.touchmoved = function(...)
-    touchController.touchmoved(...)
+    touchController:touchmoved(...)
     if editorWindow:touchmoved(...) then
         return end
 end
 
 scene.touchreleased = function(...)
-    touchController.touchreleased(...)
+    touchController:touchreleased(...)
     if editorWindow:touchreleased(...) then
         return end
 end

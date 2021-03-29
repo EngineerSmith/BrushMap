@@ -1,17 +1,32 @@
 local scene = {}
 
-local anchor = require("ui.base.anchor")
-local button = require("ui.button")
+local editorWindow = require("scene.ui.tilemapEditor")
+local touchController = require("input.touch").new()
 
-local anchor = anchor.new("Center", 0,0, 200,60)
-scene.button = button.new(anchor)
-scene.button:setText("To Tileset Editor")
-scene.button:setCallbackPressed(function(self)
-    require("utilities.sceneManager").changeScene("scene.tilesetEditor")
-end)
+scene.update = function(dt)
+    editorWindow:update(dt)
+end
 
-scene.update = function(dt) scene.button:update(dt) end
-scene.draw = function() scene.button:draw() end
-scene.touchpressed = function(...) scene.button:touchpressed(...) end
+scene.draw = function() 
+    editorWindow:draw()
+end
+
+scene.touchpressed = function(...)
+    if editorWindow:touchpressed(...) then
+        return end
+    touchController:touchpressed(...)
+end
+
+scene.touchmoved = function(...)
+    touchController:touchmoved(...)
+    if editorWindow:touchmoved(...) then
+        return end
+end
+
+scene.touchreleased = function(...)
+    touchController:touchreleased(...)
+    if editorWindow:touchreleased(...) then
+        return end
+end
 
 return scene
