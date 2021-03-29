@@ -10,7 +10,7 @@ scene.menuWindow = require("scene.ui.menu")
 
 scene.menuWindow.buttonNew2D:setCallbackPressed(function(self)
     global.editorSession = require("utilities.session").new()
-   require("utilities.sceneManager").changeScene("scene.editor")
+   require("utilities.sceneManager").changeScene("scene.tilemapEditor")
    return true
 end)
 
