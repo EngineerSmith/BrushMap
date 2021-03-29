@@ -10,7 +10,7 @@ local floor, max = math.floor, math.max
 
 local editorWindow = require("scene.ui.tilesetEditor")
 local touchController = require("input.touch").new()
-local grid = require("utilities.grid").new()
+local grid = require("utilities.tilesetGrid").new()
 
 editorWindow.grid = grid
 
