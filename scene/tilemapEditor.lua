@@ -4,6 +4,12 @@ local editorWindow = require("scene.ui.tilemapEditor")
 local touchController = require("input.touch").new()
 local grid = require("utilities.tilemapGrid").new(16, 16)
 
+scene.load = function()
+    local _,_, w,h = love.window.getSafeArea()
+    touchController:setDimensions(w, h)
+    touchController:setLimitScale(0.8, 2)
+end
+
 scene.update = function(dt)
     editorWindow:update(dt)
 end
@@ -14,9 +20,12 @@ scene.update = function(dt)
     touchController:update()
 end
 
-scene.draw = function() 
+scene.draw = function()
+    local s = touchController.scale
+    local x = touchController.x * s
+    local y = touchController.y * s
     local w,h = love.graphics.getDimensions()
-    grid:draw(touchController.x, touchController.y, w, h, 1)
+    grid:draw(x, y, w, h, s)
     
     editorWindow:draw()
     

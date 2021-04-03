@@ -16,8 +16,8 @@ grid.setTileSize = function(self, w, h)
 end
 
 grid.draw = function(self, x, y, w, h, scale)
-    local dash = 5
-    local space = 5
+    local dash = math.min(5, 5 / scale)
+    local space = math.min(5 / scale)
     str = ""
     lg.setLineWidth(2)
     -- X Line
@@ -27,8 +27,24 @@ grid.draw = function(self, x, y, w, h, scale)
     lg.setColor(1,0,0)
     lg.line(x, 0, x, h)
     -- Dashed Lines
-    lg.setLineWidth(1)
+    lg.setLineWidth(0.8)
+    lg.setColor(.6,.6,.6)
     
+    local scaledW = self.tileW * scale
+    local scaledH = self.tileH * scale
+    
+    local offsetX = x % scaledW
+    local offsetY = y % scaledH
+    
+    for i=-scaledW + offsetX, w, scaledW do
+        dashedLine(i, -y, i, h, dash, space)
+    end
+    
+    for i=-scaledH + offsetY, h, scaledH do
+        dashedLine(-x, i, w, i, dash, space)
+    end
+    
+    lg.setLineWidth(1)
 end
 
 return grid

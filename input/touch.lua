@@ -94,6 +94,8 @@ controller.update = function(self)
                 else
                     self.lastDist = dist
                 end
+            else
+                self.lastDist = dist
             end
             --Translate
             A.x, A.y = A.x / self.scale, A.y / self.scale
