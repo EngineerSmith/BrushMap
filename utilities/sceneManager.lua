@@ -49,12 +49,12 @@ local sceneManager = {
 sceneManager.changeScene = function(scene, ...)
     scene = require(scene) --TODO Add load fail catch 
     
-    for _, v in ipairs(sceneManager.sceneHandlers) do
-        love[v] = scene[v] or sceneManager.nilFunc
-    end
-    
     if sceneManager.currentScene then
         love.unload()
+    end
+    
+    for _, v in ipairs(sceneManager.sceneHandlers) do
+        love[v] = scene[v] or sceneManager.nilFunc
     end
     
     sceneManager.currentScene = scene

@@ -64,12 +64,13 @@ tabController.setActive = function(self, value, child)
     end
     if value then
         for _, c in ipairs(self.children) do
-            if c ~= child then 
+            if c ~= child then
                 c.active = false
             end
         end
         self.activeChild = child
-    else
+    elseif self.activeChild then
+        self.activeChild.active = false
         self.activeChild = nil
     end
     

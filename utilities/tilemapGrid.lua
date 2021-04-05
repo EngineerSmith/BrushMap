@@ -3,8 +3,6 @@ grid.__index = grid
 
 local lg = love.graphics
 
-local dashedLine = require("utilities.dashedLine")
-
 grid.new = function(tileW, tileH)
     return setmetatable({
         tileW = tileW, tileH = tileH
@@ -16,8 +14,6 @@ grid.setTileSize = function(self, w, h)
 end
 
 grid.draw = function(self, x, y, w, h, scale)
-    local dash = math.min(5, 5 / scale)
-    local space = math.min(5 / scale)
     str = ""
     lg.setLineWidth(2)
     -- X Line
@@ -27,7 +23,7 @@ grid.draw = function(self, x, y, w, h, scale)
     lg.setColor(1,0,0)
     lg.line(x, 0, x, h)
     -- Dashed Lines
-    lg.setLineWidth(0.8)
+    lg.setLineWidth(math.min(0.8 / (scale * 1.5)), 0.4)
     lg.setColor(.6,.6,.6)
     
     local scaledW = self.tileW * scale
@@ -37,11 +33,11 @@ grid.draw = function(self, x, y, w, h, scale)
     local offsetY = y % scaledH
     
     for i=-scaledW + offsetX, w, scaledW do
-        dashedLine(i, -y, i, h, dash, space)
+        lg.line(i, -y, i, h)
     end
     
     for i=-scaledH + offsetY, h, scaledH do
-        dashedLine(-x, i, w, i, dash, space)
+        lg.line(-x, i, w, i)
     end
     
     lg.setLineWidth(1)

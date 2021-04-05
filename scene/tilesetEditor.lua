@@ -49,6 +49,15 @@ touchController:setPressedCallback(function(x, y)
     end
 end)
 
+scene.load = function()
+    editorWindow.controllerWest:setActive(false)
+    lg.setBackgroundColor(editorWindow.picker:getColor())
+end
+
+scene.unload = function()
+    lg.setBackgroundColor(0,0,0)
+end
+
 local boundary = 50
 scene.update = function(dt)
     local px, py, ps = touchController.x, touchController.y, touchController.scale

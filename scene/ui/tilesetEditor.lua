@@ -154,7 +154,7 @@ end
 local anchor = anchor.new("NorthEast", 40,40, 80,80)
 pickerReturn = button.new(anchor, nil, function()
     window.togglePicker(false)
-    love.graphics.setBackgroundColor(picker:getColor())
+    lg.setBackgroundColor(picker:getColor())
 end)
 pickerReturn:setText("Return", nil, font)
 pickerReturn:setOutline(true, 4, 2)

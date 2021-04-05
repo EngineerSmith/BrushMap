@@ -13,16 +13,10 @@ controllerWest = tabController.new("West", 150)
 window:addChild(controllerWest)
 window.controllerWest = controllerWest
 
-window.tabTileset = tabWindow.new("Tileset", font, controllerWest)
-controllerWest:addChild(window.tabTileset)
+--[[ TAB TILESET ]]
+controllerWest.tabTileset = require("scene.ui.tilemapEditor.tabTileset")(font, controllerWest, window)
 
-local anchor = anchor.new("NorthWest", 10,30, -1,40, 20,0)
-local button = button.new(anchor)
-button:setText("Tileset Editor", nil, font)
-button:setCallbackPressed(function(self)
-    require("utilities.sceneManager").changeScene("scene.tilesetEditor")
-end)
-
-window.tabTileset:addChild(button)
+controllerWest.tabTileset:createUI()
+controllerWest:addChild(controllerWest.tabTileset)
 
 return window

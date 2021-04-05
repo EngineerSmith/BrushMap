@@ -8,6 +8,8 @@ scene.load = function()
     local _,_, w,h = love.window.getSafeArea()
     touchController:setDimensions(w, h)
     touchController:setLimitScale(0.8, 2)
+    
+    editorWindow.controllerWest:setActive(false, "all")
 end
 
 scene.update = function(dt)
