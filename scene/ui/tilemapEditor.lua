@@ -9,7 +9,11 @@ local button = require("ui.button")
 
 local font = global.assets["font.robotoReg18"]
 
-controllerWest = tabController.new("West", 150)
+local controllerEast = tabController.new("East")
+window:addChild(controllerEast)
+window.controllerEast = controllerEast
+
+local controllerWest = tabController.new("West", 150)
 window:addChild(controllerWest)
 window.controllerWest = controllerWest
 
@@ -18,5 +22,11 @@ controllerWest.tabTileset = require("scene.ui.tilemapEditor.tabTileset")(font, c
 
 controllerWest.tabTileset:createUI()
 controllerWest:addChild(controllerWest.tabTileset)
+
+--[[ TAB LAYERS ]]
+controllerEast.tabLayer = require("scene.ui.tilemapEditor.tabLayer")(font, controllerEast, window)
+
+controllerEast.tabLayer:createUI()
+controllerEast:addChild(controllerEast.tabLayer)
 
 return window

@@ -2,9 +2,10 @@ local tabWindow = require("ui.tabWindow")
 
 local anchor = require("ui.base.anchor")
 local button = require("ui.button")
+local scrollView = require("ui.scrollView")
 
 return function(font, controller, window)
-local tabTileset = tabWindow.new("Tileset", font, controllerWest)
+local tabTileset = tabWindow.new("Tileset", font, controller)
 
 tabTileset.createUI = function(self)
     local anchor = anchor.new("NorthWest", 10,30, -1,40, 20,0)
