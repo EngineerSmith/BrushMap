@@ -69,25 +69,24 @@ tabController.setActive = function(self, value, child)
             end
         end
         self.activeChild = child
-    elseif self.activeChild then
-        self.activeChild.active = false
-        self.activeChild = nil
     end
     
     if self.active ~= value then
         self.active = value
         
-        local dir = 0
+        local dir = self.active and 1 or -1
         if self.side == "West" then
-            dir = self.active and 1 or -1
             self.anchor.x = self.anchor.x + self.windowWidth * dir
         elseif self.side == "East" then
-            dir = self.active and 1 or -1
             self.anchor.x = self.anchor.x + (self.windowWidth - tabTitleWidth) * dir
         end
         
-        
         self:getAnchorUpdate()
+    end
+    if not value and self.activeChild then
+        self.activeChild.active = false
+        self.activeChild = nil
+        return false
     end
     return true
 end
