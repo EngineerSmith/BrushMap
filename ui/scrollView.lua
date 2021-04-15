@@ -23,6 +23,7 @@ scrollView.new = function(anchor, widthDistance, heightDistance, maskFunction)
     
     self.offsetX, self.offsetY = 0,0
     self.actualHeight = 0
+    self.activeShape = true
     
     return self
 end
@@ -80,7 +81,9 @@ scrollView.touchreleasedChildren = function(self, id, x, y, dx, dy, pressure)
 end
 
 scrollView.draw = function(self)
-    self.background:drawElement()
+    if self.activeShape then
+        self.background:drawElement()
+    end
     
     lg.setColor(1,1,1)
     

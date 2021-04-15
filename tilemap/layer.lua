@@ -5,8 +5,9 @@ local lg = love.graphics
 
 local insert, remove = table.insert, table.remove
 
-layer.new = function(w, h)
+layer.new = function(w, h, name)
     local self = setmetatable({
+        name = name,
         tileCount = 0,
         tiles = {},
         hash = {},
