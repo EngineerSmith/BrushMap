@@ -4,7 +4,7 @@ tileAnimated.__index = tileAnimated
 
 local lg = love.graphics
 
-tileAnimated.new = function
+tileAnimated.new = function(tileset, quads)
     tileset = tileset or error("Tileset requied")
     local self = setmetatable(tile.new("animated", tileset), tileAnimated)
     self:setQuads(quads)

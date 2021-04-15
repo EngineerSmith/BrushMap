@@ -5,7 +5,7 @@ local lg = love.graphics
 
 local insert, remove = table.insert, table.remove
 
-layer.new = function()
+layer.new = function(w, h)
     local self = setmetatable({
         tileCount = 0,
         tiles = {},
@@ -13,6 +13,7 @@ layer.new = function()
         w, h, x, y
         canvas
     }, layer)
+    self:resize(w, h)
     return self
 end
 
@@ -211,15 +212,14 @@ layer.getTile = function(self, x, y)
     return index and self.tiles[index] or nil
 end
 
-layer.removeTile = function(self, x, y)
-    
-end
-
-layer.draw = function(tilesize, x, y, w, h)
+layer.resize = function(self, w, h)
     if self.w ~= w or self.h ~= h then
         self.w, self.h = w, h
         self.canavs = lg.newCanvas(w, h)
     end
+end
+
+layer.draw = function(self, tilesize, x, y)
     self.x, self.y = x, y
     lg.setCanvas(self.canvas)
     lg.clear(0,0,0,0)
@@ -228,7 +228,7 @@ layer.draw = function(tilesize, x, y, w, h)
     for _, tile in ipairs(self.tiles) do
         lg.push()
         lg.translate(tile.x * tilesize, tile.y * tilesize)
-        tile.tileData:draw()
+        tile.tileData:draw(tile.score)
         lg.pop()
     end
     lg.pop()

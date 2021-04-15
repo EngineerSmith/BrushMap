@@ -20,7 +20,7 @@ tileBitmask.directions48 = {
 
 tileBitmask.validDirections48 = {}
 for _, bit in ipairs(tileBitmask.directions48) do
-    tileBitmask.directions48Valid[bit] = true
+    tileBitmask.validDirections48[bit] = true
 end
 
 tileBitmask.new = function(tiles, bitType)

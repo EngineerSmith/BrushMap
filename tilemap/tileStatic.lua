@@ -1,3 +1,4 @@
+local tile = require("tilemap/tile")
 local tileStatic = setmetatable({}, tile)
 tileStatic.__index = tileStatic
 

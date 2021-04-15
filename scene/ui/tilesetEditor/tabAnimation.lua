@@ -2,6 +2,8 @@ local global = require("global")
 
 local lg = love.graphics
 
+local tileAnimated = require("tilemap/tileAnimated")
+
 local tabWindow = require("ui.tabWindow")
 local anchor = require("ui.base.anchor")
 local imageAnimation = require("ui.imageAnimation")
@@ -119,25 +121,21 @@ tabAnimation.createUI = function(self)
     local anchor = anchor.new("NorthWest", 10,150+height, -1,40, 20,0)
     self.create = button.new(anchor, nil, function(_)
         local preview = self.preview
-        local quads = preview.quads
+        local quads = {}
+        for index, quad in ipairs(preview.quads) do
+            local x,y,w,h = quad:getViewport()
+            insert(quads, {
+                x=x, y=y, w=w, h=h,
+                time = preview:getTime(index)
+            })
+        end
         
         local tileData = window.tile 
         if tileData == nil or tileData.type ~= "animated" then
-            tileData = {type = "animated"}
-        end 
-        tileData.tiles = {}
-        
-        for index, quad in ipairs(quads) do
-            local x,y,w,h = quad:getViewport()
-            local tile = {
-                x=x, y=y, w=w, h=h,
-                time = preview:getTime(index)
-            }
-            insert(tileData.tiles, tile)
-        end
-        
-        if not tileData.id then
+            tileData = tileAnimated.new(window.tileset, quads)
             global.editorSession:addTile(tileData, window.tileset)
+        else
+            tileData:setQuads(quads)
         end
         
         self:reset()

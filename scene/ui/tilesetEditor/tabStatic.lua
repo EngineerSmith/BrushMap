@@ -2,6 +2,8 @@ local global = require("global")
 
 local lg = love.graphics
 
+local tileStatic = require("tilemap/tileStatic")
+
 local tabWindow = require("ui.tabWindow")
 local anchor = require("ui.base.anchor")
 local image = require("ui.image")
@@ -140,18 +142,12 @@ tabStatic.createUI = function(self)
         
         local tileData = window.tile
         if tileData == nil or tileData.type ~= "static" then
-            tileData = {type = "static"}
-        end
-        
-        tileData.x = p.x
-        tileData.y = p.y
-        tileData.w = p.width
-        tileData.h = p.height
-        
-        if not tileData.id then
+            tileData = tileStatic.new(window.tileset, p.x, p.y, p.width, p.height)
             global.editorSession:addTile(tileData, window.tileset)
             window.tile = tileData
             self:setState("edit")
+        else
+            tileData:setQuad(p.x, p.y, p.width, p.height)
         end
     end)
     self.create:setText("Add Tile", nil, font)

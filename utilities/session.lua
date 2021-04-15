@@ -20,6 +20,14 @@ session.load = function()
     error("TODO")
 end
 
+session.update = function(self, dt)
+    for _, tileset in ipairs(self.tilesets.items) do
+        for _, tile in ipairs(tileset.tiles.items) do
+            tile:update(dt)
+        end
+    end
+end
+
 local id = os.time()
 session.getUniqueId = function()
     id = id + 1

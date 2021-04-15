@@ -78,7 +78,7 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
             if window.tile == tile then
                 break
             end
-            local t = tile.tiles[1]
+            local t = tile.quads[1]
             if aabb(pressedX, pressedY, t.x, t.y, t.w, t.h) then
                 if window.bitmaskEditing then
                     controllerEast.tabBitmask:addTileToBit(tile)
@@ -87,7 +87,7 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
                 else
                     window.tile = tile
                     window.updatePreview(t.x, t.y, t.w, t.h)
-                    for _, tile in ipairs(tile.tiles) do
+                    for _, tile in ipairs(tile.quads) do
                         local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, window.tileset.image:getDimensions())
                         controllerEast.tabAnimation.preview:addFrame(quad, tile.time)
                     end
@@ -99,11 +99,11 @@ window.selectPreview = function(x, y, w, h, pressedX, pressedY)
         elseif window.bitmaskEditPick and tile.type == "bitmask" then
             local count = tile.tileCount == 15 and 15 or 255
             for i=0, count do
-                local t = global.editorSession:getTile(tile.tiles[i], window.tileset)
+                local t = tile.tiles[i]
                 if t then
-                    local tiles = t.tiles
+                    local quads = t.quads
                     if (t.type == "static" and  aabb(pressedX, pressedY, t.x, t.y, t.w, t.h)) or
-                       (t.type == "animated"and aabb(pressedX, pressedY, tiles[1].x, tiles[1].y, tiles[1].w, tiles[1].h)) then
+                       (t.type == "animated"and aabb(pressedX, pressedY, quads[1].x, quads[1].y, quads[1].w, quads[1].h)) then
                         window.bitmaskEditPick = false
                         controllerEast.tabBitmask:setTile(tile)
                         controllerEast.tabBitmask:setState("edit", true)
@@ -175,10 +175,10 @@ window.drawScene = function(scale)
             if tile.type == "bitmask" then
                 local count = tile.tileCount == 15 and 15 or 255
                 for i=0, count do
-                    if tile.tiles[i] then
-                        local t = global.editorSession:getTile(tile.tiles[i], window.tileset)
+                    local t = tile.tiles[i]
+                    if t then
                         if t.type == "animated" then
-                            t = t.tiles[1] 
+                            t = t.quads[1] 
                         end
                         box:setRect(t.x, t.y, t.w, t.h)
                         box:draw(scale)
@@ -192,13 +192,13 @@ window.drawScene = function(scale)
                 box:draw(scale)
             elseif tile.type == "animated" then
                 box:setColor(tileColorAnimated)
-                local tiles = tile.tiles
-                box:setRect(tiles[1].x, tiles[1].y, tiles[1].w, tiles[1].h)
+                local quads = tile.quads
+                box:setRect(quads[1].x, quads[1].y, quads[1].w, quads[1].h)
                 box:draw(scale)
                 box:setColor(tileColorAnimatedAlpha)
-                for i, tile in ipairs(tiles) do
+                for i, quad in ipairs(quads) do
                     if i > 1 then
-                        box:setRect(tile.x, tile.y, tile.w, tile.h)
+                        box:setRect(quad.x, quad.y, quad.w, quad.h)
                         box:draw(scale)
                     end
                 end

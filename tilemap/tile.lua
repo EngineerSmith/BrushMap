@@ -12,10 +12,10 @@ tile.new = function(type, tileset)
         error("Invalid tile type: "..tostring(type))
     end
     return setmetatable({
-        id = -1,
+        id = nil,
         type = type,
         tileset = tileset,
-        tilesetId = tileset and -1 or tileset.id
+        tilesetId = tileset and tileset.id or -1
     }, tile)
 end
 

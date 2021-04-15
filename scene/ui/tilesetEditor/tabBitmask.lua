@@ -2,6 +2,8 @@ local global = require("global")
 
 local lg = love.graphics
 
+local tileBitmask = require("tilemap/tileBitmask")
+
 local tabWindow = require("ui.tabWindow")
 local anchor = require("ui.base.anchor")
 local bitmaskPreview = require("ui.bitmaskPreview")
@@ -13,17 +15,12 @@ local text = require("ui.text")
 return function(font, controller, window)
 local tabBitmask = tabWindow.new("Bitmask", font, controller)
 
-tabBitmask.directions48 = {
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 19, 23, 27, 31, 38, 39, 46, 47, 55, 63, 76, 77, 78, 79, 95, 110, 111, 127, 137, 139, 141, 143, 155, 159, 175, 191, 205, 207, 223, 239, 255
-    
-}
-
 tabBitmask.newTileset = function(self, tileset)
     self.preview:setImage(tileset)
     tabBitmask:reset()
 end
 
-tabBitmask.getTileCount = function(self)
+tabBitmask.getBitType = function(self)
     if self.check16.selected then
         return 15
     elseif self.check48.selected then
@@ -31,7 +28,7 @@ tabBitmask.getTileCount = function(self)
     elseif self.check256.selected then
         return 255
     end
-    error("Shouldn't hit here: tabBitmask")
+    error("Shouldn't hit here: tabBitmask.\nAll checkboxes are false")
 end
 
 tabBitmask.setTile = function(self, tile)
@@ -46,15 +43,15 @@ tabBitmask.setTile = function(self, tile)
     self.preview:setActiveTiles(0)
     self:setPreviewToBit(0)
     if active then
-        if tile.tileCount == 15 then
+        if tile.bitType == 15 then
             self.check16.selected = true
             self.check48.selected = false
             self.check256.selected = false
-        elseif tile.tileCount == 47 then
+        elseif tile.bitType == 47 then
             self.check16.selected = false
             self.check48.selected = true
             self.check256.selected = false
-        elseif tile.tileCount == 255 then
+        elseif tile.bitType == 255 then
             self.check16.selected = false
             self.check48.selected = false
             self.check256.selected = true
@@ -84,7 +81,7 @@ tabBitmask.setState = function(self, state, ...)
 end
 
 tabBitmask.addTileToBit = function(self, tile)
-    self.tile.tiles[self.numberSelect:getValue()] = tile.id
+    self.tile.tiles[self.numberSelect:getValue()] = tile
     self.change:setActive(true)
     self:setTileToPreview(tile)
 end
@@ -92,27 +89,25 @@ end
 tabBitmask.setTileToPreview = function(self, tile)
     self.preview:resetQuads()
     local p = window.preview
-    if tile.type == "static" then
-        local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, self.preview.image:getDimensions())
-        self.preview:addQuad(quad)
-        p.x, p.y, p.width, p.height = tile.x, tile.y, tile.w, tile.h
-    elseif tile.type == "animated" then
-        local iw, ih = self.preview.image:getDimensions()
-        for _, tile in ipairs(tile.tiles) do
-            local quad = lg.newQuad(tile.x, tile.y, tile.w, tile.h, iw, ih)
-            self.preview:addQuad(quad, tile.time)
+    if tile then
+        if tile.type == "static" then
+            self.preview:addQuad(tile.quad)
+            p.x, p.y, p.width, p.height = tile.x, tile.y, tile.w, tile.h
+        elseif tile.type == "animated" then
+            for _, tile in ipairs(tile.quads) do
+                self.preview:addQuad(tile.quad, tile.time)
+            end
+            local quad1 = tile.quads[1]
+            p.x, p.y, p.width, p.height = quad1.x, quad1.y, quad1.w, quad1.h
+        else
+            error("You shouldn't reach here: tabBitmask.lua")
         end
-        p.x, p.y, p.width, p.height = tile.tiles[1].x, tile.tiles[1].y, tile.tiles[1].w, tile.tiles[1].h
-    else
-        error("You shouldn't reach here: tabBitmask.lua")
     end
 end
 
 tabBitmask.setPreviewToBit = function(self, bit)
     if window.tileset and self.tile and self.tile.tiles[bit] then
-        local id = self.tile.tiles[bit]
-        local tile = global.editorSession:getTile(id, window.tileset)
-        self:setTileToPreview(tile)
+        self:setTileToPreview(self.tile.tiles[bit])
     else
         self.preview:resetQuads()
         local p = window.preview
@@ -167,7 +162,7 @@ tabBitmask.createUI = function(self)
             self.numberSelect.max = 15
             self.preview:setActiveTiles(15)
             self:setPreviewToBit(15)
-            self.tile.tileCount = 15
+            self.tile.bitType = 15
         end
     end)
     self:addChild(self.check16)
@@ -179,10 +174,10 @@ tabBitmask.createUI = function(self)
     self.check48:setValueChangedCallback(function(_, selected)
         if selected then
             self.preview:drawEvenDirectionsOnly(false)
-            self.numberSelect:setList(tabBitmask.directions48)
+            self.numberSelect:setList(tileBitmask.directions48)
             self.preview:setActiveTiles(255)
             self:setPreviewToBit(255)
-            self.tile.tileCount = 47
+            self.tile.bitType = 47
         end
     end)
     self.check16:addOwnership(self.check48)
@@ -200,7 +195,7 @@ tabBitmask.createUI = function(self)
             self.preview:setActiveTiles(255)
             self:setPreviewToBit(255)
             if self.tile then
-                self.tile.tileCount = 255
+                self.tile.bitType = 255
             end
         end
     end)
@@ -237,7 +232,7 @@ tabBitmask.createUI = function(self)
         if not window.bitmaskEditing then
             window.bitmaskEditing = true
             
-            self.tile = {type="bitmask", tiles={}, tileCount = self:getTileCount()}
+            self.tile = tileBitmask.new({}, self:getBitType())
             global.editorSession:addTile(self.tile, window.tileset)
             
             self:setState("edit", true)
