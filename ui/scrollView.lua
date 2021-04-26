@@ -34,10 +34,11 @@ scrollView.addChild = function(self, child)
     end
     
     insert(self.children, child)
-    self.children.count = self.children.count + 1
     child.parent = self
     
-    local num = self.children.count - 1
+    local num = self.children.count 
+    self.children.count = self.children.count + 1
+    child.parentIndex = self.children.count
     
     child.anchor.x = num * self.widthDistance
     child.anchor.y = num * self.heightDistance
@@ -45,6 +46,28 @@ scrollView.addChild = function(self, child)
     self:getAnchorUpdate()
     
     self.actualHeight = child.anchor.y + child.anchor.height.max
+end
+
+scrollView.move = function(self, child, distance)
+    local target = child.parentIndex + distance
+    if target == child.parentIndex or target < 1 or target > self.children.count then
+        return
+    end
+    
+    local targetChild = self.children[target]
+    
+    local x, y = child.anchor.x, child.anchor.y
+    child.anchor.x, child.anchor.y = targetChild.anchor.x, targetChild.anchor.y
+    targetChild.anchor.x, targetChild.anchor.y = x, y
+    
+    local index = child.parentIndex
+    child.parentIndex = target
+    targetChild.parentIndex = index
+    
+    self.children[target] = child
+    self.children[index] = targetChild
+    
+    self:getAnchorUpdate()
 end
 
 scrollView.empty = function(self)
