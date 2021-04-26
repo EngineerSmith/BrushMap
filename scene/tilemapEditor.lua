@@ -1,5 +1,7 @@
 local scene = {}
 
+local global = require("global")
+
 local editorWindow = require("scene.ui.tilemapEditor")
 local touchController = require("input.touch").new()
 local grid = require("utilities.tilemapGrid").new(16, 16)
@@ -13,10 +15,8 @@ scene.load = function()
 end
 
 scene.update = function(dt)
-    editorWindow:update(dt)
-end
-
-scene.update = function(dt)
+    global.editorSession:update(dt)
+    
     editorWindow:update(dt)
     
     touchController:update()
@@ -27,6 +27,9 @@ scene.draw = function()
     local x = touchController.x * s
     local y = touchController.y * s
     local w,h = love.graphics.getDimensions()
+    
+    global.editorSession.tilemap:draw(x, y)
+    
     grid:draw(x, y, w, h, s)
     
     editorWindow:draw()

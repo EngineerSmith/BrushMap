@@ -4,6 +4,7 @@ session.__index = session
 local lg = love.graphics
 
 local list = require("utilities.list")
+local tilemap = require("tilemap.map")
 
 local insert, remove = table.insert, table.remove
 
@@ -11,6 +12,7 @@ session.new = function()
     local self = setmetatable({}, session)
     
     self.tilesets = list.new()
+    self.tilemap = tilemap.new()
     self.static, self.animated, self.bitmask = 0, 0, 0
     
     return self

@@ -11,7 +11,7 @@ layer.new = function(w, h, name)
         tileCount = 0,
         tiles = {},
         hash = {},
-        w, h, x, y
+        w, h, x, y,
         canvas
     }, layer)
     self:resize(w, h)
@@ -85,7 +85,7 @@ layer.addBitScore = function(self, x, y)
         local id = getHashId(x-1, y+1)
         if id and tiles[id].tileData == tileData then
             score = score + 64
-            tiles[id].score - tiles[id].score + 16
+            tiles[id].score = tiles[id].score + 16
         end
     end
     -- NORTH WEST
@@ -148,7 +148,7 @@ layer.removeBitScore = function(self, x, y, oldTileData)
     if type == 255 or (S and W) then
         local id = getHashId(x-1, y+1)
         if id and tiles[id].tileData == oldTileData then
-            tiles[id].score - tiles[id].score - 16
+            tiles[id].score = tiles[id].score - 16
         end
     end
     -- NORTH EAST
@@ -209,7 +209,7 @@ layer.removeTile = function(self, x, y)
 end
 
 layer.getTile = function(self, x, y)
-    local index self.hash[getHashId(x, y)]
+    local index = self.hash[getHashId(x, y)]
     return index and self.tiles[index] or nil
 end
 
