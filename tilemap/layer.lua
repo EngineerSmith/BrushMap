@@ -216,7 +216,7 @@ end
 layer.resize = function(self, w, h)
     if self.w ~= w or self.h ~= h then
         self.w, self.h = w, h
-        self.canavs = lg.newCanvas(w, h)
+        self.canvas = lg.newCanvas(w, h)
     end
 end
 

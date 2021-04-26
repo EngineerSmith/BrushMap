@@ -16,7 +16,9 @@ end
 
 map.newLayer = function(self, name)
     local _,_,w,h = love.window.getSafeArea()
-    insert(self.layers, layer.new(w, h, name))
+    local layer = layer.new(w, h, name)
+    insert(self.layers, layer)
+    return layer
 end
 
 map.draw = function(self, x, y)
