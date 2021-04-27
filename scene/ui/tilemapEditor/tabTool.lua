@@ -5,6 +5,7 @@ local global = require("global")
 local anchor = require("ui.base.anchor")
 local button = require("ui.button")
 local shape = require("ui.shape")
+local tilePreviewGrid = require("ui.tilePreviewGrid")
 
 return function(font, controller, window)
 local tabTool = tabWindow.new("Tools", font, controller)
@@ -23,6 +24,9 @@ tabTool.createUI = function(self)
     local anchor = anchor.new("NorthWest", 10,90, -1,5, 20,0)
     self:addChild(shape.new(anchor, "Rectangle", {.4,.4,.4}, "fill"))
     
+    local anchor = anchor.new("NorthWest", 10,100, -1,-1,20,0)
+    local tilePreviewGrid = tilePreviewGrid.new(anchor, global.editorSession.tilesets, font)
+    self:addChild(tilePreviewGrid)
 end
 
 return tabTool

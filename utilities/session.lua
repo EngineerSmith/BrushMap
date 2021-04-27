@@ -36,6 +36,11 @@ session.getUniqueId = function()
     return id
 end
 
+local function splitFilename(strFilename)
+  -- Returns the Path, Filename, and Extension as 3 values
+  return string.match(strFilename, "(.-)([^/]-([^/%.]+))$")
+end
+
 --TODO copy to save dir
 --TODO if failed to load
 session.addTileset = function(self, path)
@@ -51,8 +56,10 @@ session.addTileset = function(self, path)
     local image = lg.newImage(path)
     image:setFilter("nearest","nearest")
     image:setWrap("clampzero")
+    local _,name,_ = splitFilename(path)
     local tileset = {
         path = path,
+        name = name,
         image = image,
         tiles = list.new(),
         id = self.getUniqueId()
