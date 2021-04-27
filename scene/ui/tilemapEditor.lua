@@ -29,4 +29,10 @@ controllerEast.tabLayer = require("scene.ui.tilemapEditor.tabLayer")(font, contr
 controllerEast.tabLayer:createUI()
 controllerEast:addChild(controllerEast.tabLayer)
 
+--[[ TAB TOOL ]]
+controllerEast.tabTool = require("scene.ui.tilemapEditor.tabTool")(font, controllerEast, window)
+
+controllerEast.tabTool:createUI()
+controllerEast:addChild(controllerEast.tabTool)
+
 return window

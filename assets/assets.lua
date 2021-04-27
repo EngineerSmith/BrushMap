@@ -21,6 +21,7 @@ local assets = {
     {"icon.stack.128", "icons/stack-128.png"},
     {"icon.disc.128", "icons/compact-disc-128.png"},
     {"icon.plus", "icons/plus.png"},
+    {"icon.brush", "icons/paint-brush.png"},
     {"texture.checkerboard", "textures/checkerboard.png", onLoad=pixelArt}
     --EXAMPLE {"icon.pixel", "pixel.png", onLoad=pixelArt},
 }

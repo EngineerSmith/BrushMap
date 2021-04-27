@@ -24,6 +24,8 @@ layerPreview.new = function(layer, width, font)
     
     local anchor = anchor.new("SouthWest", 15,5, 30,30)
     self.trash = button.new(anchor, color, function()
+        
+        return true
     end)
     self.trash:setText("T", nil, font)
     self:addChild(self.trash)
@@ -37,8 +39,8 @@ layerPreview.new = function(layer, width, font)
             local t = self.layer.map.layers[index]
             layers[index] = layers[target]
             layers[target] = t
-            return true
         end
+        return true
     end)
     self.upButton:setText("^", nil, font)
     self:addChild(self.upButton)
@@ -51,8 +53,8 @@ layerPreview.new = function(layer, width, font)
             local t = self.layer.map.layers[index]
             layers[index] = layers[target]
             layers[target] = t
-            return true
         end
+        return true
     end)
     
     self.downButton:setText("v", nil, font)
