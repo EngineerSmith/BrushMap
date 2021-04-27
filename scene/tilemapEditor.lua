@@ -2,6 +2,8 @@ local scene = {}
 
 local global = require("global")
 
+local lg = love.graphics
+
 local editorWindow = require("scene.ui.tilemapEditor")
 local touchController = require("input.touch").new()
 local grid = require("utilities.tilemapGrid").new(16, 16)
@@ -36,8 +38,9 @@ scene.draw = function()
     
     editorWindow:draw()
     
-    local str = str or "" -- debug, global str
-    love.graphics.print(str, 100,50)
+    lg.setColor(1,1,1)
+    local str = str2 or "" -- debug, global str
+    lg.print(str, 100,50)
 end
 
 scene.touchpressed = function(...)

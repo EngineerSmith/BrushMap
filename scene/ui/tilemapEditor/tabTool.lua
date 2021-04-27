@@ -24,7 +24,7 @@ tabTool.createUI = function(self)
     local anchor = anchor.new("NorthWest", 10,90, -1,5, 20,0)
     self:addChild(shape.new(anchor, "Rectangle", {.4,.4,.4}, "fill"))
     
-    local anchor = anchor.new("NorthWest", 10,100, -1,-1,20,0)
+    local anchor = anchor.new("NorthWest", 5,100, -1,-1)
     local tilePreviewGrid = tilePreviewGrid.new(anchor, global.editorSession.tilesets, font)
     self:addChild(tilePreviewGrid)
 end
