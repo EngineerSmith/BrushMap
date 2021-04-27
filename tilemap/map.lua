@@ -9,7 +9,8 @@ local insert = table.insert
 map.new = function(tilesize)
     local self = setmetatable({
         tilesize = tilesize or 16,
-        layers = {}
+        layers = {},
+        activeLayer = nil
     }, map)
     return self
 end
@@ -18,7 +19,18 @@ map.newLayer = function(self, name)
     local _,_,w,h = love.window.getSafeArea()
     local layer = layer.new(w, h, name)
     insert(self.layers, layer)
+    self.activeLayer = layer
+    self.activeLayer.selected = true
+    layer.map = self
     return layer
+end
+
+map.selectLayer = function(self, layer)
+    for _, v in ipairs(self.layers) do
+        v.selected = false
+    end
+    self.activeLayer = layer
+    layer.selected = true
 end
 
 map.draw = function(self, x, y)

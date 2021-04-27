@@ -19,6 +19,7 @@ tabLayers.createUI = function(self)
         local l = global.editorSession.tilemap:newLayer("Layer "..layerCounter)
         local layer = layerPreview.new(l, 240, font)
         sv:addChild(layer)
+        return false
     end)
     newLayer:setText("New Layer", nil, font)
     self:addChild(newLayer)

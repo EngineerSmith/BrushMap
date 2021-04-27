@@ -51,7 +51,7 @@ end
 scrollView.move = function(self, child, distance)
     local target = child.parentIndex + distance
     if target == child.parentIndex or target < 1 or target > self.children.count then
-        return
+        return false
     end
     
     local targetChild = self.children[target]
@@ -68,6 +68,7 @@ scrollView.move = function(self, child, distance)
     self.children[index] = targetChild
     
     self:getAnchorUpdate()
+    return true
 end
 
 scrollView.empty = function(self)

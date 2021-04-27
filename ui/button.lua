@@ -122,6 +122,7 @@ button.touchreleasedElement = function(self, id, pressedX, pressedY, dx, dy, pre
     if key ~= -1 then
         if self.active and aabb(pressedX, pressedY, self.anchor:getRect()) then
             local result = self:callbackReleased()
+            remove(self.touches, key)
             return result ~= nil and result or true
         end
         remove(self.touches, key)
