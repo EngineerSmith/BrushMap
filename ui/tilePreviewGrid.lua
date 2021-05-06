@@ -14,6 +14,7 @@ tilePreviewGrid.new = function(anchor, tilesets, font)
 end
 
 local tileSize = 42
+local tileSizeWithSpacing = tileSize + 5
 
 tilePreviewGrid.drawElement = function(self)
     local x,y,w,h = self.anchor:getRect()
@@ -28,15 +29,15 @@ tilePreviewGrid.drawElement = function(self)
         for j, tile in ipairs(tileset.tiles.items) do
             j = j -1
             if j ~= 0 and j % row == 0 then
-                lg.translate(0, tileSize + 5)
+                lg.translate(0, tileSizeWithSpacing)
             end
             if tile.type == "static" then
                 local sw = tileSize / tile.w
                 local sh = tileSize / tile.h
-                lg.draw(tileset.image, tile.quad, (j % row)*(tileSize+5),0, 0, sw, sh)
+                lg.draw(tileset.image, tile.quad, (j % row)*tileSizeWithSpacing,0, 0, sw, sh)
             end
         end
-        lg.translate(0, tileSize+5)
+        lg.translate(0, tileSizeWithSpacing)
     end
     lg.pop()
 end
@@ -66,28 +67,32 @@ tilePreviewGrid.touchpressedElement = function(self, id, pressedX, pressedY, ...
             end
             
             local itemCount = #tileset.tiles.items
-            local rowCount = itemCount / row
-            if pressedY - ((tileSize+5)*rowCount) < 0 then
+            local rowCount = math.ceil(itemCount / row)
+            if pressedY - (tileSizeWithSpacing*rowCount) < 0 then
                 for j, tile in ipairs(tileset.tiles.items) do
-                    j = j -1
-                    local r = j % row
-                    if j ~= 0 and r == 0 then
-                        pressedY = pressedY - (tileSize+5)
+                    j = j - 1
+                    if j ~= 0 and j % row == 0 then
+                        pressedY = pressedY - tileSizeWithSpacing
                     end
-                    if pressedY > 0 and pressedY <= tileSize+5 then
-                        local pressedX = pressedX - (r*(tileSize+5))
-                        if pressedX > 0 and pressedX <= tileSize then
+                    if pressedY > 0 and pressedY <= tileSizeWithSpacing then
+                        local x = pressedX - ((j % row)*tileSizeWithSpacing)
+                        
+                        if x > 0 and x <= tileSizeWithSpacing then
                             str2 = "ID: " .. tile.id
+                            str2 = string.format(str2 .. "\n %.2f:%.2f", x, pressedY)
                             return true
                         end
                     end
                 end
             end
-            pressedY = pressedY - (tileSize+5)
+            pressedY = pressedY - tileSizeWithSpacing*2
         end
     
         --insert(self.touches, {id=id, x=pressedX, y=pressedY})
+        str2 = string.format("Hit 4\n %.2f : %.2f", pressedX ,pressedY)
+        return false
     end
+    str2 = string.format("Hit 3 \n %.1f:%.1f, %.0f:%.0f %.0f:%.0f", pressedX, pressedY, self.anchor:getRect())
     return false
 end
 
