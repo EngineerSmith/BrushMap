@@ -2,7 +2,7 @@ local global = require("global")
 
 local lg = love.graphics
 
-local tileAnimated = require("tilemap/tileAnimated")
+local tileAnimated = require("tilemap.tileAnimated")
 
 local tabWindow = require("ui.tabWindow")
 local anchor = require("ui.base.anchor")

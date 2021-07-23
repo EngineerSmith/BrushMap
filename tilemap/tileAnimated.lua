@@ -21,19 +21,24 @@ tileAnimated.setQuads = function(self, quads)
     end
 end
 
+tileAnimated.getSize = function(self)
+    local q = self.quads[self.index]
+    return q.w, q.h
+end
+
 tileAnimated.update = function(self, dt)
     self.currentTime = self.currentTime + dt
     while self.currentTime >= self.quads[self.index].time do
         self.currentTime = self.currentTime - self.quads[self.index].time
         self.index = self.index + 1
         if self.index > #self.quads then
-            self.indx = 1
+            self.index = 1
         end
     end
 end
 
-tileAnimated.draw = function(self)
-    lg.draw(self.tileset.image, self.quads[self.index].quad) 
+tileAnimated.draw = function(self, ...)
+    lg.draw(self.tileset.image, self.quads[self.index].quad, ...)
 end
 
 return tileAnimated

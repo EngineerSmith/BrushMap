@@ -25,16 +25,23 @@ tilePreviewGrid.drawElement = function(self)
         lg.setColor(.7,.7,.7)
         lg.print(tileset.name, self.font)
         lg.translate(0, self.font:getHeight() + 2)
-        lg.setColor(1,1,1)
         for j, tile in ipairs(tileset.tiles.items) do
             j = j -1
             if j ~= 0 and j % row == 0 then
                 lg.translate(0, tileSizeWithSpacing)
             end
+            lg.setColor(.8,.8,.8)
+            lg.rectangle("fill", (j % row)*tileSizeWithSpacing, 0, tileSize, tileSize)
+            lg.setColor(1,1,1)
             if tile.type == "static" then
                 local sw = tileSize / tile.w
                 local sh = tileSize / tile.h
                 lg.draw(tileset.image, tile.quad, (j % row)*tileSizeWithSpacing,0, 0, sw, sh)
+            elseif tile.type == "animated" then
+                local w, h = tile:getSize()
+                local sw = tileSize / w
+                local sh = tileSize / h
+                tile:draw((j % row)*tileSizeWithSpacing,0, 0, sw, sh)
             end
         end
         lg.translate(0, tileSizeWithSpacing)
