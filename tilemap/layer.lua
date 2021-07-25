@@ -171,7 +171,7 @@ layer.setTile = function(self, x, y, tileData, tags)
         end
         tile.tileData = tileData
         tile.tags = tags or {}
-        if tyle.tileData.type == "bitmask" then
+        if tile.tileData.type == "bitmask" then
             self:addBitScore(x, y)
         end
     else
