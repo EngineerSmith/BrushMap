@@ -15,9 +15,9 @@ tilePreviewGrid.new = function(anchor, tilesets, font)
     self.scrollY = 0
     self.scrollLimit = 0
     self.maskFunction = maskFunction or function()
-        local x,y, width,height = self.anchor:getRect()
-        lg.rectangle("fill", x,y, width,height)
+        lg.rectangle("fill", self.anchor:getRect())
     end
+    self.selectedTile = nil
     return self
 end
 
@@ -35,6 +35,10 @@ end
 local tileSize = 42
 local tileSizeWithSpacing = tileSize + 5
 
+tilePreviewGrid.getFontHeight = function(self)
+    return self.font:getHeight() + 2
+end
+
 tilePreviewGrid.drawElement = function(self)
     local x,y,w,h = self.anchor:getRect()
     local row = floor(w / tileSize)
@@ -46,10 +50,9 @@ tilePreviewGrid.drawElement = function(self)
     self.scrollLimit = 0
     lg.setColor(1,1,1)
     for i, tileset in ipairs(self.tilesets.items) do
-        lg.setColor(.7,.7,.7)
         lg.print(tileset.name, self.font)
-        lg.translate(0, self.font:getHeight() + 2)
-        self.scrollLimit = self.scrollLimit + self.font:getHeight() + 2
+        lg.translate(0, self:getFontHeight())
+        self.scrollLimit = self.scrollLimit + self:getFontHeight()
         for j, tile in ipairs(tileset.tiles.items) do
             j = j -1
             if j ~= 0 and j % row == 0 then
@@ -66,7 +69,14 @@ tilePreviewGrid.drawElement = function(self)
                 local sh = tileSize / h
                 tile:draw((j % row)*tileSizeWithSpacing,0, 0, sw, sh)
             end
+            local selected = self.selectedTile == tile
+            if selected then
+                lg.setColor(1,0.2,0.2)
+            end
             lg.rectangle("line", (j % row)*tileSizeWithSpacing, 0, tileSize, tileSize)
+            if selected then
+                lg.setColor(1,1,1)
+            end
         end
         lg.translate(0, tileSizeWithSpacing)
         self.scrollLimit = self.scrollLimit + tileSizeWithSpacing
@@ -115,6 +125,8 @@ tilePreviewGrid.touchmovedElement = function(self, id, x, y, ...)
     end
 end
 
+local f = floor
+
 tilePreviewGrid.touchreleasedElement = function(self, id, pressedX, pressedY, ...)
     local key, touch = getTouch(self.touches, id)
     if key ~= -1 then
@@ -129,17 +141,19 @@ tilePreviewGrid.touchreleasedElement = function(self, id, pressedX, pressedY, ..
                 pressedX = pressedX - x 
                 pressedY = pressedY - y - self.scrollY
                 
-                if pressedX < 0 or pressedY < 0 or pressedX > w then
+                if pressedX < 0 or pressedY < 0 or pressedX > w and pressedY > h then
                     return false
                 end
+                
                 for i, tileset in ipairs(self.tilesets.items) do
-                    pressedY = pressedY - (self.font:getHeight() + 2)
+                    pressedY = pressedY - self:getFontHeight()
                     if pressedY < 0 then
                         return false
                     end
                     
-                    local itemCount = #tileset.tiles.items
+                    local itemCount = tileset.tiles.size
                     local rowCount = math.ceil(itemCount / row)
+                    
                     if pressedY - (tileSizeWithSpacing*rowCount) < 0 then
                         for j, tile in ipairs(tileset.tiles.items) do
                             j = j - 1
@@ -151,17 +165,19 @@ tilePreviewGrid.touchreleasedElement = function(self, id, pressedX, pressedY, ..
                                 
                                 if x > 0 and x <= tileSizeWithSpacing then
                                     str2 = "ID: " .. tile.id
-                                    str2 = string.format(str2 .. "\n %.2f:%.2f", x, pressedY)
+                                    self.selectedTile = tile
                                     return true
                                 end
                             end
                         end
+                    else
+                        pressedY = pressedY - tileSizeWithSpacing*rowCount
                     end
-                    pressedY = pressedY - tileSizeWithSpacing
                 end
             end
             return true
         end
+        self.selectedTile = nil
         remove(self.touches, key)
         return false
     end

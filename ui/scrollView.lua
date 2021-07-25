@@ -17,8 +17,7 @@ scrollView.new = function(anchor, widthDistance, heightDistance, maskFunction)
     self.heightDistance = heightDistance or 10
     
     self.maskFunction = maskFunction or function()
-        local x,y, width,height = self.anchor:getRect()
-        lg.rectangle("fill", x,y, width,height)
+        lg.rectangle("fill", self.anchor:getRect())
     end
     
     self.offsetX, self.offsetY = 0,0
