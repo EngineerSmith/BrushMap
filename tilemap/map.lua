@@ -35,7 +35,7 @@ end
 
 map.draw = function(self, x, y)
     for _, layer in ipairs(self.layers) do
-        layer:draw(self.tileset, x, y)
+        layer:draw(self.tilesize, x, y)
         lg.draw(layer.canvas)
     end
 end

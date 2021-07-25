@@ -162,8 +162,10 @@ tilePreviewGrid.touchreleasedElement = function(self, id, pressedX, pressedY, ..
                                 local x = pressedX - ((j % row)*tileSizeWithSpacing)
                                 
                                 if x > 0 and x <= tileSizeWithSpacing then
-                                    str2 = "ID: " .. tile.id
                                     self.selectedTile = tile
+                                    if self.CBSelectTile then
+                                       self:CBSelectTile(tile)
+                                    end
                                     return true
                                 end
                             end

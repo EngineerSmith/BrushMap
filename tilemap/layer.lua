@@ -164,8 +164,8 @@ layer.setTile = function(self, x, y, tileData, tags)
     local id = getHashId(x, y)
     local index = self.hash[id]
     local tile
-    if index then
-        tile = self.tiles[id]
+    if index ~= nil then
+        tile = self.tiles[index]
         if tile.tileData.type == "bitmask" then
             self:removeTile(x, y, tile.tileData)
         end

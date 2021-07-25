@@ -58,6 +58,9 @@ tabTool.createUI = function(self)
     
     local anchor = anchor.new("NorthWest", 5,100, -1,-1)
     local tilePreviewGrid = tilePreviewGrid.new(anchor, global.editorSession.tilesets, font)
+    tilePreviewGrid.CBSelectTile = function(_, tile)
+        window.selectedTile = tile
+    end
     self:addChild(tilePreviewGrid)
 end
 

@@ -51,6 +51,12 @@ scene.touchpressed = function(...)
     if editorWindow.selectedTool == "move" then
         touchController:touchpressed(...)
     end
+    if editorWindow.selectedTool == "brush" then
+        local l = global.editorSession.tilemap.activeLayer
+        if l then
+            l:setTile(0, 0, editorWindow.selectedTile)
+        end
+    end
 end
 
 scene.touchmoved = function(...)
