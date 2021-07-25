@@ -20,7 +20,7 @@ anchor.new = function(point, x, y, width, height, horizontal, vertical)
     local self = setmetatable({}, anchor)
     
     if point == "Centre" then -- I keep writing it the British way
-        error("Did you mean Center not Centre?")
+        error("Did you mean Center not Centre? We're following American standard")
     end
     
     self.point = anchor.points[point] or error("Anchor requires point")
