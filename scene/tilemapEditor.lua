@@ -23,7 +23,9 @@ scene.update = function(dt)
     
     editorWindow:update(dt)
     
-    touchController:update()
+    if editorWindow.selectedTool == "move" then
+        touchController:update()
+    end
 end
 
 scene.draw = function()
@@ -46,17 +48,23 @@ end
 scene.touchpressed = function(...)
     if editorWindow:touchpressed(...) then
         return end
-    touchController:touchpressed(...)
+    if editorWindow.selectedTool == "move" then
+        touchController:touchpressed(...)
+    end
 end
 
 scene.touchmoved = function(...)
-    touchController:touchmoved(...)
+    if editorWindow.selectedTool == "move" then
+        touchController:touchmoved(...)
+    end
     if editorWindow:touchmoved(...) then
         return end
 end
 
 scene.touchreleased = function(...)
-    touchController:touchreleased(...)
+    if editorWindow.selectedTool == "move" then
+        touchController:touchreleased(...)
+    end
     if editorWindow:touchreleased(...) then
         return end
 end

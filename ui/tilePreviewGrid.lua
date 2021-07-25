@@ -125,8 +125,6 @@ tilePreviewGrid.touchmovedElement = function(self, id, x, y, ...)
     end
 end
 
-local f = floor
-
 tilePreviewGrid.touchreleasedElement = function(self, id, pressedX, pressedY, ...)
     local key, touch = getTouch(self.touches, id)
     if key ~= -1 then
