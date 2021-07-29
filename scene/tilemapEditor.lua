@@ -34,7 +34,7 @@ scene.draw = function()
     local y = touchController.y * s
     local w,h = love.graphics.getDimensions()
     
-    global.editorSession.tilemap:draw(x, y)
+    global.editorSession.tilemap:draw(x, y, s)
     
     grid:draw(x, y, w, h, s)
     
@@ -53,8 +53,10 @@ scene.touchpressed = function(...)
     end
     if editorWindow.selectedTool == "brush" then
         local l = global.editorSession.tilemap.activeLayer
-        if l then
+        if l and editorWindow.selectedTile then
             l:setTile(0, 0, editorWindow.selectedTile)
+        else
+            str2 = "No tile selected!"
         end
     end
 end

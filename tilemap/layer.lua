@@ -220,15 +220,19 @@ layer.resize = function(self, w, h)
     end
 end
 
-layer.draw = function(self, tilesize, x, y)
+layer.draw = function(self, tilesize, x, y, scale)
     self.x, self.y = x, y
     lg.setCanvas(self.canvas)
     lg.clear(0,0,0,0)
     lg.push()
-    lg.translate(-x, -y)
+    lg.origin()
+    lg.translate(x, y)
+    lg.setColor(1,1,1)
     for _, tile in ipairs(self.tiles) do
         lg.push()
+        lg.scale(scale, scale)
         lg.translate(tile.x * tilesize, tile.y * tilesize)
+        str2 = tile.x * tilesize .. ":" ..  tile.y * tilesize .. "\n" .. x .. ":" .. y .. "\n" .. scale
         tile.tileData:draw(tile.score)
         lg.pop()
     end

@@ -33,9 +33,10 @@ map.selectLayer = function(self, layer)
     layer.selected = true
 end
 
-map.draw = function(self, x, y)
+map.draw = function(self, x, y, scale)
+    lg.setColor(1,1,1)
     for _, layer in ipairs(self.layers) do
-        layer:draw(self.tilesize, x, y)
+        layer:draw(self.tilesize, x, y, scale)
         lg.draw(layer.canvas)
     end
 end
