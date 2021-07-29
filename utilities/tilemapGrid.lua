@@ -2,6 +2,7 @@ local grid = {}
 grid.__index = grid
 
 local lg = love.graphics
+local floor = math.floor
 
 grid.new = function(tileW, tileH)
     return setmetatable({
@@ -11,6 +12,10 @@ end
 
 grid.setTileSize = function(self, w, h)
     self.tileW, self.tileH = w, h
+end
+
+grid.positionToTile = function(self, x, y)
+    return floor(x / self.tileW), floor(y / self.tileH)
 end
 
 grid.draw = function(self, x, y, w, h, scale)

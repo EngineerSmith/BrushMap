@@ -8,6 +8,8 @@ local editorWindow = require("scene.ui.tilemapEditor")
 local touchController = require("input.touch").new()
 local grid = require("utilities.tilemapGrid").new(16, 16)
 
+local brush_LastX, brush_LastY = nil, nil
+
 scene.load = function()
     local _,_, w,h = love.window.getSafeArea()
     touchController:setDimensions(w, h)
@@ -45,28 +47,42 @@ scene.draw = function()
     lg.print(str, 100,50)
 end
 
-scene.touchpressed = function(...)
-    if editorWindow:touchpressed(...) then
+scene.touchpressed = function(id, x, y, ...)
+    if editorWindow:touchpressed(id, x, y, ...) then
         return end
     if editorWindow.selectedTool == "move" then
-        touchController:touchpressed(...)
+        touchController:touchpressed(id, x, y, ...)
     end
     if editorWindow.selectedTool == "brush" then
         local l = global.editorSession.tilemap.activeLayer
         if l and editorWindow.selectedTile then
-            l:setTile(0, 0, editorWindow.selectedTile)
+            local px, py = touchController:touchToWorld(x, y)
+            brush_LastX, brush_LastY = grid:positionToTile(px, py)
+            l:setTile(brush_LastX, brush_LastY, editorWindow.selectedTile)
         else
-            str2 = "No tile selected!"
+            str2 = "No " .. (l and "tile" or "layer") .. " selected!"
         end
     end
 end
 
-scene.touchmoved = function(...)
+scene.touchmoved = function(id, x, y, ...)
     if editorWindow.selectedTool == "move" then
-        touchController:touchmoved(...)
+        touchController:touchmoved(id, x, y, ...)
     end
-    if editorWindow:touchmoved(...) then
-        return end
+    if editorWindow.selectedTool == "brush" then
+        local l = global.editorSession.tilemap.activeLayer
+        if l and editorWindow.selectedTile then
+            local px, py = touchController:touchToWorld(x, y)
+            local bx, by = grid:positionToTile(px, py)
+            if bx ~= brush_LastX or by ~= brush_LastY then
+                brush_LastX, brush_LastY = bx, by
+                l:setTile(brush_LastX, brush_LastY, editorWindow.selectedTile)
+            end
+        end
+    end
+    if editorWindow:touchmoved(id, x, y, ...) then
+        return 
+    end
 end
 
 scene.touchreleased = function(...)

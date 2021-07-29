@@ -232,7 +232,6 @@ layer.draw = function(self, tilesize, x, y, scale)
         lg.push()
         lg.scale(scale, scale)
         lg.translate(tile.x * tilesize, tile.y * tilesize)
-        str2 = tile.x * tilesize .. ":" ..  tile.y * tilesize .. "\n" .. x .. ":" .. y .. "\n" .. scale
         tile.tileData:draw(tile.score)
         lg.pop()
     end
