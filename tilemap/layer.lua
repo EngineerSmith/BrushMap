@@ -28,34 +28,34 @@ end
      64, 4, 32,     ]]
 layer.addBitScore = function(self, x, y)
     local tiles = self.tiles
-    local tileData = tiles[getHashId(x, y)].tileData
+    local tileData = tiles[self.hash[getHashId(x, y)]].tileData
     local type = tileData.bitType
     local score = 0
     local N, E, S, W = false, false, false, false
     
     -- NORTH
-    local id = getHashId(x, y-1)
+    local id = self.hash[getHashId(x, y-1)]
     if id and tiles[id].tileData == tileData then
         score = score + 1
         tiles[id].score = tiles[id].score + 4
         N = true
     end
     -- EAST
-    local id = getHashId(x+1, y)
+    local id = self.hash[getHashId(x+1, y)]
     if id and tiles[id].tileData == tileData then
         score = score + 2
         tiles[id].score = tiles[id].score + 8
         E = true
     end
     -- SOUTH
-    local id = getHashId(x, y+1)
+    local id = self.hash[getHashId(x, y+1)]
     if id and tiles[id].tileData == tileData then
         score = score + 4
         tiles[id].score = tiles[id].score + 1
         S = true
     end
     -- WEST
-    local id = getHashId(x-1, y)
+    local id = self.hash[getHashId(x-1, y)]
     if id and tiles[id].tileData == tileData then
         score = score + 8
         tiles[id].score = tiles[id].score + 2
@@ -66,7 +66,7 @@ layer.addBitScore = function(self, x, y)
     end
     -- NORTH EAST
     if type == 255 or (N and E) then
-        local id = getHashId(x+1, y-1)
+        local id = self.hash[getHashId(x+1, y-1)]
         if id and tiles[id].tileData == tileData then
             score = score + 16
             tiles[id].score = tiles[id].score + 64
@@ -74,7 +74,7 @@ layer.addBitScore = function(self, x, y)
     end
     -- SOUTH EAST
     if type == 255 or (S and E) then
-        local id = getHashId(x+1, y+1)
+        local id = self.hash[getHashId(x+1, y+1)]
         if id and tiles[id].tileData == tileData then
             score = score + 32
             tiles[id].score = tiles[id].score + 128
@@ -82,7 +82,7 @@ layer.addBitScore = function(self, x, y)
     end
     -- SOUTH WEST
     if type == 255 or (S and W) then
-        local id = getHashId(x-1, y+1)
+        local id = self.hash[getHashId(x-1, y+1)]
         if id and tiles[id].tileData == tileData then
             score = score + 64
             tiles[id].score = tiles[id].score + 16
@@ -90,7 +90,7 @@ layer.addBitScore = function(self, x, y)
     end
     -- NORTH WEST
     if type == 255 or (N and W) then
-        local id = getHashId(x-1, y-1)
+        local id = self.hash[getHashId(x-1, y-1)]
         if id and tiles[id].tileData == tileData then
             score = score + 128
             tiles[id].score = tiles[id].score + 32
@@ -101,28 +101,28 @@ end
 
 layer.removeBitScore = function(self, x, y, oldTileData)
     local tiles = self.tiles
-    local type = tileData.bitType
+    local type = oldTileData.bitType
     local N, E, S, W = false, false, false, false
     --NORTH
-    local id = getHashId(x, y-1)
+    local id = self.hash[getHashId(x, y-1)]
     if id and tiles[id].tileData == oldTileData then
         tiles[id].score = tiles[id].score - 4
         N = true
     end
     -- EAST
-    local id = getHashId(x+1, y)
+    local id = self.hash[getHashId(x+1, y)]
     if id and tiles[id].tileData == oldTileData then
         tiles[id].score = tiles[id].score - 8
         E = true
     end
     -- SOUTH
-    local id = getHashId(x, y+1)
+    local id = self.hash[getHashId(x, y+1)]
     if id and tiles[id].tileData == oldTileData then
         tiles[id].score = tiles[id].score - 1
         S = true
     end
     -- WEST
-    local id = getHashId(x-1, y)
+    local id = self.hash[getHashId(x-1, y)]
     if id and tiles[id].tileData == oldTileData then
         tiles[id].score = tiles[id].score - 2
         W = true
@@ -132,28 +132,28 @@ layer.removeBitScore = function(self, x, y, oldTileData)
     end
     -- NORTH EAST
     if type == 255 or (N and E) then
-        local id = getHashId(x+1, y-1)
+        local id = self.hash[getHashId(x+1, y-1)]
         if id and tiles[id].tileData == oldTileData then
             tiles[id].score = tiles[id].score - 64
         end
     end
     -- SOUTH EAST
     if type == 255 or (S and E) then
-        local id = getHashId(x+1, y+1)
+        local id = self.hash[getHashId(x+1, y+1)]
         if id and tiles[id].tileData == oldTileData then
             tiles[id].score = tiles[id].score - 128
         end
     end
     -- SOUTH WEST
     if type == 255 or (S and W) then
-        local id = getHashId(x-1, y+1)
+        local id = self.hash[getHashId(x-1, y+1)]
         if id and tiles[id].tileData == oldTileData then
             tiles[id].score = tiles[id].score - 16
         end
     end
     -- NORTH EAST
     if type == 255 or (N and E) then
-        local id = getHashId(x-1, y-1)
+        local id = self.hash[getHashId(x-1, y-1)]
         if id and tiles[id].tileData == oldTileData then
             tiles[id].score = tiles[id].score - 32
         end
@@ -167,7 +167,7 @@ layer.setTile = function(self, x, y, tileData, tags)
     if index ~= nil then
         tile = self.tiles[index]
         if tile.tileData.type == "bitmask" then
-            self:removeTile(x, y, tile.tileData)
+            self:removeBitScore(x, y, tile.tileData)
         end
         tile.tileData = tileData
         tile.tags = tags or {}
@@ -201,7 +201,7 @@ layer.removeTile = function(self, x, y)
     if index then
         local tile = self.tiles[index]
         if tile.tileData.type == "bitmask" then
-            self:removeTile(x, y, tile.tileData)
+            self:removeBitScore(x, y, tile.tileData)
         end
         self.tiles[index] =nil
         self.hash[id] = nil

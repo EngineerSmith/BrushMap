@@ -55,7 +55,10 @@ tileBitmask.draw = function(self, bit)
         if bit > 255 then error("Bit given greater than 255: "..tostring(bit)) end
     end
     
-    self.tiles[bit]:draw()
+    local t = self.tiles[bit]
+    if t then
+        t:draw()
+    end
 end
 
 return tileBitmask
