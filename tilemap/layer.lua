@@ -22,141 +22,91 @@ local getHashId = function(x, y)
     return x .. ":" .. y
 end
 
+
+local scoreTile = function(score, tile, tileData, left, right)
+    if tile and tile.tileData == tileData then
+        tile.score = tile.score + right
+       return true, score + left
+    end
+    return false, score
+end
+
 --[[ bit map
     128, 1, 16,
       8, 0,  2,
      64, 4, 32,     ]]
 layer.addBitScore = function(self, x, y)
     local tiles = self.tiles
-    local tileData = tiles[self.hash[getHashId(x, y)]].tileData
-    local type = tileData.bitType
+    local tileData = self:getTile(x, y).tileData
     local score = 0
     local N, E, S, W = false, false, false, false
     
     -- NORTH
-    local id = self.hash[getHashId(x, y-1)]
-    if id and tiles[id].tileData == tileData then
-        score = score + 1
-        tiles[id].score = tiles[id].score + 4
-        N = true
-    end
+    N, score = scoreTile(score, self:getTile(x, y-1), tileData, 1, 4)
     -- EAST
-    local id = self.hash[getHashId(x+1, y)]
-    if id and tiles[id].tileData == tileData then
-        score = score + 2
-        tiles[id].score = tiles[id].score + 8
-        E = true
-    end
+    E, score = scoreTile(score, self:getTile(x+1, y), tileData, 2, 8)
     -- SOUTH
-    local id = self.hash[getHashId(x, y+1)]
-    if id and tiles[id].tileData == tileData then
-        score = score + 4
-        tiles[id].score = tiles[id].score + 1
-        S = true
-    end
+    S, score = scoreTile(score, self:getTile(x, y+1), tileData, 4, 1)
     -- WEST
-    local id = self.hash[getHashId(x-1, y)]
-    if id and tiles[id].tileData == tileData then
-        score = score + 8
-        tiles[id].score = tiles[id].score + 2
-        W = true
-    end
+    W, score = scoreTile(score, self:getTile(x-1, y), tileData, 8, 2)
+    
+    local type = tileData.bitType
     if type == 15 then
         return score
     end
+    local type47 = type == 47
     -- NORTH EAST
-    if type == 255 or (N and E) then
-        local id = self.hash[getHashId(x+1, y-1)]
-        if id and tiles[id].tileData == tileData then
-            score = score + 16
-            tiles[id].score = tiles[id].score + 64
-        end
+    if type == 255 or (type47 and N and E) then
+        _, score = scoreTile(score, self:getTile(x+1, y-1), tileData, 16, 64)
     end
     -- SOUTH EAST
-    if type == 255 or (S and E) then
-        local id = self.hash[getHashId(x+1, y+1)]
-        if id and tiles[id].tileData == tileData then
-            score = score + 32
-            tiles[id].score = tiles[id].score + 128
-        end
+    if type == 255 or (type47 and S and E) then
+        _, score = scoreTile(score, self:getTile(x+1, y+1), tileData, 32, 128)
     end
     -- SOUTH WEST
-    if type == 255 or (S and W) then
-        local id = self.hash[getHashId(x-1, y+1)]
-        if id and tiles[id].tileData == tileData then
-            score = score + 64
-            tiles[id].score = tiles[id].score + 16
-        end
+    if type == 255 or (type47 and S and W) then
+        _, score = scoreTile(score, self:getTile(x-1, y+1), tileData, 64, 16)
     end
     -- NORTH WEST
-    if type == 255 or (N and W) then
-        local id = self.hash[getHashId(x-1, y-1)]
-        if id and tiles[id].tileData == tileData then
-            score = score + 128
-            tiles[id].score = tiles[id].score + 32
-        end
+    if type == 255 or (type47 and N and W) then
+        _, score = scoreTile(score, self:getTile(x-1, y-1), tileData, 128, 32)
     end
+    
     return score
 end
 
 layer.removeBitScore = function(self, x, y, oldTileData)
-    local tiles = self.tiles
-    local type = oldTileData.bitType
+    local tiles, _ = self.tiles, 0
     local N, E, S, W = false, false, false, false
     --NORTH
-    local id = self.hash[getHashId(x, y-1)]
-    if id and tiles[id].tileData == oldTileData then
-        tiles[id].score = tiles[id].score - 4
-        N = true
-    end
+    N, _ = scoreTile(_, self:getTile(x, y-1), oldTileData, _, -4)
     -- EAST
-    local id = self.hash[getHashId(x+1, y)]
-    if id and tiles[id].tileData == oldTileData then
-        tiles[id].score = tiles[id].score - 8
-        E = true
-    end
+    E, _ = scoreTile(_, self:getTile(x+1, y), oldTileData, _, -8)
     -- SOUTH
-    local id = self.hash[getHashId(x, y+1)]
-    if id and tiles[id].tileData == oldTileData then
-        tiles[id].score = tiles[id].score - 1
-        S = true
-    end
+    S, _ = scoreTile(_, self:getTile(x, y+1), oldTileData, _, -1)
     -- WEST
-    local id = self.hash[getHashId(x-1, y)]
-    if id and tiles[id].tileData == oldTileData then
-        tiles[id].score = tiles[id].score - 2
-        W = true
-    end
+    W, _ = scoreTile(_, self:getTile(x-1, y), oldTileData, _, -2)
+    
+    local type = oldTileData.bitType
     if type == 15 then
         return
     end
+    local type47 = type == 47
     -- NORTH EAST
-    if type == 255 or (N and E) then
-        local id = self.hash[getHashId(x+1, y-1)]
-        if id and tiles[id].tileData == oldTileData then
-            tiles[id].score = tiles[id].score - 64
-        end
+    if type == 255 or (type47 and N and E) then
+        scoreTile(_, self:getTile(x+1, y-1), oldTileData, _, -64)
     end
     -- SOUTH EAST
-    if type == 255 or (S and E) then
-        local id = self.hash[getHashId(x+1, y+1)]
-        if id and tiles[id].tileData == oldTileData then
-            tiles[id].score = tiles[id].score - 128
-        end
+    if type == 255 or (type47 and S and E) then
+        scoreTile(_, self:getTile(x+1, y+1), oldTileData, _, -128)
     end
     -- SOUTH WEST
-    if type == 255 or (S and W) then
-        local id = self.hash[getHashId(x-1, y+1)]
-        if id and tiles[id].tileData == oldTileData then
-            tiles[id].score = tiles[id].score - 16
-        end
+    if type == 255 or (type47 and S and W) then
+        scoreTile(_, self:getTile(x-1, y+1), oldTileData, _, -16)
     end
     -- NORTH EAST
-    if type == 255 or (N and E) then
-        local id = self.hash[getHashId(x-1, y-1)]
-        if id and tiles[id].tileData == oldTileData then
-            tiles[id].score = tiles[id].score - 32
-        end
+    if type == 255 or (type47 and N and E) then
+        scoreTile(_, self:getTile(x-1, y-1), oldTileData, _, -32)
     end
 end
 
