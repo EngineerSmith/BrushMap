@@ -104,8 +104,8 @@ layer.removeBitScore = function(self, x, y, oldTileData)
     if type == 255 or (type47 and S and W) then
         scoreTile(_, self:getTile(x-1, y+1), oldTileData, _, -16)
     end
-    -- NORTH EAST
-    if type == 255 or (type47 and N and E) then
+    -- NORTH WEST
+    if type == 255 or (type47 and N and W) then
         scoreTile(_, self:getTile(x-1, y-1), oldTileData, _, -32)
     end
 end
