@@ -26,14 +26,14 @@ end
 local scoreTile = function(score, tile, tileData, left, right)
     if tile and tile.tileData == tileData then
         tile.score = tile.score + right
-       return true, score + left
+        return true, score + left
     end
     return false, score
 end
 
 --[[ bit map
     128, 1, 16,
-      8, 0,  2,
+      8, T,  2,
      64, 4, 32,     ]]
 layer.addBitScore = function(self, x, y)
     local tiles = self.tiles
@@ -118,11 +118,12 @@ layer.setTile = function(self, x, y, tileData, tags)
         tile = self.tiles[index]
         if tile.tileData.type == "bitmask" then
             self:removeBitScore(x, y, tile.tileData)
+            tile.score = 0
         end
         tile.tileData = tileData
         tile.tags = tags or {}
         if tile.tileData.type == "bitmask" then
-            self:addBitScore(x, y)
+            tile.score = self:addBitScore(x, y)
         end
     else
         local index = self.tileCount + 1
